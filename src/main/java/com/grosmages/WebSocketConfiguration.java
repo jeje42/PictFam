@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.payroll;
+package com.grosmages;
 
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
-	static final String MESSAGE_PREFIX = "/topic";
+	public static final String MESSAGE_PREFIX = "/topic";
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {

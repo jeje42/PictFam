@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.payroll;
-
-import static com.greglturnquist.payroll.WebSocketConfiguration.*;
+package com.grosmages;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.core.annotation.HandleAfterCreate;
@@ -25,6 +23,8 @@ import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+
+import com.grosmages.entities.Employee;
 
 /**
  * @author Greg Turnquist
@@ -47,19 +47,19 @@ public class EventHandler {
 	@HandleAfterCreate
 	public void newEmployee(Employee employee) {
 		this.websocket.convertAndSend(
-				MESSAGE_PREFIX + "/newEmployee", getPath(employee));
+				WebSocketConfiguration.MESSAGE_PREFIX + "/newEmployee", getPath(employee));
 	}
 
 	@HandleAfterDelete
 	public void deleteEmployee(Employee employee) {
 		this.websocket.convertAndSend(
-				MESSAGE_PREFIX + "/deleteEmployee", getPath(employee));
+				WebSocketConfiguration.MESSAGE_PREFIX + "/deleteEmployee", getPath(employee));
 	}
 
 	@HandleAfterSave
 	public void updateEmployee(Employee employee) {
 		this.websocket.convertAndSend(
-				MESSAGE_PREFIX + "/updateEmployee", getPath(employee));
+				WebSocketConfiguration.MESSAGE_PREFIX + "/updateEmployee", getPath(employee));
 	}
 
 	/**

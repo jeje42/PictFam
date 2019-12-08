@@ -1,27 +1,27 @@
 {
-  "name": "spring-data-rest-and-reactjs",
+  "name": "grosmages",
   "version": "0.1.0",
-  "description": "Demo of ReactJS + Spring Data REST",
+  "description": "A kind project to visualise some images",
   "repository": {
     "type": "git",
-    "url": "git@github.com:spring-guides/tut-react-and-spring-data-rest.git"
+    "url": ""
   },
   "keywords": [
     "rest",
-    "hateoas",
+    "jguidon",
     "spring",
     "data",
     "react"
   ],
-  "author": "Greg L. Turnquist",
+  "author": "Jérôme Guidon",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/spring-guides/tut-react-and-spring-data-rest/issues"
+    "url": ""
   },
-  "homepage": "https://github.com/spring-guides/tut-react-and-spring-data-rest",
+  "homepage": "",
   "dependencies": {
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "rest": "^1.3.1",
     "sockjs-client": "^1.0.3",
     "stompjs": "^2.3.3"
@@ -33,8 +33,13 @@
     "@babel/core": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-react": "^7.0.0",
+    "@types/react": "^16.9.15",
+    "@types/react-dom": "^16.9.4",
     "babel-loader": "^8.0.2",
-    "webpack": "^4.19.1",
-    "webpack-cli": "^3.1.0"
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.3",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   }
 }

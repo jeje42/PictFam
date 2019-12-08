@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.payroll;
+package com.grosmages.repositories;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+import com.grosmages.entities.Employee;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-@SpringBootApplication
-public class ReactAndSpringDataRestApplication {
+public interface EmployeeRepository extends PagingAndSortingRepository<Employee, Long> {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ReactAndSpringDataRestApplication.class, args);
-	}
 }
 // end::code[]

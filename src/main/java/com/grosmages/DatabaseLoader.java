@@ -13,35 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.payroll;
+package com.grosmages;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.grosmages.filesscan.FilesUtil;
+import com.grosmages.repositories.EmployeeRepository;
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
 @Component
 public class DatabaseLoader implements CommandLineRunner {
-
+	@Autowired
 	private final EmployeeRepository repository;
+	
+	@Autowired
+	private final PhotoRepository photoRepository;
 
 	@Autowired
-	public DatabaseLoader(EmployeeRepository repository) {
+	private FilesUtil filesUtil;
+	
+	@Autowired
+	public DatabaseLoader(EmployeeRepository repository, PhotoRepository photoRepository) {
 		this.repository = repository;
+		this.photoRepository = photoRepository;
 	}
 
 	@Override
-	public void run(String... strings) throws Exception {
-
-		this.repository.save(new Employee("Frodo", "Baggins", "ring bearer"));
-		this.repository.save(new Employee("Bilbo", "Baggins", "burglar"));
-		this.repository.save(new Employee("Gandalf", "the Grey", "wizard"));
-		this.repository.save(new Employee("Samwise", "Gamgee", "gardener"));
-		this.repository.save(new Employee("Meriadoc", "Brandybuck", "pony rider"));
-		this.repository.save(new Employee("Peregrin", "Took", "pipe smoker"));
+	public void run(String... args) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
+	
 }
 // end::code[]

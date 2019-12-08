@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.payroll;
+package com.grosmages;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-public interface EmployeeRepository extends PagingAndSortingRepository<Employee, Long> {
+@Controller
+public class HomeController {
+
+	@RequestMapping(value = "/")
+	public String index() {
+		return "index";
+	}
 
 }
 // end::code[]

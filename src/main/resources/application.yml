@@ -1,0 +1,7 @@
+spring:
+   data:
+      rest:
+         base-path: /api
+grosmages:
+   folders:
+      images: ["/home/jeje/Pictures"]
