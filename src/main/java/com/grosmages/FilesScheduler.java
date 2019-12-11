@@ -61,8 +61,6 @@ public class FilesScheduler {
 				}
 			});
 		});
-		
-		
 	}
 	
 	private void createPhoto(Path path) {
