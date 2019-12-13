@@ -45,13 +45,12 @@ const Hello = (props: OwnProps) => {
 
     return (
       <div>
+        <h1>Hello !</h1>
+        <Button variant="contained" color="primary">
+          Hello World
+        </Button>
 
-      <h1>Hello !</h1>
-      <Button variant="contained" color="primary">
-        Hello World
-      </Button>
-
-      {photosElem}
+        {photosElem}
       </div>
     )
 }
