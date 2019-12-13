@@ -1,4 +1,5 @@
 import { Photo } from '../../types/Photo'
+
 export const PHOTOS_ADDED = 'PHOTOS_ADDED'
 
 export interface PhotosState {
@@ -7,7 +8,7 @@ export interface PhotosState {
 
 interface AddPhotosAction {
   type: typeof PHOTOS_ADDED
-  photos: Array<Photo>
+  photos: PhotosState
 }
 
 export type PhotoActionTypes = AddPhotosAction

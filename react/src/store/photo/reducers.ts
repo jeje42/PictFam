@@ -4,14 +4,15 @@ const initialState: PhotosState = {
   photos: []
 }
 
-export function photosReducer(
+export function photosReducer (
   state = initialState,
   action: PhotoActionTypes
 ): PhotosState {
   switch (action.type) {
     case PHOTOS_ADDED:
       return {
-        photos: action.photos
+        ...state,
+        ...action.photos
       }
     default:
       return state

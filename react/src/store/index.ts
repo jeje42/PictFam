@@ -1,24 +1,23 @@
-import { createStore, applyMiddleware } from 'redux'
-import { createBrowserHistory } from 'history';
-import { routerMiddleware as createRouterMiddleware } from 'connected-react-router';
-import rootReducer from './root-reducer';
-import { composeEnhancers } from './utils';
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import thunkMiddleware from "redux-thunk";
+import { composeWithDevTools } from "redux-devtools-extension";
 
+import  { photosReducer } from "./photo/reducers";
 
-// browser history
-export const history = createBrowserHistory();
+const rootReducer = combineReducers({
+  photos: photosReducer,
+});
 
-const routerMiddleware = createRouterMiddleware(history);
+export type AppState = ReturnType<typeof rootReducer>;
 
-// configure middlewares
-const middlewares = [routerMiddleware];
-// compose enhancers
-const enhancer = composeEnhancers(applyMiddleware(...middlewares));
+export default function configureStore() {
+  const middlewares = [thunkMiddleware];
+  const middleWareEnhancer = applyMiddleware(...middlewares);
 
-// rehydrate state on app start
-const initialState = {};
+  const store = createStore(
+    rootReducer,
+    composeWithDevTools(middleWareEnhancer)
+  );
 
-// create store
-const store = createStore(rootReducer(history), initialState, enhancer);
-
-export default store;
+  return store;
+}

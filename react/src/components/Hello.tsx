@@ -1,40 +1,47 @@
 import * as React from "react"
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { bindActionCreators, Dispatch } from 'redux';
 import Types from 'MyTypes';
 
 import { loadFromServer } from '../rest/methods'
 import { Photo } from '../types/Photo'
-import { addPhotos } from '../store/photo/actions'
 
-type OwnProps = {
-  photos?: Array<Photo>
+import { AppState } from '../store/index'
+import { addPhotos } from '../store/photo/actions'
+import { PhotosState } from '../store/photo/types'
+
+interface OwnProps {
+  addPhotos: typeof addPhotos
+  photos: PhotosState
 }
 
-const newPhotosHandler = (photos: Array<Photo>) => async (dispatch: Dispatch): Promise<void> => {
-  setTimeout(() => dispatch(addPhotos(photos)), 1000);
-};
-
-const Hello = () => {
-
-    const [photos, setPhotos] = useState<Array<Photo>>(undefined)
-
+const Hello = (props: OwnProps) => {
     useEffect(() => {
       loadFromServer('photos', 100, photosCallback)
     }, [])
 
     const photosCallback = (results: Array<any>) => {
-      let photosLocal = results.map((result: any) => {
-        return {
-          id: result.entity.id,
-          name: result.entity.name
-        }
-      })
-        setPhotos(photosLocal)
+      let photosLocal: PhotosState = {
+        photos: results.map((result: any) => {
+          return {
+            id: result.entity.id,
+            name: result.entity.name
+          }
+        })
+      }
 
-        console.log("Photos")
-        console.log(photosLocal)
+        props.addPhotos(photosLocal)
+    }
+
+    console.log("PhotosInElement")
+    console.log(props.photos.photos)
+    let photosElem = null
+    if(props.photos.photos.length>0) {
+      photosElem = props.photos.photos.map((photo:Photo) => {
+        return (
+          <div>{photo.name}</div>
+        )
+      })
     }
 
     return (
@@ -42,25 +49,16 @@ const Hello = () => {
 
       <h1>Hello !</h1>
 
+      {photosElem}
       </div>
     )
 }
 
-interface State {
-
-
-}
-
-const mapStateToProps = (state: Types.RootState, ownProps: OwnProps) => ({
+const mapStateToProps = (state: AppState) => ({
   photos: state.photos
 })
 
-const mapDispatchToProps = (dispatch: Dispatch<Types.RootAction>) =>
-  bindActionCreators(
-    {
-      onNewPhotos: newPhotosHandler,
-    },
-    dispatch
-  )
-
-export default connect()(Hello)
+export default connect(
+  mapStateToProps,
+  { addPhotos }
+)(Hello);

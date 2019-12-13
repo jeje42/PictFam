@@ -1,9 +1,9 @@
-// import cuid from 'cuid';
-import { action } from 'typesafe-actions';
+import { PhotosState, PHOTOS_ADDED } from "./types";
 
-import { Photo } from '../../types/Photo'
 
-import { PHOTOS_ADDED } from './types';
-
-export const addPhotos = (photos: Array<Photo>) =>
-  action(PHOTOS_ADDED, photos);
+export function addPhotos(newPhotos: PhotosState) {
+  return {
+    type: PHOTOS_ADDED,
+    photos: newPhotos
+  }
+}

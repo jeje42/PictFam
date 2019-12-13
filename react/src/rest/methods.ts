@@ -17,8 +17,6 @@ const loadFromServer = (resource:string, pageSize: number, callback: Function) =
       }).then((schema: any) => {
         // this.schema = schema.entity;
         // this.links = employeeCollection.entity._links;
-        console.log('employeeCollection')
-        console.log(employeeCollection)
         return employeeCollection;
       });
   }).then((employeeCollection: any) => {
