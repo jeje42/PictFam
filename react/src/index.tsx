@@ -1,6 +1,5 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,7 +10,7 @@ import theme from './theme';
 
 const store = configureStore();
 
-import Hello from './components/Hello'
+import Hello from './containers/Welcome'
 
 ReactDOM.render(
     <ThemeProvider theme={theme}>

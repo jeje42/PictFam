@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import Types from 'MyTypes';
 import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { loadFromServer } from '../rest/methods'
 import { Photo } from '../types/Photo'
@@ -10,13 +11,37 @@ import { Photo } from '../types/Photo'
 import { AppState } from '../store/index'
 import { addPhotos } from '../store/photo/actions'
 import { PhotosState } from '../store/photo/types'
+import {ThumnailProps, Thumnail}  from './Thumnail'
+import {MainPhotoProps, MainPhoto}  from './MainPhoto'
 
-interface OwnProps {
+
+interface WelcomeProps {
   addPhotos: typeof addPhotos
   photos: PhotosState
 }
 
-const Hello = (props: OwnProps) => {
+const mainPhotoWidth: string = '50%'
+const useStyles = makeStyles(() => ({
+  mainPhoto: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginBottom: '40px',
+    marginTop: '40px',
+    width: mainPhotoWidth
+  },
+  flexThumbs: {
+    // margin: theme.spacing(6, 0, 3),
+    flexDirection: 'row',
+    display: 'flex',
+    width: '100%',
+    overflowX: 'auto',
+    background: '#949994'
+  },
+}))
+
+const Welcome = (props: WelcomeProps) => {
+  const classes = useStyles();
+
     useEffect(() => {
       loadFromServer('photos', 100, photosCallback)
     }, [])
@@ -34,23 +59,34 @@ const Hello = (props: OwnProps) => {
         props.addPhotos(photosLocal)
     }
 
+    let mainPhotoElem = null
     let photosElem = null
     if(props.photos.photos.length>0) {
+      mainPhotoElem = (
+        <MainPhoto
+          photo={props.photos.photos[0]}
+          width={mainPhotoWidth}
+        />
+      )
+
       photosElem = props.photos.photos.map((photo:Photo) => {
+
         return (
-          <div>{photo.name}</div>
+          <Thumnail photo={photo}>
+          </Thumnail>
         )
       })
     }
 
     return (
       <div>
-        <h1>Hello !</h1>
-        <Button variant="contained" color="primary">
-          Hello World
-        </Button>
+        <div className={classes.mainPhoto}>
+          {mainPhotoElem}
+        </div>
 
-        {photosElem}
+        <div className={classes.flexThumbs}>
+          {photosElem}
+        </div>
       </div>
     )
 }
@@ -62,4 +98,4 @@ const mapStateToProps = (state: AppState) => ({
 export default connect(
   mapStateToProps,
   { addPhotos }
-)(Hello);
+)(Welcome);
