@@ -2,6 +2,7 @@ import * as React from "react"
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import Types from 'MyTypes';
+import Button from '@material-ui/core/Button';
 
 import { loadFromServer } from '../rest/methods'
 import { Photo } from '../types/Photo'
@@ -33,8 +34,6 @@ const Hello = (props: OwnProps) => {
         props.addPhotos(photosLocal)
     }
 
-    console.log("PhotosInElement")
-    console.log(props.photos.photos)
     let photosElem = null
     if(props.photos.photos.length>0) {
       photosElem = props.photos.photos.map((photo:Photo) => {
@@ -48,6 +47,9 @@ const Hello = (props: OwnProps) => {
       <div>
 
       <h1>Hello !</h1>
+      <Button variant="contained" color="primary">
+        Hello World
+      </Button>
 
       {photosElem}
       </div>
