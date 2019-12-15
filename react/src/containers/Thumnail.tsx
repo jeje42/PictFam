@@ -1,5 +1,5 @@
 import * as React from "react"
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles'
 import { Photo } from '../types/Photo'
 
 
@@ -19,7 +19,6 @@ const useStyles = makeStyles(() => ({
     backgroundColor: 'green'
   },
   img: {
-    // margin: theme.spacing(6, 0, 3),
     margin: '10px',
     borderRadius: '5px',
     width: '100px',

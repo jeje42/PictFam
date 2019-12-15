@@ -1,24 +1,16 @@
 import * as React from "react"
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { connect } from 'react-redux'
-import Types from 'MyTypes';
-import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
+import { makeStyles } from '@material-ui/core/styles'
 import { withSize } from 'react-sizeme'
 
 import { loadFromServer } from '../rest/methods'
-import { Photo } from '../types/Photo'
 
 import { AppState } from '../store/index'
 import { addPhotos, selectPhoto, selectNextPhoto, selectPreviousPhoto } from '../store/photo/actions'
 import { PhotosState } from '../store/photo/types'
-import Thumnail  from './Thumnail'
 import ThumnailsGalery from './ThumnailsGalery'
-import {MainPhotoProps, MainPhoto}  from './MainPhoto'
-import Galery from './Galery'
-
+import MainPhoto  from './MainPhoto'
 
 interface WelcomeProps {
   addPhotos: typeof addPhotos,
@@ -29,18 +21,20 @@ interface WelcomeProps {
   size: any
 }
 
-const mainPhotoWidth: string = '50%'
 const useStyles = makeStyles(() => ({
   flexMainContainer: {
-    maxHeight: '100%'
+    height: '100%',
+  },
+  galery: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right:0,
   },
   mainPhoto: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginBottom: '40px',
-    marginTop: '40px',
-    maxWidth: mainPhotoWidth,
-  },
+    marginTop: 'auto',
+    marginBottom: 'auto',
+  }
 }))
 
 const Welcome = (props: WelcomeProps) => {
@@ -70,24 +64,23 @@ const Welcome = (props: WelcomeProps) => {
       mainPhotoElem = (
         <MainPhoto
           photo={props.photos.photos.filter(photo => photo.selected)[0]}
-          width={mainPhotoWidth}
           selectPrevious={props.selectPreviousPhoto}
           selectNext={props.selectNextPhoto}
+          screenWidth={props.size.width}
+          screenHeight={props.size.height}
         />
       )
     }
 
     return (
       <div className={classes.flexMainContainer}>
-
-
-        <ThumnailsGalery
-          screenWidth={props.size.width}
-        />
-
-        <div className={classes.mainPhoto}>
-          {mainPhotoElem}
+        <div className={classes.galery}>
+          <ThumnailsGalery
+            screenWidth={props.size.width}
+          />
         </div>
+
+        {mainPhotoElem}
       </div>
     )
 }

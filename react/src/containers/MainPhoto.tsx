@@ -1,43 +1,64 @@
 import * as React from "react"
-import { makeStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import NavigatePrevIcon from '@material-ui/icons/NavigateBefore';
-import Fab from '@material-ui/core/Fab';
+import { makeStyles } from '@material-ui/core/styles'
 
 import { Photo } from '../types/Photo'
-
+import NavButton from './NavButton'
 
 interface MainPhotoProps {
   photo: Photo,
-  width: string,
   selectPrevious: () => void,
-  selectNext: () => void
+  selectNext: () => void,
+  screenWidth: number,
+  screenHeight: number,
 }
 
 const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
+    const computeImageHeight: () => number = () => {
+      if(props.screenHeight === undefined){
+        return 400
+      }
+
+      //56(thumnailHeight) + 20(thumnailMargin) + 80(mainPhotoMargin)
+      return props.screenHeight - 156
+    }
+
+    const computeImageWidth: () => number = () => {
+      if(props.screenWidth === undefined){
+        return 711
+      }
+
+      //16(marginNavButton) + 56(buttonsWidth)
+      return props.screenWidth - (144)
+    }
+
+    const imageHeight = computeImageHeight()
+    const imageWidth = computeImageWidth()
+
     const useStyles = makeStyles((theme: any) => ({
       flexContainer: {
         display: 'flex',
-        flexDirection: 'row',
         alignItems: 'center',
-        // marginLeft: 'auto',
-        // marginRight: 'auto',
+        justifyContent: 'space-between',
+        height: '100%',
+        paddingTop: '96px',
+        paddingBottom: '20px',
       },
       img: {
-        // margin: theme.spacing(6, 0, 3),
         borderRadius: '5px',
-        // maxWidth: '100%',
-        // maxHeight: '100%',
-        // height: '300px',
-        height: '400px',
-        width: '711px',
+        maxHeight: imageHeight + 'px',
+        maxWidth: imageWidth + 'px',
         objectFit: 'contain',
-        // boxShadow: '5px 10px 10px #1b4f1b',
+        boxShadow: '5px 10px 10px #1b4f1b',
       },
       margin: {
         margin: theme.spacing(1),
       },
+      navPrev: {
+        float: 'left'
+      },
+      navNext: {
+        float: 'right'
+      }
     }))
     const classes = useStyles();
 
@@ -50,25 +71,17 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
 
     return (
         <div className={classes.flexContainer}>
-          <Fab
-            color="primary"
-            aria-label="add"
-            className={classes.margin}
+          <NavButton
             onClick={props.selectPrevious}
-          >
-            <NavigatePrevIcon />
-          </Fab>
+            previous={true}
+          />
           {imgElem}
-          <Fab
-            color="primary"
-            aria-label="add"
-            className={classes.margin}
+          <NavButton
             onClick={props.selectNext}
-          >
-            <NavigateNextIcon />
-          </Fab>
+            previous={false}
+          />
         </div>
     )
 }
 
-export {MainPhoto, MainPhotoProps}
+export default MainPhoto
