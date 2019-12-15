@@ -1,16 +1,15 @@
 package com.grosmages.entities;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,14 +19,15 @@ import lombok.NoArgsConstructor;
 @Component
 @Entity
 @Scope("prototype")
-public class Photo {
+public class Album {
 	private @Id @GeneratedValue Long id;
 	private String name;
-	@JsonIgnore @Nullable @Lob private byte[] thumnail;
-	@JsonIgnore private String path;
 	
-	@ManyToOne
-	private Album album;
+	@OneToMany
+	private List<Photo> photos;
+	
+	@OneToOne
+	private Album parentAlbum;
 	
 	@Override
     public boolean equals(Object obj) {
@@ -35,16 +35,12 @@ public class Photo {
             return false;
         }
 
-        if (!Photo.class.isAssignableFrom(obj.getClass())) {
+        if (!Album.class.isAssignableFrom(obj.getClass())) {
             return false;
         }
 
-        final Photo other = (Photo) obj;
+        final Album other = (Album) obj;
         if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
-            return false;
-        }
-
-        if ((this.path == null) ? (other.path != null) : !this.path.equals(other.path)) {
             return false;
         }
 
@@ -55,7 +51,6 @@ public class Photo {
     public int hashCode() {
         int hash = 3;
         hash = 53 * hash + (this.name != null ? this.name.hashCode() : 0);
-        hash = 53 * hash + (this.path != null ? this.path.hashCode() : 0);
         return hash;
     }
 }
