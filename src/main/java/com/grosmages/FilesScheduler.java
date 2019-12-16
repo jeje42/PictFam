@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.grosmages.constants.Patterns;
+import com.grosmages.entities.Album;
 import com.grosmages.entities.Photo;
 import com.grosmages.filesscan.FilesUtil;
 
@@ -38,6 +39,9 @@ public class FilesScheduler {
 	
 	@Autowired
 	private PhotoRepository photoRepository;
+	
+	@Autowired
+	private AlbumRepository albumRepository;
 	
 	@Autowired
 	private FilesUtil filesUtil;
@@ -85,6 +89,25 @@ public class FilesScheduler {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
+		createCategories(photo);
 		photoRepository.save(photo);
+	}
+	
+	private void createCategories(Photo photo) {
+		Album parentAlbum = null;
+		for(String folder : photo.getPath().split(File.separator)) {
+			if (!folder.equals(photo.getName())) {
+				Album album = albumRepository.findByName(folder);
+				if(album == null) {
+					album = context.getBean(Album.class);
+					album.setName(folder);
+					album.setParentAlbum(parentAlbum);
+					albumRepository.save(album);
+				}
+				parentAlbum = album;
+			} else if (parentAlbum != null) {
+				photo.setAlbum(parentAlbum);
+			}
+		}
 	}
 }
