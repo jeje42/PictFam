@@ -57,6 +57,7 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
       } else if (newIndexEndPhoto >= props.photos.length) {
         newIndexEndPhoto = props.photos.length - 1
         newIndexBeginPhoto = newIndexEndPhoto - numberOfImages
+        if (newIndexBeginPhoto<0) newIndexBeginPhoto = 0
       }
 
       return {
@@ -104,6 +105,8 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
         let indexSelected = props.photos.indexOf(props.photos.filter(photo => photo.selected)[0])
         let numberOfImages: number = computeNumberOfImages(props.screenWidth)
         let newIndexBeginPhoto: number = indexSelected - Math.trunc(numberOfImages/2)
+        if (newIndexBeginPhoto < 0)   newIndexBeginPhoto = 0
+
         let newIndexEndPhoto: number = newIndexBeginPhoto + numberOfImages
 
         let result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages)
@@ -154,6 +157,7 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
     const previousPhotos = () => {
       let numberOfImages: number = computeNumberOfImages(props.screenWidth)
       let newIndexBeginPhoto = indexBeginPhoto - numberOfImages
+      if (newIndexBeginPhoto < 0 ) newIndexBeginPhoto = 0
       let newIndexEndPhoto = newIndexBeginPhoto + numberOfImages
       let result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages)
 
