@@ -132,8 +132,6 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
         photosArrayShowed.push(props.photos[i])
       }
 
-      console.log(indexBeginPhoto + ' ; ' + indexEndPhoto)
-
       thumbsElem = photosArrayShowed.map((photo: Photo) => {
         return (
           <Thumnail

@@ -9,5 +9,6 @@ declare module 'typesafe-actions'
 declare module '@material-ui/*'
 declare module 'clsx'
 declare module 'react-sizeme'
+declare module 'axios'
 
 declare module 'MyTypes'

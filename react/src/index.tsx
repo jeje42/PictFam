@@ -17,9 +17,6 @@ interface AppProps {
 }
 
 const App = (props: AppProps) => {
-  console.log("AppProps")
-  console.log(props.size)
-
   return (
     <Hello compiler="Doudou" framework="Grosminet"></Hello>
   )

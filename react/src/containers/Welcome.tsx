@@ -40,15 +40,15 @@ const useStyles = makeStyles(() => ({
 const Welcome = (props: WelcomeProps) => {
   const classes = useStyles();
     useEffect(() => {
-      loadFromServer('photos', 100, photosCallback)
+      loadFromServer('photos', photosCallback)
     }, [])
 
     const photosCallback = (results: Array<any>) => {
       let photosLocal: PhotosState = {
         photos: results.map((result: any) => {
           return {
-            id: result.entity.id,
-            name: result.entity.name,
+            id: result.id,
+            name: result.name,
             selected: false
           }
         })

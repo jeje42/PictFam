@@ -1,37 +1,14 @@
-import * as when from 'when'
+import axios from 'axios'
 
-import * as client from './client'
-import * as follow from './follow'
+const root = '/api/';
 
-const root: string = '/api';
-
-// 'employees'
-const loadFromServer = (resource:string, pageSize: number, callback: Function) => {
-  follow(client, root, [
-      {rel: resource, params: {size: pageSize}}]
-  ).then((employeeCollection: any) => {
-      return client({
-        method: 'GET',
-        path: employeeCollection.entity._links.profile.href,
-        headers: {'Accept': 'application/schema+json'}
-      }).then((schema: any) => {
-        // this.schema = schema.entity;
-        // this.links = employeeCollection.entity._links;
-        return employeeCollection;
-      });
-  }).then((employeeCollection: any) => {
-    // this.page = employeeCollection.entity.page;
-    return employeeCollection.entity._embedded[resource].map((employee: any) =>
-        client({
-          method: 'GET',
-          path: employee._links.self.href
-        })
-    );
-  }).then((employeePromises: any) => {
-    return when.all(employeePromises);
-  }).done((listResults: any) => {
-    callback(listResults)
-  });
+const loadFromServer = (resource:string, callback: Function) => {
+  axios.get('http://' + window.location.host + root + resource)
+    .then((res:any) => {
+      console.log(res.data._embedded[resource])
+      callback(res.data._embedded[resource])
+    })
+  console.log(window.location.host)
 }
 
 
