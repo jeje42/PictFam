@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.util.StringUtils;
 
 import com.grosmages.constants.Patterns;
 import com.grosmages.entities.Album;
@@ -96,17 +97,19 @@ public class FilesScheduler {
 	private void createCategories(Photo photo) {
 		Album parentAlbum = null;
 		for(String folder : photo.getPath().split(File.separator)) {
-			if (!folder.equals(photo.getName())) {
-				Album album = albumRepository.findByName(folder);
-				if(album == null) {
-					album = context.getBean(Album.class);
-					album.setName(folder);
-					album.setParentAlbum(parentAlbum);
-					albumRepository.save(album);
+			if (!StringUtils.isEmpty(folder)) {
+				if (!folder.equals(photo.getName())) {
+					Album album = albumRepository.findByName(folder);
+					if(album == null) {
+						album = context.getBean(Album.class);
+						album.setName(folder);
+						album.setParentAlbum(parentAlbum);
+						albumRepository.save(album);
+					}
+					parentAlbum = album;
+				} else if (parentAlbum != null) {
+					photo.setAlbum(parentAlbum);
 				}
-				parentAlbum = album;
-			} else if (parentAlbum != null) {
-				photo.setAlbum(parentAlbum);
 			}
 		}
 	}
