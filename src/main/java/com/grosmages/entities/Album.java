@@ -1,9 +1,11 @@
 package com.grosmages.entities;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -24,11 +26,14 @@ public class Album {
 	private @Id @GeneratedValue Long id;
 	private String name;
 	
-	@OneToMany
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "album", cascade = CascadeType.MERGE)
 	private List<Photo> photos;
 	
 	@OneToOne
-	private Album parentAlbum;
+	private Album parent;
+	
+	@OneToMany
+	private Set<Album> sons;
 	
 	@Override
     public boolean equals(Object obj) {

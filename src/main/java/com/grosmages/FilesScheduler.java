@@ -9,6 +9,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
@@ -103,9 +107,23 @@ public class FilesScheduler {
 					if(album == null) {
 						album = context.getBean(Album.class);
 						album.setName(folder);
-						album.setParentAlbum(parentAlbum);
-						albumRepository.save(album);
+						album.setParent(parentAlbum);	
 					}
+					List<Photo> albumPhotos = album.getPhotos();
+					if(albumPhotos == null)	albumPhotos = new ArrayList<Photo>();
+					albumPhotos.add(photo);
+					album.setPhotos(albumPhotos);
+					
+					albumRepository.save(album);
+					
+					if (parentAlbum != null) {
+						Set<Album> sons = new HashSet<>();
+						sons.add(album);
+						parentAlbum.setSons(sons);
+						
+						albumRepository.save(parentAlbum);
+					}
+					
 					parentAlbum = album;
 				} else if (parentAlbum != null) {
 					photo.setAlbum(parentAlbum);
