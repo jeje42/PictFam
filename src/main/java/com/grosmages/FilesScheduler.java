@@ -105,17 +105,21 @@ public class FilesScheduler {
 					if(album == null) {
 						album = context.getBean(Album.class);
 						album.setName(folder);
-						album.setParent(parentAlbum);	
 					}
 					
-					album = albumRepository.save(album);
-										
 					if (parentAlbum != null) {
+						album.setIsRoot(false);
+						album = albumRepository.save(album);
+						
 						Set<Album> sons = new HashSet<>();
 						sons.add(album);
 						parentAlbum.setSons(sons);
 						
+						
 						parentAlbum = albumRepository.save(parentAlbum);
+					} else {
+						album.setIsRoot(true);
+						album = albumRepository.save(album);
 					}
 					
 					parentAlbum = album;

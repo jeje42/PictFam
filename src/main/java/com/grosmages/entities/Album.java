@@ -8,7 +8,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,10 +24,9 @@ public class Album {
 	private @Id @GeneratedValue Long id;
 	private String name;
 	
-	@OneToOne
-	private Album parent;
+	private Boolean isRoot;
 	
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parent", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Album> sons;
 	
 	@Override
