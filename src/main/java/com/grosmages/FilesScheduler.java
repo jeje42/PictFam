@@ -9,9 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -109,19 +107,15 @@ public class FilesScheduler {
 						album.setName(folder);
 						album.setParent(parentAlbum);	
 					}
-					List<Photo> albumPhotos = album.getPhotos();
-					if(albumPhotos == null)	albumPhotos = new ArrayList<Photo>();
-					albumPhotos.add(photo);
-					album.setPhotos(albumPhotos);
 					
-					albumRepository.save(album);
-					
+					album = albumRepository.save(album);
+										
 					if (parentAlbum != null) {
 						Set<Album> sons = new HashSet<>();
 						sons.add(album);
 						parentAlbum.setSons(sons);
 						
-						albumRepository.save(parentAlbum);
+						parentAlbum = albumRepository.save(parentAlbum);
 					}
 					
 					parentAlbum = album;

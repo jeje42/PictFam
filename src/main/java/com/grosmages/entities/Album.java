@@ -1,6 +1,5 @@
 package com.grosmages.entities;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -26,13 +25,10 @@ public class Album {
 	private @Id @GeneratedValue Long id;
 	private String name;
 	
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "album", cascade = CascadeType.MERGE)
-	private List<Photo> photos;
-	
 	@OneToOne
 	private Album parent;
 	
-	@OneToMany
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "parent", cascade = CascadeType.ALL)
 	private Set<Album> sons;
 	
 	@Override
