@@ -1,14 +1,14 @@
-export interface Photo {
+export interface Album {
   id: number,
   name: string,
-  selected: boolean
+  photosId: string[]
 }
 
-export interface PhotoAxios {
+export interface AlbumAxios {
   id: number,
   name: string,
   _links: {
-    album: {
+    photos: {
       href: string
     }
   }
