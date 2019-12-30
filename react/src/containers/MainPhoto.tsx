@@ -1,8 +1,12 @@
 import * as React from "react"
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, createStyles } from '@material-ui/core/styles'
+import clsx from 'clsx';
+import { connect } from 'react-redux'
 
+import { toggleDrawer } from '../store/drawer/actions'
 import { Photo } from '../types/Photo'
 import NavButton from './NavButton'
+import { AppState } from "../store/index";
 
 interface MainPhotoProps {
   photo: Photo,
@@ -10,6 +14,8 @@ interface MainPhotoProps {
   selectNext: () => void,
   screenWidth: number,
   screenHeight: number,
+  drawerWidth: number,
+  openDrawer: boolean
 }
 
 const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
@@ -28,7 +34,7 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
       }
 
       //16(marginNavButton) + 56(buttonsWidth)
-      return props.screenWidth - (144)
+      return props.screenWidth - (200) - (props.openDrawer?props.drawerWidth:0)
     }
 
     const imageHeight = computeImageHeight()
@@ -60,7 +66,44 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
         float: 'right'
       }
     }))
-    const classes = useStyles();
+
+    const useStylesDrawer = makeStyles((theme: any) =>
+      createStyles({
+        content: {
+          flexGrow: 1,
+          padding: theme.spacing(3),
+          transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+          marginLeft: - props.drawerWidth,
+
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: '100%',
+          paddingTop: '96px',
+          paddingBottom: '20px',
+        },
+        contentShift: {
+          transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+          marginLeft: 0,
+
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: '100%',
+          paddingTop: '96px',
+          paddingBottom: '20px',
+        },
+      }),
+    )
+
+    const classes = useStyles()
+    const classesDrawer = useStylesDrawer()
 
     let imgElem = null
     if (props.photo) {
@@ -70,7 +113,12 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
     }
 
     return (
-        <div className={classes.flexContainer}>
+        // <div className={classes.flexContainer}>
+        <div
+          className={clsx(classesDrawer.content, {
+            [classesDrawer.contentShift]: props.openDrawer,
+          })}
+        >
           <NavButton
             onClick={props.selectPrevious}
             previous={true}
@@ -84,4 +132,11 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
     )
 }
 
-export default MainPhoto
+const mapStateToProps = (state: AppState) => ({
+  openDrawer: state.drawer.open
+})
+
+export default connect(
+  mapStateToProps,
+  { toggleDrawer }
+)(MainPhoto)

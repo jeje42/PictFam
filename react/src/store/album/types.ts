@@ -4,12 +4,12 @@ export const ALBUM_ADDED = 'ALBUM_ADDED'
 export const ALBUM_SELECTED = 'ALBUM_SELECTED'
 
 export interface AlbumState {
-  albums: Array<Album>
+  albums: Album[]
 }
 
 interface AddAlbumAction {
   type: typeof ALBUM_ADDED
-  album: Album
+  albums: Album[]
 }
 
 interface SelectAlbumAction {

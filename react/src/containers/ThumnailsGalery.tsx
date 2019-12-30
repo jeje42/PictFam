@@ -1,10 +1,16 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, createStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { AppState } from '../store/index'
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import Toolbar from '@material-ui/core/Toolbar';
+import AppBar from '@material-ui/core/AppBar';
+import clsx from 'clsx';
 
 import { selectPhoto } from '../store/photo/actions'
+import { toggleDrawer } from '../store/drawer/actions'
 import { Photo } from '../types/Photo'
 import Thumnail from './Thumnail'
 import NavButton from './NavButton'
@@ -14,6 +20,9 @@ interface ThumnailsGaleryProps {
   photos: Array<Photo>,
   screenWidth: number,
   selectPhoto: typeof selectPhoto,
+  drawerWidth: number,
+  toggleDrawer: typeof toggleDrawer,
+  openDrawer: boolean
 }
 
 const useStyles = makeStyles(() => ({
@@ -34,17 +43,47 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-const computeNumberOfImages: (number: number) => number = (screenWidth: number) => {
-  if (screenWidth === undefined) {
-     return 10
-  }
-  let widthTrunc = Math.trunc(screenWidth)
-  //16(marginNavButton) + 56(buttonsWidth)
-  return Math.trunc(widthTrunc/(144)) -1
-}
-
 const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
-    const classes = useStyles();
+  const useStylesDrawer = makeStyles((theme: any) =>
+    createStyles({
+      appBar: {
+        transition: theme.transitions.create(['margin', 'width'], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+      },
+      appBarShift: {
+        width: `calc(100% - ${props.drawerWidth}px)`,
+        marginLeft: props.drawerWidth,
+        transition: theme.transitions.create(['margin', 'width'], {
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+      },
+      menuButton: {
+        marginRight: theme.spacing(2),
+      },
+      hide: {
+        display: 'none',
+      },
+    }),
+  )
+
+  const computeNumberOfImages: (number: number) => number = (screenWidth: number) => {
+    if (screenWidth === undefined) {
+       return 10
+    }
+    let widthTrunc = Math.trunc(screenWidth)
+    //8*2(marginNavButton) + 56(buttonsWidth)
+    // 100(image width) + 10*2 (margin)
+    console.log('props.openDrawer')
+    console.log(props.openDrawer)
+    return Math.trunc((widthTrunc - 16 - 112 - (props.openDrawer?props.drawerWidth:0))/(120)) - 2
+  }
+
+
+    const classes = useStyles()
+    const classesDrawer = useStylesDrawer()
 
     const [indexBeginPhoto, setIndexBeginPhoto] = useState(-1)
     const [indexEndPhoto, setIndexEndPhoto] = useState(-1)
@@ -114,7 +153,7 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
         setIndexBeginPhoto(result.newIndexBeginPhoto)
         setIndexEndPhoto(result.newIndexEndPhoto)
       }
-    }, [props.screenWidth])
+    }, [props.screenWidth, props.openDrawer])
 
     const selectPhotoHandler: (photo: Photo) => void = (photo: Photo) => {
       props.selectPhoto(photo)
@@ -164,27 +203,46 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
     }
 
     return (
-      <div className={classes.flexThumbs}>
-        <NavButton
-          onClick={() => previousPhotos()}
-          previous={true}
-        />
+      // <div className={classes.flexThumbs}>
+      <AppBar
+        position="fixed"
+        className={clsx(classesDrawer.appBar, {
+          [classesDrawer.appBarShift]: props.openDrawer,
+        })}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={props.toggleDrawer}
+            edge="start"
+            className={clsx(classesDrawer.menuButton, props.openDrawer && classesDrawer.hide)}
+          >
+            <MenuIcon />
+          </IconButton>
 
-          {thumbsElem}
+          <NavButton
+            onClick={() => previousPhotos()}
+            previous={true}
+          />
 
-        <NavButton
-          onClick={() => nextPhotos()}
-          previous={false}
-        />
-      </div>
+            {thumbsElem}
+
+          <NavButton
+            onClick={() => nextPhotos()}
+            previous={false}
+          />
+        </Toolbar>
+      </AppBar>
     )
 }
 
 const mapStateToProps = (state: AppState) => ({
-  photos: state.photos.photos
+  photos: state.photos.photos,
+  openDrawer: state.drawer.open
 })
 
 export default connect(
   mapStateToProps,
-  { selectPhoto }
+  { selectPhoto, toggleDrawer }
 )(ThumnailsGalery)

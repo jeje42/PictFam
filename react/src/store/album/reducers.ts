@@ -5,7 +5,7 @@ const initialState: AlbumState = {
   albums: []
 }
 
-const albumSelected = (state: AlbumState, newPhotoSelected: Album) => {
+const albumSelected = (state: AlbumState, newAlbumSelected: Album) => {
   return {
     ...state,
     albums: state.albums.map(photo => {
@@ -14,7 +14,7 @@ const albumSelected = (state: AlbumState, newPhotoSelected: Album) => {
   }
 }
 
-export function AlbumsReducer (
+export function albumsReducer (
   state = initialState,
   action: AlbumActionTypes
 ): AlbumState {
@@ -22,7 +22,7 @@ export function AlbumsReducer (
     case ALBUM_ADDED:
       return {
         ...state,
-        ...action.album
+        albums: action.albums
       }
     case ALBUM_SELECTED:
       return albumSelected(state, action.album)

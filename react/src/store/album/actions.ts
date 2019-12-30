@@ -1,11 +1,11 @@
 import { ALBUM_ADDED, ALBUM_SELECTED } from "./types";
 import { Album } from '../../types/Album'
+import { AlbumState } from './types'
 
-
-export function addAlbum(newAlbum: Album) {
+export function addAlbums(newAlbum: AlbumState) {
   return {
     type: ALBUM_ADDED,
-    album: newAlbum
+    albums: newAlbum.albums
   }
 }
 
