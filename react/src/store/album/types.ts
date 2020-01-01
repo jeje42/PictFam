@@ -4,7 +4,8 @@ export const ALBUM_ADDED = 'ALBUM_ADDED'
 export const ALBUM_SELECTED = 'ALBUM_SELECTED'
 
 export interface AlbumState {
-  albums: Album[]
+  albums: Album[],
+  albumIdSelected: number
 }
 
 interface AddAlbumAction {

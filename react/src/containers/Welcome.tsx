@@ -3,14 +3,11 @@ import { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { makeStyles, createStyles, useTheme } from '@material-ui/core/styles'
 import { withSize } from 'react-sizeme'
-import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import Divider from '@material-ui/core/Divider';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import Drawer from '@material-ui/core/Drawer'
+import IconButton from '@material-ui/core/IconButton'
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import Divider from '@material-ui/core/Divider'
 
 import { loadFromDefaultApiServer, loadFromCustomApiServer } from '../rest/methods'
 
@@ -113,7 +110,8 @@ const Welcome = (props: WelcomeProps) => {
             name: result.name,
             selected: false
           }
-        })
+        }),
+        photosSelected: []
       }
 
       props.addPhotos(photosLocal)
@@ -121,10 +119,7 @@ const Welcome = (props: WelcomeProps) => {
     }
 
     const albumsTreeCallback = (resData: any) => {
-      let albumState: AlbumState = {
-        albums: resData
-      }
-      props.addAlbums(albumState)
+      props.addAlbums(resData)
     }
 
     let mainPhotoElem = null

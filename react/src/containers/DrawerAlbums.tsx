@@ -4,36 +4,25 @@ import { connect } from 'react-redux'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
-import { makeStyles, createStyles, useTheme } from '@material-ui/core/styles'
+import { makeStyles, createStyles } from '@material-ui/core/styles'
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
 import { AppState } from '../store/index'
-import { AlbumState } from '../store/album/types'
-import { Album } from "../types/Album";
+import { Album } from '../types/Album'
+import { selectAlbum } from '../store/album/actions'
 
 
 interface DrawerAlbumsProps {
   albums: Array<Album>,
+  selectAlbum: typeof selectAlbum,
+  albumIdSelected: number
 }
 
 interface AlbumsHash {
   [id: number]: boolean
 }
-
-const useStyles = makeStyles((theme: any) =>
-  createStyles({
-    root: {
-      width: '100%',
-      maxWidth: 360,
-      backgroundColor: theme.palette.background.paper,
-    },
-    nested: {
-      paddingLeft: theme.spacing(4),
-    },
-  }),
-)
 
 const recursAlbumOpen = (album: Album, finalObject: AlbumsHash) => {
   finalObject[album.id] = false
@@ -44,7 +33,6 @@ const recursAlbumOpen = (album: Album, finalObject: AlbumsHash) => {
 
 const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
   const [albumsHash, setAlbumsHash] = React.useState({} as AlbumsHash)
-  const classes = useStyles()
 
   const toggleAlbumHash = (idAlbum: number) => {
     let newAlbumHash = {...albumsHash}
@@ -52,6 +40,24 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
     setAlbumsHash(newAlbumHash)
   }
 
+  const handleListAlbumClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    album: Album,
+    toggleAlbum: boolean
+  ) => {
+    if (toggleAlbum) {
+      event.stopPropagation()
+      toggleAlbumHash(album.id)
+    } else {
+      props.selectAlbum(album);
+    }
+  };
+
+  /**
+   * Used to generate an album tree in the drawer.
+   *  - Generates the item (variable item)
+   *  - if the album has sons, generates collapse and the nested by calling generateAlbumLeaf recursively.
+   **/
   const generateAlbumLeaf = (album: Album, albumsHash: AlbumsHash, nestedIndex: number) => {
     const useStyles = makeStyles((theme: any) =>
       createStyles({
@@ -69,10 +75,13 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
         key={album.id}
         button
         className={localClasses.nested}
-        onClick={() => toggleAlbumHash(album.id)}
+        onClick={(event: any) => handleListAlbumClick(event, album, false)}
+        selected={props.albumIdSelected === album.id}
         >
         <ListItemText primary={album.name} />
-        {albumHasSons?(albumsHash[album.id] ? <ExpandLess /> : <ExpandMore />):null}
+        {albumHasSons?(albumsHash[album.id] ?
+          <ExpandLess onClick={(event: any) => handleListAlbumClick(event, album, true)} /> :
+          <ExpandMore onClick={(event: any) => handleListAlbumClick(event, album, true)}/>):null}
       </ListItem>
     )
     let collapse = null
@@ -127,10 +136,11 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
 
 const mapStateToProps = (state: AppState) => ({
   albums: state.albums.albums,
+  albumIdSelected: state.albums.albumIdSelected
 })
 
 export default connect(
   mapStateToProps,
-  {
+  { selectAlbum
   }
 )(DrawerAlbums)

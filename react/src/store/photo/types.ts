@@ -6,7 +6,8 @@ export const PHOTOS_SELECTED_NEXT = 'PHOTOS_SELECTED_NEXT'
 export const PHOTOS_SELECTED_PREVIOUS = 'PHOTOS_SELECTED_PREVIOUS'
 
 export interface PhotosState {
-  photos: Array<Photo>
+  photos: Array<Photo>,
+  photosSelected: Array<Photo>
 }
 
 interface AddPhotosAction {

@@ -2,7 +2,8 @@ import { PhotosState, PhotoActionTypes, PHOTOS_ADDED, PHOTOS_SELECTED, PHOTOS_SE
 import { Photo } from '../../types/Photo'
 
 const initialState: PhotosState = {
-  photos: []
+  photos: [],
+  photosSelected: []
 }
 
 const photoSelected = (state: PhotosState, newPhotoSelected: Photo) => {

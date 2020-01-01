@@ -2,10 +2,10 @@ import { ALBUM_ADDED, ALBUM_SELECTED } from "./types";
 import { Album } from '../../types/Album'
 import { AlbumState } from './types'
 
-export function addAlbums(newAlbum: AlbumState) {
+export function addAlbums(newAlbums: Album[]) {
   return {
     type: ALBUM_ADDED,
-    albums: newAlbum.albums
+    albums: newAlbums
   }
 }
 
