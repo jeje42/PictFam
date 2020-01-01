@@ -10,10 +10,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 
 import { loadFromDefaultApiServer, loadFromCustomApiServer } from '../rest/methods'
 
@@ -24,6 +21,7 @@ import { toggleDrawer } from '../store/drawer/actions'
 import { PhotosState } from '../store/photo/types'
 import { AlbumState } from '../store/album/types'
 import ThumnailsGalery from './ThumnailsGalery'
+import DrawerAlbums from './DrawerAlbums'
 import MainPhoto  from './MainPhoto'
 
 interface WelcomeProps {
@@ -99,8 +97,8 @@ const useStylesDrawer = makeStyles((theme: any) =>
 const Welcome = (props: WelcomeProps) => {
   const classes = useStyles()
 
-  const classesDrawer = useStylesDrawer();
-  const theme = useTheme();
+  const classesDrawer = useStylesDrawer()
+  const theme = useTheme()
 
   useEffect(() => {
     loadFromDefaultApiServer('photos', photosCallback)
@@ -161,23 +159,8 @@ const Welcome = (props: WelcomeProps) => {
             </IconButton>
           </div>
           <Divider />
-          <List>
-            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
-          </List>
+          <DrawerAlbums />
           <Divider />
-          <List>
-            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
-          </List>
         </Drawer>
       )
     }

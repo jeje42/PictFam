@@ -15,7 +15,6 @@ import { Photo } from '../types/Photo'
 import Thumnail from './Thumnail'
 import NavButton from './NavButton'
 
-
 interface ThumnailsGaleryProps {
   photos: Array<Photo>,
   screenWidth: number,
