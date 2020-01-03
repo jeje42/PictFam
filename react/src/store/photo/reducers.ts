@@ -1,5 +1,6 @@
-import { PhotosState, PhotoActionTypes, PHOTOS_ADDED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS } from './types'
+import { PhotosState, PhotoActionTypes, PHOTOS_ADDED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS, NEW_ALBUM_SELECTED } from './types'
 import { Photo } from '../../types/Photo'
+import { Album } from '../../types/Album'
 
 const initialState: PhotosState = {
   photos: [],
@@ -9,7 +10,7 @@ const initialState: PhotosState = {
 const photoSelected = (state: PhotosState, newPhotoSelected: Photo) => {
   return {
     ...state,
-    photos: state.photos.map(photo => {
+    photosSelected: state.photosSelected.map(photo => {
       if(photo.selected && newPhotoSelected.id !== photo.id) {
         photo.selected = false
       }
@@ -24,20 +25,29 @@ const photoSelected = (state: PhotosState, newPhotoSelected: Photo) => {
 }
 
 const selectedNextPhoto = (state: PhotosState) => {
-  let idPhoto:number = 1 + state.photos.indexOf(state.photos.filter(photo => photo.selected)[0])
+  let idPhoto:number = 1 + state.photosSelected.indexOf(state.photosSelected.filter(photo => photo.selected)[0])
 
-  if(idPhoto === state.photos.length) idPhoto = 0
+  if(idPhoto === state.photosSelected.length) idPhoto = 0
 
-  return photoSelected(state, state.photos[idPhoto])
+  return photoSelected(state, state.photosSelected[idPhoto])
 }
 
 const selectedPreviousPhoto = (state: PhotosState) => {
-  let idPhoto:number = state.photos.indexOf(state.photos.filter(photo => photo.selected)[0])
+  let idPhoto:number = state.photosSelected.indexOf(state.photosSelected.filter(photo => photo.selected)[0])
 
   if(idPhoto === -1) idPhoto = 0
   else if(idPhoto > 0) idPhoto--
 
-  return photoSelected(state, state.photos[idPhoto])
+  return photoSelected(state, state.photosSelected[idPhoto])
+}
+
+const newAlbumSelected = (state: PhotosState, albums: Array<Album>) => {
+  let newPhotosSelected = state.photos.filter(photo => albums.filter(album => album.id === photo.album.id).length > 0 )
+
+  return photoSelected({
+    ...state,
+    photosSelected: newPhotosSelected
+  }, newPhotosSelected[0])
 }
 
 export function photosReducer (
@@ -56,6 +66,8 @@ export function photosReducer (
       return selectedNextPhoto(state)
     case PHOTOS_SELECTED_PREVIOUS:
       return selectedPreviousPhoto(state)
+    case NEW_ALBUM_SELECTED:
+      return newAlbumSelected(state, action.albums)
     default:
       return state
   }

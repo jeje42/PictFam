@@ -12,11 +12,13 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import { AppState } from '../store/index'
 import { Album } from '../types/Album'
 import { selectAlbum } from '../store/album/actions'
+import { newAlbumSelected } from '../store/photo/actions'
 
 
 interface DrawerAlbumsProps {
   albums: Array<Album>,
   selectAlbum: typeof selectAlbum,
+  newAlbumSelected: typeof newAlbumSelected,
   albumIdSelected: number
 }
 
@@ -28,6 +30,13 @@ const recursAlbumOpen = (album: Album, finalObject: AlbumsHash) => {
   finalObject[album.id] = false
   album.sons.forEach(son => {
     recursAlbumOpen(son, finalObject)
+  })
+}
+
+const generateAlbumListRecurs = (album: Album, finalList: Array<Album>) => {
+  album.sons.forEach(album => {
+    finalList.push(album)
+    generateAlbumListRecurs(album, finalList)
   })
 }
 
@@ -49,7 +58,10 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
       event.stopPropagation()
       toggleAlbumHash(album.id)
     } else {
-      props.selectAlbum(album);
+      props.selectAlbum(album)
+      let albums = [album] as Array<Album>
+      generateAlbumListRecurs(album, albums)
+      props.newAlbumSelected(albums)
     }
   };
 
@@ -141,6 +153,6 @@ const mapStateToProps = (state: AppState) => ({
 
 export default connect(
   mapStateToProps,
-  { selectAlbum
+  { selectAlbum, newAlbumSelected
   }
 )(DrawerAlbums)

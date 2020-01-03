@@ -1,5 +1,6 @@
-import { PhotosState, PHOTOS_ADDED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS } from "./types";
+import { PhotosState, PHOTOS_ADDED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS, NEW_ALBUM_SELECTED } from "./types"
 import { Photo } from '../../types/Photo'
+import { Album } from "../../types/Album"
 
 
 export function addPhotos(newPhotos: PhotosState) {
@@ -25,5 +26,12 @@ export function selectNextPhoto() {
 export function selectPreviousPhoto() {
   return {
     type: PHOTOS_SELECTED_PREVIOUS
+  }
+}
+
+export function newAlbumSelected(albums: Array<Album>) {
+  return {
+    type: NEW_ALBUM_SELECTED,
+    albums: albums
   }
 }

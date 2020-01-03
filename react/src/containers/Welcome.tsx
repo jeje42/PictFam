@@ -20,6 +20,7 @@ import { AlbumState } from '../store/album/types'
 import ThumnailsGalery from './ThumnailsGalery'
 import DrawerAlbums from './DrawerAlbums'
 import MainPhoto  from './MainPhoto'
+import { Photo } from "../types/Photo"
 
 interface WelcomeProps {
   addPhotos: typeof addPhotos,
@@ -27,7 +28,7 @@ interface WelcomeProps {
   selectNextPhoto: typeof selectNextPhoto,
   selectPreviousPhoto: typeof selectPreviousPhoto,
   addAlbums: typeof addAlbums,
-  photos: PhotosState,
+  photos: Array<Photo>,
   albums: AlbumState,
   size: any,
   toggleDrawer: typeof toggleDrawer,
@@ -92,13 +93,11 @@ const useStylesDrawer = makeStyles((theme: any) =>
 )
 
 const Welcome = (props: WelcomeProps) => {
-  const classes = useStyles()
-
   const classesDrawer = useStylesDrawer()
   const theme = useTheme()
 
   useEffect(() => {
-    loadFromDefaultApiServer('photos', photosCallback)
+    loadFromCustomApiServer('photostree', photosCallback)
     loadFromCustomApiServer('albumstree', albumsTreeCallback)
   }, [])
 
@@ -108,7 +107,8 @@ const Welcome = (props: WelcomeProps) => {
           return {
             id: result.id,
             name: result.name,
-            selected: false
+            selected: false,
+            album: result.album
           }
         }),
         photosSelected: []
@@ -123,10 +123,10 @@ const Welcome = (props: WelcomeProps) => {
     }
 
     let mainPhotoElem = null
-    if(props.photos.photos.length>0) {
+    if(props.photos.length>0) {
       mainPhotoElem = (
         <MainPhoto
-          photo={props.photos.photos.filter(photo => photo.selected)[0]}
+          photo={props.photos.filter(photo => photo.selected)[0]}
           selectPrevious={props.selectPreviousPhoto}
           selectNext={props.selectNextPhoto}
           screenWidth={props.size.width}
@@ -177,7 +177,7 @@ const Welcome = (props: WelcomeProps) => {
 }
 
 const mapStateToProps = (state: AppState) => ({
-  photos: state.photos,
+  photos: state.photos.photosSelected,
   albums: state.albums,
   openDrawer: state.drawer.open
 })
