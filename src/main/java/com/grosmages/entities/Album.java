@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +25,12 @@ import lombok.NoArgsConstructor;
 public class Album {
 	private @Id @GeneratedValue Long id;
 	private String name;
+	
+	/**
+	 * Path not including the name of the file.
+	 */
+	@JsonIgnore
+	private String path;
 	
 	private Boolean isRoot;
 	

@@ -45,7 +45,7 @@ public class FilesController {
 	public @ResponseBody byte[] getImage(@PathVariable("id") long id) throws IOException {
 		Photo photo = photoRepository.findById(id).orElse(null);		
 		if(photo != null) {
-			InputStream is = new FileInputStream(new File(photo.getPath()));
+			InputStream is = new FileInputStream(new File(photo.getPath() + File.separator + photo.getName()));
 			return IOUtils.toByteArray(is);
 		}
 		

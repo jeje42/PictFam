@@ -49,7 +49,8 @@ public class FilesScheduler {
 	@Autowired
 	private FilesUtil filesUtil;
 	
-	@Scheduled(cron="0 * * * * *")
+//	@Scheduled(cron="0 * * * * *")
+	@Scheduled(fixedRate = 600000)
 	public void scanFiles() {		
 		propertiesFolder.getImages().forEach(folder -> {
 			logger.info("Scanning " + folder);
@@ -73,10 +74,10 @@ public class FilesScheduler {
 	private void createPhoto(Path path) {
 		Photo photo = context.getBean(Photo.class);
 		photo.setName(path.getFileName().toString());
-		photo.setPath(path.getParent().toString() + File.separator + path.getFileName().toString());
+		photo.setPath(path.getParent().toString());
 		
 		try {
-			Image image = ImageIO.read(new File(photo.getPath()))
+			Image image = ImageIO.read(new File(photo.getPath() + File.separator + photo.getName()))
 					.getScaledInstance(200, 200, BufferedImage.SCALE_SMOOTH);
 			
 			BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
@@ -91,6 +92,11 @@ public class FilesScheduler {
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+			return;
+		} catch (NullPointerException npe) {
+			logger.error(npe.getMessage());
+			npe.printStackTrace();
+			return;
 		}
 		createCategories(photo);
 		photoRepository.save(photo);
@@ -98,35 +104,40 @@ public class FilesScheduler {
 	
 	private void createCategories(Photo photo) {
 		Album parentAlbum = null;
+		String folderPathParts = File.separator;
 		for(String folder : photo.getPath().split(File.separator)) {
 			if (!StringUtils.isEmpty(folder)) {
+				folderPathParts = folderPathParts + folder + File.separator;
 				if (!folder.equals(photo.getName())) {
-					Album album = albumRepository.findByName(folder);
+					Album album = albumRepository.findByPath(folderPathParts);
 					if(album == null) {
 						album = context.getBean(Album.class);
 						album.setName(folder);
-					}
-					
-					if (parentAlbum != null) {
-						album.setIsRoot(false);
-						album = albumRepository.save(album);
+						album.setPath(folderPathParts);
 						
-						Set<Album> sons = new HashSet<>();
-						sons.add(album);
-						parentAlbum.setSons(sons);
-						
-						
-						parentAlbum = albumRepository.save(parentAlbum);
-					} else {
-						album.setIsRoot(true);
-						album = albumRepository.save(album);
+						if (parentAlbum != null) {
+							album.setIsRoot(false);
+							album = albumRepository.save(album);
+							
+							Set<Album> sons = parentAlbum.getSons();
+							if (sons == null)	sons = new HashSet<>();
+							
+							sons.add(album);
+							parentAlbum.setSons(sons);
+							
+							parentAlbum = albumRepository.save(parentAlbum);
+						} else {
+							album.setIsRoot(true);
+							album = albumRepository.save(album);
+						}
 					}
 					
 					parentAlbum = album;
-				} else if (parentAlbum != null) {
-					photo.setAlbum(parentAlbum);
 				}
 			}
+		}
+		if (parentAlbum != null) {
+			photo.setAlbum(parentAlbum);
 		}
 	}
 }

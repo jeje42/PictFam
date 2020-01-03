@@ -15,6 +15,8 @@
  */
 package com.grosmages;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,7 @@ public class ReactAndSpringDataRestApplication implements CommandLineRunner {
 	public void run(String... strings) throws Exception {
 		
 		
-		photoRepository.findAll().forEach(photo -> log.info(photo.getPath()));
+		photoRepository.findAll().forEach(photo -> log.info(photo.getPath() + File.separator + photo.getName()));
 	}
 }
 // end::code[]

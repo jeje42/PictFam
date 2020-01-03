@@ -4,4 +4,4 @@ spring:
          base-path: /api
 grosmages:
    folders:
-      images: ["/home/jeje/Pictures", "/imagesTest"]
+      images: ["/home/jeje/Pictures", "/imagesTest", "/net/nas/PrivateMaison/Images"]
