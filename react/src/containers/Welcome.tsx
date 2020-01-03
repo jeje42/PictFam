@@ -55,6 +55,8 @@ const useStyles = makeStyles(() => ({
 const Welcome = (props: WelcomeProps) => {
   const [drawerWidth, setDrawerWidth] = React.useState(0)
 
+  const theme = useTheme()
+
   const useStylesDrawer = makeStyles((theme: any) =>
     createStyles({
       root: {
@@ -71,11 +73,19 @@ const Welcome = (props: WelcomeProps) => {
         ...theme.mixins.toolbar,
         justifyContent: 'flex-end',
       },
+
     }),
   )
 
+  const useDrawerOverride = makeStyles({
+    drawerRoot: {
+      backgroundColor: theme.palette.secondary.main
+    }
+  })
+
   const classesDrawer = useStylesDrawer()
-  const theme = useTheme()
+  const classesDrawerOverride = useDrawerOverride()
+
 
   useEffect(() => {
     if (props.openDrawer) {
@@ -136,6 +146,9 @@ const Welcome = (props: WelcomeProps) => {
           variant="persistent"
           anchor="left"
           open={props.openDrawer}
+          classes={{
+            paper: classesDrawerOverride.drawerRoot
+          }}
         >
           <div className={classesDrawer.drawerHeader}>
             <IconButton onClick={props.toggleDrawer}>

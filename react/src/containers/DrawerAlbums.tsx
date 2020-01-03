@@ -44,11 +44,6 @@ const generateAlbumListRecurs = (album: Album, finalList: Array<Album>) => {
   })
 }
 
-const handleMousedown = (e: any) => {
-  // this.setState({ isResizing: true, lastDownX: e.clientX });
-  console.log('Resizing! ' + e.clientX)
-}
-
 const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
   const [albumsHash, setAlbumsHash] = React.useState({} as AlbumsHash)
 
@@ -168,7 +163,6 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
       }
     }),
   )
-  let localClasses = useStyles()
 
   return (
     <div>
