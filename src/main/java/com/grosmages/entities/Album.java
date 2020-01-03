@@ -26,9 +26,6 @@ public class Album {
 	private @Id @GeneratedValue Long id;
 	private String name;
 	
-	/**
-	 * Path not including the name of the file.
-	 */
 	@JsonIgnore
 	private String path;
 	

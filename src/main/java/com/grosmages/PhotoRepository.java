@@ -8,7 +8,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import com.grosmages.entities.Photo;
 
 public interface PhotoRepository extends PagingAndSortingRepository<Photo, Long> {
-	public Photo findByPath(String path);
+	public Photo findByPathAndName(String path, String name);
 	
 	@Query("SELECT p FROM Photo p")
 	Collection<Photo> findAllPhotos();

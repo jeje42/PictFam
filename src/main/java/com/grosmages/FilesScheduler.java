@@ -59,7 +59,7 @@ public class FilesScheduler {
 			.forEach(path -> {
 				String wholePath = path.getParent().toString() + File.separator + path.getFileName().toString();
 				logger.info("Handling " + wholePath);
-				Photo photoInDatabase = photoRepository.findByPath(wholePath);
+				Photo photoInDatabase = photoRepository.findByPathAndName(path.getParent().toString(), path.getFileName().toString());
 				
 				if(photoInDatabase == null) {
 					logger.info("Inserting photo " + wholePath);
