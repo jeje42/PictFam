@@ -8,18 +8,22 @@ import { makeStyles, createStyles } from '@material-ui/core/styles'
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import { withSize } from 'react-sizeme'
 
 import { AppState } from '../store/index'
 import { Album } from '../types/Album'
 import { selectAlbum } from '../store/album/actions'
 import { newAlbumSelected } from '../store/photo/actions'
+import { drawerWidthChanged } from '../store/drawer/actions'
 
 
 interface DrawerAlbumsProps {
   albums: Array<Album>,
   selectAlbum: typeof selectAlbum,
   newAlbumSelected: typeof newAlbumSelected,
-  albumIdSelected: number
+  drawerWidthChanged: typeof drawerWidthChanged,
+  albumIdSelected: number,
+  size: any,
 }
 
 interface AlbumsHash {
@@ -40,8 +44,17 @@ const generateAlbumListRecurs = (album: Album, finalList: Array<Album>) => {
   })
 }
 
+const handleMousedown = (e: any) => {
+  // this.setState({ isResizing: true, lastDownX: e.clientX });
+  console.log('Resizing! ' + e.clientX)
+}
+
 const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
   const [albumsHash, setAlbumsHash] = React.useState({} as AlbumsHash)
+
+  useEffect(() => {
+    props.drawerWidthChanged(Math.trunc(props.size.width))
+  }, [props.size.width])
 
   const toggleAlbumHash = (idAlbum: number) => {
     let newAlbumHash = {...albumsHash}
@@ -139,6 +152,24 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
     )
   }
 
+  const useStyles = makeStyles((theme: any) =>
+    createStyles({
+      dragger: {
+        width: '5px',
+        cursor: 'ew-resize',
+        padding: '4px 0 0',
+        borderTop: '1px solid #ddd',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        zIndex: '100',
+        backgroundColor: '#f4f7f9'
+      }
+    }),
+  )
+  let localClasses = useStyles()
+
   return (
     <div>
       {listRootElem}
@@ -151,8 +182,9 @@ const mapStateToProps = (state: AppState) => ({
   albumIdSelected: state.albums.albumIdSelected
 })
 
-export default connect(
+export default withSize()(connect(
   mapStateToProps,
-  { selectAlbum, newAlbumSelected
+  { selectAlbum, newAlbumSelected,
+    drawerWidthChanged
   }
-)(DrawerAlbums)
+)(DrawerAlbums))

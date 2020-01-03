@@ -32,7 +32,8 @@ interface WelcomeProps {
   albums: AlbumState,
   size: any,
   toggleDrawer: typeof toggleDrawer,
-  openDrawer: boolean
+  openDrawer: boolean,
+  drawerWidth: number
 }
 
 const useStyles = makeStyles(() => ({
@@ -51,50 +52,42 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
-const drawerWidth = 240;
-
-const useStylesDrawer = makeStyles((theme: any) =>
-  createStyles({
-    root: {
-      display: 'flex',
-      height: '100%',
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
-    drawerHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: theme.spacing(0, 1),
-      ...theme.mixins.toolbar,
-      justifyContent: 'flex-end',
-    },
-    content: {
-      flexGrow: 1,
-      padding: theme.spacing(3),
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-      marginLeft: -drawerWidth,
-    },
-    contentShift: {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    },
-  }),
-)
-
 const Welcome = (props: WelcomeProps) => {
+  const [drawerWidth, setDrawerWidth] = React.useState(0)
+
+  const useStylesDrawer = makeStyles((theme: any) =>
+    createStyles({
+      root: {
+        display: 'flex',
+        height: '100%',
+      },
+      drawer: {
+        flexShrink: 0
+      },
+      drawerHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: theme.spacing(0, 1),
+        ...theme.mixins.toolbar,
+        justifyContent: 'flex-end',
+      },
+    }),
+  )
+
   const classesDrawer = useStylesDrawer()
   const theme = useTheme()
+
+  useEffect(() => {
+    if (props.openDrawer) {
+      if(props.drawerWidth) {
+        setDrawerWidth(props.drawerWidth)
+      } else {
+        setDrawerWidth(240)
+      }
+    } else {
+      setDrawerWidth(0)
+    }
+  }, [props.openDrawer, props.drawerWidth])
 
   useEffect(() => {
     loadFromCustomApiServer('photostree', photosCallback)
@@ -131,7 +124,6 @@ const Welcome = (props: WelcomeProps) => {
           selectNext={props.selectNextPhoto}
           screenWidth={props.size.width}
           screenHeight={props.size.height}
-          drawerWidth={drawerWidth}
         />
       )
     }
@@ -144,9 +136,6 @@ const Welcome = (props: WelcomeProps) => {
           variant="persistent"
           anchor="left"
           open={props.openDrawer}
-          classes={{
-            paper: classesDrawer.drawerPaper,
-          }}
         >
           <div className={classesDrawer.drawerHeader}>
             <IconButton onClick={props.toggleDrawer}>
@@ -163,7 +152,6 @@ const Welcome = (props: WelcomeProps) => {
     let toolbarElement = (
       <ThumnailsGalery
         screenWidth={props.size.width}
-        drawerWidth={drawerWidth}
       />
     )
 
@@ -179,7 +167,8 @@ const Welcome = (props: WelcomeProps) => {
 const mapStateToProps = (state: AppState) => ({
   photos: state.photos.photosSelected,
   albums: state.albums,
-  openDrawer: state.drawer.open
+  openDrawer: state.drawer.open,
+  drawerWidth: state.drawer.width
 })
 
 export default withSize({ monitorHeight: true })(connect(

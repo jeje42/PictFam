@@ -76,7 +76,7 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          marginLeft: - props.drawerWidth,
+          marginLeft: 0,
 
           display: 'flex',
           alignItems: 'center',
@@ -90,7 +90,7 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
           }),
-          marginLeft: 0,
+          marginLeft: props.drawerWidth,
 
           display: 'flex',
           alignItems: 'center',
@@ -133,7 +133,8 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
 }
 
 const mapStateToProps = (state: AppState) => ({
-  openDrawer: state.drawer.open
+  openDrawer: state.drawer.open,
+  drawerWidth: state.drawer.width
 })
 
 export default connect(
