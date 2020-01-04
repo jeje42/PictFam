@@ -98,11 +98,15 @@ public class FilesScheduler {
 			npe.printStackTrace();
 			return;
 		}
-		createCategories(photo);
+		createAlbums(photo);
 		photoRepository.save(photo);
 	}
 	
-	private void createCategories(Photo photo) {
+	/**
+	 * Creates the album hierarchy of albums regarding the photo.
+	 * @param photo
+	 */
+	void createAlbums(Photo photo) {
 		Album parentAlbum = null;
 		String folderPathParts = File.separator;
 		for(String folder : photo.getPath().split(File.separator)) {
