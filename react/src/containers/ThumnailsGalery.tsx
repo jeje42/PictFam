@@ -25,7 +25,7 @@ interface ThumnailsGaleryProps {
   openDrawer: boolean
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: any) => ({
   img: {
     margin: '10px',
     borderRadius: '5px',
@@ -62,6 +62,7 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
       },
       menuButton: {
         marginRight: theme.spacing(2),
+        marginLeft: theme.spacing(1)
       },
       hide: {
         display: 'none',
@@ -80,6 +81,7 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
   }
 
   const classesDrawer = useStylesDrawer()
+  const classes = useStyles()
 
   const [indexBeginPhoto, setIndexBeginPhoto] = useState(-1)
   const [indexEndPhoto, setIndexEndPhoto] = useState(-1)
