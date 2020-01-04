@@ -76,7 +76,7 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
     let widthTrunc = Math.trunc(screenWidth)
     //8*2(marginNavButton) + 56(buttonsWidth)
     // 100(image width) + 10*2 (margin)
-    return Math.trunc((widthTrunc - 16 - 112 - (props.openDrawer?props.drawerWidth:0))/(120)) - 2
+    return Math.trunc((widthTrunc - 16 - 112 - 20 - (props.openDrawer?props.drawerWidth:0))/(120)) - 1
   }
 
   const classesDrawer = useStylesDrawer()
@@ -169,6 +169,8 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
   }
 
   let thumbsElem = null
+  let buttonPrev = null
+  let buttonNext = null
   if (
       props.photos !== undefined
       && props.photos.length > 0
@@ -187,6 +189,22 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
           photo={photo}
         selectPhoto={selectPhotoHandler}/>
       )})
+
+    buttonPrev = (
+      <NavButton
+        onClick={() => previousPhotos()}
+        previous={true}
+        disabled={indexBeginPhoto == 0}
+      />
+    )
+
+    buttonNext = (
+      <NavButton
+        onClick={() => nextPhotos()}
+        disabled={indexEndPhoto >= props.photos.length-1}
+        previous={false}
+      />
+    )
   }
 
   const nextPhotos = () => {
@@ -219,7 +237,8 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
         [classesDrawer.appBarShift]: props.openDrawer,
       })}
     >
-      <Toolbar>
+      <Toolbar
+        disableGutters={true}>
         <IconButton
           color="inherit"
           aria-label="open drawer"
@@ -229,18 +248,9 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
         >
           <MenuIcon />
         </IconButton>
-
-        <NavButton
-          onClick={() => previousPhotos()}
-          previous={true}
-        />
-
-          {thumbsElem}
-
-        <NavButton
-          onClick={() => nextPhotos()}
-          previous={false}
-        />
+        {buttonPrev}
+        {thumbsElem}
+        {buttonNext}
       </Toolbar>
     </AppBar>
   )

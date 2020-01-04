@@ -6,7 +6,8 @@ import Fab from '@material-ui/core/Fab'
 
 interface MainPhotoProps {
   onClick: () => void,
-  previous: boolean
+  previous: boolean,
+  disabled: boolean
 }
 
 const NavButton: React.SFC<MainPhotoProps>  = (props) => {
@@ -28,6 +29,7 @@ const NavButton: React.SFC<MainPhotoProps>  = (props) => {
             aria-label="add"
             className={classes.margin}
             onClick={props.onClick}
+            disabled={props.disabled}
           >
             {iconElem}
           </Fab>
