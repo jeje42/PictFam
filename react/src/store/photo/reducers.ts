@@ -35,7 +35,7 @@ const selectedNextPhoto = (state: PhotosState) => {
 const selectedPreviousPhoto = (state: PhotosState) => {
   let idPhoto:number = state.photosSelected.indexOf(state.photosSelected.filter(photo => photo.selected)[0])
 
-  if(idPhoto === -1) idPhoto = 0
+  if(idPhoto === 0) idPhoto = state.photosSelected.length - 1
   else if(idPhoto > 0) idPhoto--
 
   return photoSelected(state, state.photosSelected[idPhoto])

@@ -122,11 +122,13 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
           <NavButton
             onClick={props.selectPrevious}
             previous={true}
+            disabled={false}
           />
           {imgElem}
           <NavButton
             onClick={props.selectNext}
             previous={false}
+            disabled={false}
           />
         </div>
     )
