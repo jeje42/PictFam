@@ -15,12 +15,23 @@
  */
 package com.grosmages.repositories;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import com.grosmages.entities.Employee;
+import com.grosmages.entities.User;
 
 @Repository
-public interface EmployeeRepository extends PagingAndSortingRepository<Employee, Long> {
+public interface UserRepository extends PagingAndSortingRepository<User, Long> {
+	Optional<User> findByName(String name);
+	
+	Optional<User> findByUid(String uid);
+	
+	Optional<User> findByNameOrUid(String name, String uid);
+	
+	List<User> findByIdIn(List<Long> userIds);
 
+    Boolean existsByName(String name);
 }

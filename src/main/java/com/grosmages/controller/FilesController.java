@@ -1,4 +1,4 @@
-package com.grosmages;
+package com.grosmages.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.grosmages.entities.Photo;
+import com.grosmages.repositories.PhotoRepository;
 
 @Controller
 public class FilesController {

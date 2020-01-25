@@ -24,10 +24,6 @@ import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/**
- * @author Greg Turnquist
- */
-// tag::code[]
 @Entity
 public class Employee {
 
@@ -115,4 +111,3 @@ public class Employee {
 			'}';
 	}
 }
-// end::code[]

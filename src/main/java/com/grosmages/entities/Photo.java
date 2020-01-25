@@ -1,10 +1,12 @@
 package com.grosmages.entities;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.lang.Nullable;
@@ -28,6 +30,10 @@ public class Photo {
 	
 	@ManyToOne
 	private Album album;
+	
+	@JsonIgnore
+	@OneToOne(cascade = CascadeType.ALL)
+	private Rights rights;
 	
 	@Override
     public boolean equals(Object obj) {

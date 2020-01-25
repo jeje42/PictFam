@@ -8,7 +8,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -24,10 +31,21 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
+import com.grosmages.config.PropertiesConfig;
 import com.grosmages.constants.Patterns;
 import com.grosmages.entities.Album;
 import com.grosmages.entities.Photo;
+import com.grosmages.entities.Rights;
+import com.grosmages.entities.SystemGroupLocal;
+import com.grosmages.entities.User;
 import com.grosmages.filesscan.FilesUtil;
+import com.grosmages.repositories.AlbumRepository;
+import com.grosmages.repositories.PhotoRepository;
+import com.grosmages.repositories.SystemGroupLocalRepository;
+import com.grosmages.repositories.UserRepository;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Component
 public class FilesScheduler {
@@ -38,21 +56,27 @@ public class FilesScheduler {
 	private ApplicationContext context;
 	
 	@Autowired
-	private PropertiesFolder propertiesFolder;
+	private PropertiesConfig properties;
 	
 	@Autowired
 	private PhotoRepository photoRepository;
 	
 	@Autowired
 	private AlbumRepository albumRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private SystemGroupLocalRepository systemGroupLocalRepository;	
 	
 	@Autowired
 	private FilesUtil filesUtil;
 	
 //	@Scheduled(cron="0 * * * * *")
-	@Scheduled(fixedRate = 600000)
+//	@Scheduled(fixedRate = 600000)
 	public void scanFiles() {		
-		propertiesFolder.getImages().forEach(folder -> {
+		properties.getFolders().forEach(folder -> {
 			logger.info("Scanning " + folder);
 			filesUtil.findFilesInDirectory(folder, Pattern.compile(Patterns.IMAGE_PATTERN, Pattern.CASE_INSENSITIVE))
 			.stream()
@@ -75,6 +99,7 @@ public class FilesScheduler {
 		Photo photo = context.getBean(Photo.class);
 		photo.setName(path.getFileName().toString());
 		photo.setPath(path.getParent().toString());
+		photo.setRights(generateRightsFromRightsPath(readAttributes(path)));
 		
 		try {
 			Image image = ImageIO.read(new File(photo.getPath() + File.separator + photo.getName()))
@@ -118,6 +143,7 @@ public class FilesScheduler {
 						album = context.getBean(Album.class);
 						album.setName(folder);
 						album.setPath(folderPathParts);
+						album.setRights(generateRightsFromRightsPath(readAttributes(Paths.get(folderPathParts))));
 						
 						if (parentAlbum != null) {
 							album.setIsRoot(false);
@@ -143,5 +169,60 @@ public class FilesScheduler {
 		if (parentAlbum != null) {
 			photo.setAlbum(parentAlbum);
 		}
+	}
+	
+	RightsPath readAttributes(Path path) {
+		PosixFileAttributes attr;
+		try {
+			attr = Files.readAttributes(path,PosixFileAttributes.class);
+		    attr = Files.getFileAttributeView(path, PosixFileAttributeView.class)
+		        .readAttributes();
+	
+		    attr.owner();
+		    
+		    return new RightsPath(attr.owner(), attr.group(), attr.permissions());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	Rights generateRightsFromRightsPath(RightsPath rightPath) {
+		Rights toReturn = context.getBean(Rights.class);
+		
+		if (rightPath == null) {
+			return null;
+		}
+		
+		User user = userRepository.findByNameOrUid(rightPath.ownerName.toString(), rightPath.ownerName.toString()).orElse(null);
+		if (user == null) {
+			logger.error("Cannot find user: {}", rightPath.ownerName.toString());
+		} else {
+			toReturn.setOwner(user);
+		}
+		
+		SystemGroupLocal systemGroupLocal = systemGroupLocalRepository.findByNameOrGid(rightPath.groupName.toString(), rightPath.groupName.toString()).orElse(null);
+		if (systemGroupLocal == null) {
+			logger.error("Cannot find group: {}", rightPath.groupName.toString());
+		} else {
+			toReturn.setSystemGroupLocal(systemGroupLocal);
+		}
+		
+		toReturn.setOwnerRead(rightPath.getAttributes().contains(PosixFilePermission.OWNER_READ));
+		toReturn.setOwnerWrite(rightPath.getAttributes().contains(PosixFilePermission.OWNER_WRITE));
+		toReturn.setGroupRead(rightPath.getAttributes().contains(PosixFilePermission.GROUP_READ));
+		toReturn.setGroupWrite(rightPath.getAttributes().contains(PosixFilePermission.GROUP_WRITE));
+		toReturn.setOthersRead(rightPath.getAttributes().contains(PosixFilePermission.OTHERS_READ));
+		toReturn.setOwnerWrite(rightPath.getAttributes().contains(PosixFilePermission.OTHERS_WRITE));
+		
+		return toReturn;
+	}
+	
+	@Data
+	@AllArgsConstructor
+	private class RightsPath {
+		UserPrincipal ownerName;
+		GroupPrincipal groupName;
+		Set<PosixFilePermission> attributes;
 	}
 }

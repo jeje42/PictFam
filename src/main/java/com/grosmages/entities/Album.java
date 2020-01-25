@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,10 @@ public class Album {
 	private String path;
 	
 	private Boolean isRoot;
+	
+	@JsonIgnore
+	@OneToOne(cascade = CascadeType.ALL)
+	private Rights rights;
 	
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Album> sons;

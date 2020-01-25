@@ -2,6 +2,7 @@ package com.grosmages;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.grosmages.entities.Album;
 import com.grosmages.entities.Photo;
+import com.grosmages.repositories.AlbumRepository;
+import com.grosmages.repositories.PhotoRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -99,6 +102,11 @@ public class FilesSchedulerTest {
 		assertThat(lAlbumsDatabase.size()).isEqualTo(2);
 		assertThat(lAlbumsDatabase.get(0).getPath()).isEqualTo("/album1/");
 		assertThat(lAlbumsDatabase.get(1).getPath()).isEqualTo("/album1/evenement1/");
+	}
+	
+	@Test
+	public void testFileAttrbutes() {
+		fileScheduler.readAttributes(Paths.get("/home/jeje/Pictures/ToSend.png"));
 	}
 
 }

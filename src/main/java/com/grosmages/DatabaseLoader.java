@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.grosmages.filesscan.FilesUtil;
 import com.grosmages.repositories.EmployeeRepository;
+import com.grosmages.repositories.PhotoRepository;
 /**
  * @author Greg Turnquist
  */

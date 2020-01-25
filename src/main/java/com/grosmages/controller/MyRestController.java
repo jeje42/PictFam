@@ -1,9 +1,11 @@
-package com.grosmages;
+package com.grosmages.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.grosmages.entities.Album;
 import com.grosmages.entities.Photo;
+import com.grosmages.repositories.AlbumRepository;
+import com.grosmages.repositories.PhotoRepository;
 
 @RestController
 public class MyRestController {
@@ -27,7 +31,23 @@ public class MyRestController {
 	
 	@RequestMapping(value = "/albumstree")	
 	public Collection<Album> getAlbumTree() throws IOException {
-		return albumRepository.findAllRoot();		
+		Collection<Album> toReturn = albumRepository.findAllRoot();
+		final Collection<Album> array = toReturn;
+		
+		
+		toReturn = toReturn.stream().filter(album -> {
+			for (Album albumLoop: array) {
+				if (albumLoop != album && albumLoop.getSons() != null) {
+					if (albumLoop.getSons().contains(album)) {
+						return false;
+					}
+				}
+			}
+			
+			return true;
+		}).collect(Collectors.toCollection(ArrayList::new));
+		
+		return toReturn;
 	}
 	
 	@RequestMapping(value = "/photostree")	

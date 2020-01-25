@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.grosmages;
+package com.grosmages.repositories;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
-/**
- * @author Greg Turnquist
- */
-// tag::code[]
-@Controller
-public class HomeController {
+import com.grosmages.entities.Rights;
 
-	@RequestMapping(value = "/")
-	public String index() {
-		return "index";
-	}
-
+@Repository
+public interface RightsRepository extends PagingAndSortingRepository<Rights, Long> {
 }
-// end::code[]
