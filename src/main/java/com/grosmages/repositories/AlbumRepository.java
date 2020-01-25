@@ -16,7 +16,7 @@ public interface AlbumRepository extends PagingAndSortingRepository<Album, Long>
 	
 	@PreAuthorize("isAuthenticated()")
 	@Query("SELECT distinct a FROM Album a WHERE "
-			+ " (a.rights.owner.id = ?#{ principal?.id } and a.rights.ownerRead is true)"
+			+ " (a.rights.owner.id = ?#{ principal?.id } and (a.rights.ownerRead is true or a.rights.othersRead is true))"
 	+ " or ( a.rights.systemGroupLocal is not empty "
 	+ " and a.rights.groupRead is true"
 	+ " and ?#{ principal?.id } in (select u.id from SystemGroupLocal g join g.users u where g = a.rights.systemGroupLocal))")
