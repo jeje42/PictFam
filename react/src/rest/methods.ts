@@ -1,20 +1,24 @@
-import axios from 'axios'
+import axios, {AxiosRequestConfig} from 'axios'
 
 const root = '/api/';
 
+const axiosInstance = axios.create({
+  baseUrl: 'http://' + window.location.host + root
+} as AxiosRequestConfig)
+
 const loadFromDefaultApiServer = (resource:string, callback: Function) => {
-  axios.get('http://' + window.location.host + root + resource)
+  axiosInstance.get(resource)
     .then((res:any) => {
       callback(res.data._embedded[resource])
     })
 }
 
 const loadFromCustomApiServer = (resource:string, callback: Function) => {
-  axios.get('http://' + window.location.host + '/' + resource)
+  axiosInstance.get(resource)
     .then((res:any) => {
       callback(res.data)
     })
 }
 
 
-export { loadFromDefaultApiServer, loadFromCustomApiServer }
+export { loadFromDefaultApiServer, loadFromCustomApiServer, axiosInstance }

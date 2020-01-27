@@ -149,6 +149,7 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
 
   const useStyles = makeStyles((theme: any) =>
     createStyles({
+      // @ts-ignore
       dragger: {
         width: '5px',
         cursor: 'ew-resize',
