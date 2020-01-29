@@ -9,13 +9,10 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import Divider from '@material-ui/core/Divider'
 
-import { loadFromDefaultApiServer, loadFromCustomApiServer } from '../rest/methods'
-
 import { AppState } from '../store/index'
-import { addPhotos, selectPhoto, selectNextPhoto, selectPreviousPhoto } from '../store/photo/actions'
-import { addAlbums } from '../store/album/actions'
+import {startPhotosFetched, selectPhoto, selectNextPhoto, selectPreviousPhoto} from '../store/photo/actions'
+import { startFetchAlbums } from '../store/album/actions'
 import { toggleDrawer } from '../store/drawer/actions'
-import { PhotosState } from '../store/photo/types'
 import { AlbumState } from '../store/album/types'
 import ThumnailsGalery from './ThumnailsGalery'
 import DrawerAlbums from './DrawerAlbums'
@@ -23,17 +20,18 @@ import MainPhoto  from './MainPhoto'
 import { Photo } from "../types/Photo"
 
 interface WelcomeProps {
-  addPhotos: typeof addPhotos,
+  startPhotosFetched: typeof startPhotosFetched,
+  startFetchAlbums: typeof startFetchAlbums,
   selectPhoto: typeof selectPhoto,
   selectNextPhoto: typeof selectNextPhoto,
   selectPreviousPhoto: typeof selectPreviousPhoto,
-  addAlbums: typeof addAlbums,
   photos: Array<Photo>,
   albums: AlbumState,
   size: any,
   toggleDrawer: typeof toggleDrawer,
   openDrawer: boolean,
-  drawerWidth: number
+  drawerWidth: number,
+  token: string
 }
 
 const useStyles = makeStyles(() => ({
@@ -100,30 +98,9 @@ const Welcome = (props: WelcomeProps) => {
   }, [props.openDrawer, props.drawerWidth])
 
   useEffect(() => {
-    loadFromCustomApiServer('photostree', photosCallback)
-    loadFromCustomApiServer('albumstree', albumsTreeCallback)
+    props.startPhotosFetched(props.token)
+    props.startFetchAlbums(props.token)
   }, [])
-
-    const photosCallback = (results: Array<any>) => {
-      let photosLocal: PhotosState = {
-        photos: results.map((result: any) => {
-          return {
-            id: result.id,
-            name: result.name,
-            selected: false,
-            album: result.album
-          }
-        }),
-        photosSelected: []
-      }
-
-      props.addPhotos(photosLocal)
-      props.selectPhoto(photosLocal.photos[0])
-    }
-
-    const albumsTreeCallback = (resData: any) => {
-      props.addAlbums(resData)
-    }
 
     let mainPhotoElem = null
     if(props.photos.length>0) {
@@ -181,13 +158,14 @@ const mapStateToProps = (state: AppState) => ({
   photos: state.photos.photosSelected,
   albums: state.albums,
   openDrawer: state.drawer.open,
-  drawerWidth: state.drawer.width
+  drawerWidth: state.drawer.width,
+  token: state.auth.token
 })
 
 export default withSize({ monitorHeight: true })(connect(
   mapStateToProps,
-  { addPhotos, selectPhoto, selectNextPhoto, selectPreviousPhoto,
-    addAlbums,
+  { startPhotosFetched, selectPhoto, selectNextPhoto, selectPreviousPhoto,
+    startFetchAlbums,
     toggleDrawer
   }
 )(Welcome))

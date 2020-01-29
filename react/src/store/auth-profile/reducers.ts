@@ -15,7 +15,6 @@ export function authReducer (
                 ...state
             }
         case DONE_LOGIN:
-            debugger
             return {
                 ...state,
                 token: action.token,

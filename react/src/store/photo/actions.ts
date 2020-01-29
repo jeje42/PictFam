@@ -1,11 +1,25 @@
-import { PhotosState, PHOTOS_ADDED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS, NEW_ALBUM_SELECTED } from "./types"
+import {
+  PhotosState,
+  START_PHOTOS_FETCHED,
+  PHOTOS_FETCHED,
+  PHOTOS_SELECTED,
+  PHOTOS_SELECTED_NEXT,
+  PHOTOS_SELECTED_PREVIOUS,
+  NEW_ALBUM_SELECTED,
+} from "./types"
 import { Photo } from '../../types/Photo'
 import { Album } from "../../types/Album"
 
-
-export function addPhotos(newPhotos: PhotosState) {
+export function startPhotosFetched(token: string) {
   return {
-    type: PHOTOS_ADDED,
+    type: START_PHOTOS_FETCHED,
+    token: token
+  }
+}
+
+export function photosFetched(newPhotos: PhotosState) {
+  return {
+    type: PHOTOS_FETCHED,
     photos: newPhotos
   }
 }

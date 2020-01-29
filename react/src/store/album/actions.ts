@@ -1,10 +1,17 @@
-import { ALBUM_ADDED, ALBUM_SELECTED } from "./types";
+import {ALBUM_FETCHED, ALBUM_SELECTED, START_ALBUM_FETCHED} from "./types";
 import { Album } from '../../types/Album'
 import { AlbumState } from './types'
 
-export function addAlbums(newAlbums: Album[]) {
+export function startFetchAlbums(token: string) {
   return {
-    type: ALBUM_ADDED,
+    type: START_ALBUM_FETCHED,
+    token: token
+  }
+}
+
+export function albumsFetch(newAlbums: Album[]) {
+  return {
+    type: ALBUM_FETCHED,
     albums: newAlbums
   }
 }

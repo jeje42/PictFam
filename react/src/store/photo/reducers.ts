@@ -1,4 +1,4 @@
-import { PhotosState, PhotoActionTypes, PHOTOS_ADDED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS, NEW_ALBUM_SELECTED } from './types'
+import { PhotosState, PhotoActionTypes, PHOTOS_FETCHED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS, NEW_ALBUM_SELECTED } from './types'
 import { Photo } from '../../types/Photo'
 import { Album } from '../../types/Album'
 
@@ -55,7 +55,7 @@ export function photosReducer (
   action: PhotoActionTypes
 ): PhotosState {
   switch (action.type) {
-    case PHOTOS_ADDED:
+    case PHOTOS_FETCHED:
       return {
         ...state,
         ...action.photos

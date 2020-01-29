@@ -1,5 +1,5 @@
-import { AlbumState, AlbumActionTypes, ALBUM_ADDED, ALBUM_SELECTED } from './types'
-import { Album } from '../../types/Album'
+import {ALBUM_FETCHED, ALBUM_SELECTED, AlbumActionTypes, AlbumState} from './types'
+import {Album} from '../../types/Album'
 
 const initialState: AlbumState = {
   albums: [],
@@ -18,7 +18,7 @@ export function albumsReducer (
   action: AlbumActionTypes
 ): AlbumState {
   switch (action.type) {
-    case ALBUM_ADDED:
+    case ALBUM_FETCHED:
       return {
         ...state,
         albums: action.albums

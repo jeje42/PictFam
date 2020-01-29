@@ -1,7 +1,8 @@
 import { Photo } from '../../types/Photo'
 import { Album } from '../../types/Album'
 
-export const PHOTOS_ADDED = 'PHOTOS_ADDED'
+export const START_PHOTOS_FETCHED = 'START_PHOTOS_FETCHED'
+export const PHOTOS_FETCHED = 'PHOTOS_FETCHED'
 export const PHOTOS_SELECTED = 'PHOTOS_SELECTED'
 export const PHOTOS_SELECTED_NEXT = 'PHOTOS_SELECTED_NEXT'
 export const PHOTOS_SELECTED_PREVIOUS = 'PHOTOS_SELECTED_PREVIOUS'
@@ -12,8 +13,13 @@ export interface PhotosState {
   photosSelected: Array<Photo>
 }
 
-interface AddPhotosAction {
-  type: typeof PHOTOS_ADDED
+interface StartPhotosFetchedAction {
+  type: typeof START_PHOTOS_FETCHED
+  token: string
+}
+
+interface PhotosFetchedAction {
+  type: typeof PHOTOS_FETCHED
   photos: PhotosState
 }
 
@@ -35,4 +41,4 @@ interface NewAlbumSelected {
   albums: Array<Album>
 }
 
-export type PhotoActionTypes = AddPhotosAction | SelectPhotoAction | SelectNextPhotoAction | SelectPreviousPhotoAction | NewAlbumSelected
+export type PhotoActionTypes = StartPhotosFetchedAction | PhotosFetchedAction | SelectPhotoAction | SelectNextPhotoAction | SelectPreviousPhotoAction | NewAlbumSelected

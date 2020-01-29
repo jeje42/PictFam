@@ -9,6 +9,8 @@ import { drawerReducer } from "./drawer/reducers";
 import { authReducer } from "./auth-profile/reducers"
 
 import { watchTryLogin } from './auth-profile/sagas'
+import {watchTryFetchPhotos} from "./photo/sagas";
+import {watchTryFetchAlbums} from "./album/sagas";
 
 const rootReducer = combineReducers({
   photos: photosReducer,
@@ -31,6 +33,8 @@ export default function configureStore() {
   )
 
   saga.run(watchTryLogin)
+  saga.run(watchTryFetchPhotos)
+  saga.run(watchTryFetchAlbums)
 
   return store
 }

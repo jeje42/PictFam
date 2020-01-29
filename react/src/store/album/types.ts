@@ -1,6 +1,7 @@
 import { Album } from '../../types/Album'
 
-export const ALBUM_ADDED = 'ALBUM_ADDED'
+export const START_ALBUM_FETCHED = 'START_ALBUM_FETCHED '
+export const ALBUM_FETCHED = 'ALBUM_FETCHED '
 export const ALBUM_SELECTED = 'ALBUM_SELECTED'
 
 export interface AlbumState {
@@ -8,8 +9,13 @@ export interface AlbumState {
   albumIdSelected: number
 }
 
-interface AddAlbumAction {
-  type: typeof ALBUM_ADDED
+interface StartFetchAlbumsAction {
+  type: typeof START_ALBUM_FETCHED,
+  token: string
+}
+
+interface AlbumFetchedAction {
+  type: typeof ALBUM_FETCHED
   albums: Album[]
 }
 
@@ -18,4 +24,4 @@ interface SelectAlbumAction {
   album: Album
 }
 
-export type AlbumActionTypes = AddAlbumAction | SelectAlbumAction
+export type AlbumActionTypes = StartFetchAlbumsAction | AlbumFetchedAction | SelectAlbumAction
