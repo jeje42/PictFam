@@ -1,6 +1,7 @@
 import * as React from "react"
 import { makeStyles } from '@material-ui/core/styles'
 import { Photo } from '../types/Photo'
+import MyImgElement from "./MyImgElement";
 
 
 interface ThumnailProps {
@@ -18,12 +19,6 @@ const useStyles = makeStyles(() => ({
   divContainerSelected: {
     backgroundColor: 'green'
   },
-  img: {
-    margin: '10px',
-    borderRadius: '5px',
-    width: '100px',
-    height: '56px',
-  },
 }))
 
 const Thumnail: React.SFC<ThumnailProps>  = (props) => {
@@ -33,12 +28,27 @@ const Thumnail: React.SFC<ThumnailProps>  = (props) => {
     if (props.photo.selected) {
       classesDiv.push(classes.divContainerSelected)
     }
+
+    const imgStyle = {
+        margin: '10px',
+        borderRadius: '5px',
+        width: '100px',
+        height: '56px',
+    }
+
+    const imgElem = (
+        <MyImgElement
+            imgUrl={'thumnail/' + props.photo.id}
+            styleRaw={imgStyle}
+        />
+    )
+
     return (
       <div
         onClick={() => props.selectPhoto(props.photo)}
         className={classesDiv.join(' ')}
       >
-        <img className={classes.img} src={'thumnail/' + props.photo.id}/>
+          { imgElem }
       </div>
     )
 }

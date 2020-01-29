@@ -7,6 +7,7 @@ import { toggleDrawer } from '../store/drawer/actions'
 import { Photo } from '../types/Photo'
 import NavButton from './NavButton'
 import { AppState } from "../store/index";
+import MyImgElement from './MyImgElement'
 
 interface MainPhotoProps {
   photo: Photo,
@@ -39,33 +40,6 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
 
     const imageHeight = computeImageHeight()
     const imageWidth = computeImageWidth()
-
-    const useStyles = makeStyles((theme: any) => ({
-      flexContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: '100%',
-        paddingTop: '96px',
-        paddingBottom: '20px',
-      },
-      img: {
-        borderRadius: '5px',
-        maxHeight: imageHeight + 'px',
-        maxWidth: imageWidth + 'px',
-        objectFit: 'contain',
-        boxShadow: '5px 10px 10px #1b4f1b',
-      },
-      margin: {
-        margin: theme.spacing(1),
-      },
-      navPrev: {
-        float: 'left'
-      },
-      navNext: {
-        float: 'right'
-      }
-    }))
 
     const useStylesDrawer = makeStyles((theme: any) =>
       createStyles({
@@ -102,14 +76,23 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
       }),
     )
 
-    const classes = useStyles()
     const classesDrawer = useStylesDrawer()
 
     let imgElem = null
     if (props.photo) {
-      imgElem = (
-        <img className={classes.img} src={'photo/' + props.photo.id}/>
-      )
+        const imgStyle = {
+            borderRadius: '5px',
+            maxHeight: imageHeight + 'px',
+            maxWidth: imageWidth + 'px',
+            objectFit: 'contain',
+            boxShadow: '5px 10px 10px #1b4f1b',
+        }
+        imgElem = (
+            <MyImgElement
+                imgUrl={'photo/' + props.photo.id}
+                styleRaw={imgStyle}
+            />
+        )
     }
 
     return (
