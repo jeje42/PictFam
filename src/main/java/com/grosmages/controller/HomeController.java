@@ -18,7 +18,6 @@ package com.grosmages.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-// tag::code[]
 @Controller
 public class HomeController {
 
@@ -26,6 +25,10 @@ public class HomeController {
 	public String index() {
 		return "index";
 	}
+	
+	@RequestMapping(value = "/login")
+	public String indexLogin() {
+		return "index";
+	}
 
 }
-// end::code[]
