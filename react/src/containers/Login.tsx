@@ -15,12 +15,14 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Alert from '@material-ui/lab/Alert';
 
 import { LoginObject } from '../store/auth-profile/types'
 import { startLogin } from '../store/auth-profile/actions'
 import {connect} from "react-redux";
 import {AppState} from "../store";
 import {useHistory} from "react-router-dom";
+import {Grow} from "@material-ui/core";
 
 function Copyright() {
     return (
@@ -57,7 +59,8 @@ const useStyles = makeStyles(theme => ({
 
 interface LoginProps {
     startLogin: typeof startLogin,
-    isAuthenticated: boolean
+    isAuthenticated: boolean,
+    loginHasFailed: boolean,
 }
 
 const Login: React.FC<LoginProps> = props => {
@@ -77,7 +80,6 @@ const Login: React.FC<LoginProps> = props => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
-        console.log('New Value: ' + loginObject)
         props.startLogin(loginObject)
     };
 
@@ -132,18 +134,9 @@ const Login: React.FC<LoginProps> = props => {
                     >
                         Sign In
                     </Button>
-                    <Grid container>
-                        <Grid item xs>
-                            <Link href="#" variant="body2">
-                                Forgot password?
-                            </Link>
-                        </Grid>
-                        <Grid item>
-                            <Link href="#" variant="body2">
-                                {"Don't have an account? Sign Up"}
-                            </Link>
-                        </Grid>
-                    </Grid>
+                    <Grow in={props.loginHasFailed}>
+                        <Alert severity="error">Invalid credentials</Alert>
+                    </Grow>
                 </form>
             </div>
             <Box mt={8}>
@@ -154,7 +147,8 @@ const Login: React.FC<LoginProps> = props => {
 }
 
 const mapStateToProps = (state: AppState) => ({
-    isAuthenticated: state.auth.isAuthenticated
+    isAuthenticated: state.auth.isAuthenticated,
+    loginHasFailed: state.auth.loginHasFailed
 })
 
 export default connect(mapStateToProps, {startLogin})(Login)

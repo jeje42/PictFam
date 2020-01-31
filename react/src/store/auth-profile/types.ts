@@ -1,5 +1,6 @@
 export const START_LOGIN = 'START_LOGIN'
 export const DONE_LOGIN = 'DONE_LOGIN'
+export const SET_LOGIN_HAS_FAILED = 'SET_LOGIN_HAS_FAILED'
 export const LOGOUT = 'LOGOUT'
 
 export interface LoginObject {
@@ -9,7 +10,8 @@ export interface LoginObject {
 
 export interface AuthState {
   token: string,
-  isAuthenticated: boolean
+  isAuthenticated: boolean,
+  loginHasFailed: boolean,
 }
 
 interface StartLoginAction {
@@ -22,8 +24,13 @@ interface DoneLoginAction {
   token: string
 }
 
+interface LoginHasFailed {
+  type: typeof SET_LOGIN_HAS_FAILED,
+  value: boolean
+}
+
 interface LogoutAction {
   type: typeof  LOGOUT
 }
 
-export type AuthActionTypes = StartLoginAction | DoneLoginAction | LogoutAction
+export type AuthActionTypes = StartLoginAction | DoneLoginAction | LoginHasFailed | LogoutAction
