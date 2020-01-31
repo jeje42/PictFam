@@ -27,8 +27,6 @@ function* tryToLoginSaga(action: AuthActionTypes) {
         return
     }
 
-    debugger
-
     let response: Response
     try {
         response = yield call(postLogin, {

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect } from 'react'
+import {useEffect } from 'react'
 import { connect } from 'react-redux'
 import { makeStyles, createStyles, useTheme } from '@material-ui/core/styles'
 import { withSize } from 'react-sizeme'
@@ -23,6 +23,7 @@ import DrawerAlbums from './DrawerAlbums'
 import MainPhoto  from './MainPhoto'
 import { Photo } from "../types/Photo"
 import {logoutAction} from "../store/auth-profile/actions"
+import CheckTokenValidComponent from './CheckTokenValidComponent'
 
 interface WelcomeProps {
   startPhotosFetched: typeof startPhotosFetched,
@@ -37,7 +38,7 @@ interface WelcomeProps {
   toggleDrawer: typeof toggleDrawer,
   openDrawer: boolean,
   drawerWidth: number,
-  token: string
+  token: string,
 }
 
 const useStyles = makeStyles(() => ({
@@ -96,7 +97,6 @@ const Welcome = (props: WelcomeProps) => {
 
   const classesDrawer = useStylesDrawer()
   const classesDrawerOverride = useDrawerOverride()
-
 
   useEffect(() => {
     if (props.openDrawer) {
@@ -209,6 +209,8 @@ const Welcome = (props: WelcomeProps) => {
         {toolbarElement}
         {drawerElem}
         {mainPhotoElem}
+
+        <CheckTokenValidComponent/>
       </div>
     )
 }
@@ -218,7 +220,7 @@ const mapStateToProps = (state: AppState) => ({
   albums: state.albums,
   openDrawer: state.drawer.open,
   drawerWidth: state.drawer.width,
-  token: state.auth.token
+  token: state.auth.token,
 })
 
 export default withSize({ monitorHeight: true })(connect(

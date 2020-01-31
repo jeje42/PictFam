@@ -1,6 +1,7 @@
 import {AuthActionTypes, AuthState, DONE_LOGIN, LOGOUT, SET_LOGIN_HAS_FAILED, START_LOGIN} from './types'
 
 export const tokenLocalStorage = 'tokenLocalStorage'
+const jwtExpirationTimeMS = 1800000
 
 const isTokenEmpty = (token: string | null) => {
     if (token === null || token === '') {
@@ -13,7 +14,8 @@ const isTokenEmpty = (token: string | null) => {
 const initialState: AuthState = {
     token: !isTokenEmpty(localStorage.getItem(tokenLocalStorage)) ? localStorage.getItem(tokenLocalStorage) as string : '',
     isAuthenticated: !isTokenEmpty(localStorage.getItem(tokenLocalStorage)),
-    loginHasFailed: false
+    loginHasFailed: false,
+    expirationDate: undefined,
 }
 
 export function authReducer (
@@ -32,6 +34,7 @@ export function authReducer (
                 token: action.token,
                 isAuthenticated: true,
                 loginHasFailed: false,
+                expirationDate: new Date(Date.now() + jwtExpirationTimeMS),
             }
         case SET_LOGIN_HAS_FAILED:
             return {
@@ -43,7 +46,8 @@ export function authReducer (
             return {
                 token: '',
                 isAuthenticated: false,
-                loginHasFailed: false
+                loginHasFailed: false,
+                expirationDate: undefined,
             }
         default:
             return state
