@@ -8,6 +8,10 @@ import IconButton from '@material-ui/core/IconButton'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import Divider from '@material-ui/core/Divider'
+import Avatar from '@material-ui/core/Avatar'
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { AppState } from '../store/index'
 import {startPhotosFetched, selectPhoto, selectNextPhoto, selectPreviousPhoto} from '../store/photo/actions'
@@ -18,6 +22,7 @@ import ThumnailsGalery from './ThumnailsGalery'
 import DrawerAlbums from './DrawerAlbums'
 import MainPhoto  from './MainPhoto'
 import { Photo } from "../types/Photo"
+import {logoutAction} from "../store/auth-profile/actions"
 
 interface WelcomeProps {
   startPhotosFetched: typeof startPhotosFetched,
@@ -25,6 +30,7 @@ interface WelcomeProps {
   selectPhoto: typeof selectPhoto,
   selectNextPhoto: typeof selectNextPhoto,
   selectPreviousPhoto: typeof selectPreviousPhoto,
+  logoutAction: typeof logoutAction,
   photos: Array<Photo>,
   albums: AlbumState,
   size: any,
@@ -69,7 +75,14 @@ const Welcome = (props: WelcomeProps) => {
         alignItems: 'center',
         padding: theme.spacing(0, 1),
         ...theme.mixins.toolbar,
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
+      },
+      drawerHeaderAccount: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: theme.spacing(0, 1),
+        ...theme.mixins.toolbar,
+        justifyContent: 'flex-start',
       },
 
     }),
@@ -115,8 +128,26 @@ const Welcome = (props: WelcomeProps) => {
       )
     }
 
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
+    const handleLogout = () => {
+      handleClose()
+      props.logoutAction()
+    }
+
     let drawerElem = null
     if (props.albums.albums.length>0) {
+      const ITEM_HEIGHT = 48;
+
         drawerElem = (
         <Drawer
           className={classesDrawer.drawer}
@@ -128,6 +159,34 @@ const Welcome = (props: WelcomeProps) => {
           }}
         >
           <div className={classesDrawer.drawerHeader}>
+            <div className={classesDrawer.drawerHeaderAccount}>
+              <Avatar>H</Avatar>
+              <IconButton
+                  aria-label="more"
+                  aria-controls="long-menu"
+                  aria-haspopup="true"
+                  onClick={handleClick}
+              >
+                <MoreVertIcon />
+              </IconButton>
+              <Menu
+                  id="long-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={open}
+                  onClose={handleClose}
+                  PaperProps={{
+                    style: {
+                      maxHeight: ITEM_HEIGHT * 4.5,
+                      width: 200,
+                    },
+                  }}
+              >
+                <MenuItem key={'logout'} onClick={handleLogout}>
+                  Logout
+                </MenuItem>
+              </Menu>
+            </div>
             <IconButton onClick={props.toggleDrawer}>
               {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
@@ -166,6 +225,7 @@ export default withSize({ monitorHeight: true })(connect(
   mapStateToProps,
   { startPhotosFetched, selectPhoto, selectNextPhoto, selectPreviousPhoto,
     startFetchAlbums,
-    toggleDrawer
+    toggleDrawer,
+    logoutAction,
   }
 )(Welcome))

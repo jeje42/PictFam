@@ -1,5 +1,6 @@
 export const DRAWER_TOGGLED = 'DRAWER_TOGGLED'
 export const DRAWER_WIDTH_CHANGED = 'DRAWER_WIDTH_CHANGED'
+export const INIT_DRAWERSTATE = 'INIT_DRAWERSTATE'
 
 export interface DrawerState {
   open: boolean,
@@ -15,4 +16,8 @@ interface DrawerWidthChangedAction {
   width: number
 }
 
-export type DrawerActionTypes = ToggleDrawerAction | DrawerWidthChangedAction
+interface InitDrawerStateAction {
+  type: typeof INIT_DRAWERSTATE
+}
+
+export type DrawerActionTypes = ToggleDrawerAction | DrawerWidthChangedAction | InitDrawerStateAction

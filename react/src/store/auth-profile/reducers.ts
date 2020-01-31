@@ -1,8 +1,18 @@
-import {AuthActionTypes, AuthState, DONE_LOGIN, START_LOGIN} from './types'
+import {AuthActionTypes, AuthState, DONE_LOGIN, LOGOUT, START_LOGIN} from './types'
+
+export const tokenLocalStorage = 'tokenLocalStorage'
+
+const isTokenEmpty = (token: string | null) => {
+    if (token === null || token === '') {
+        return true
+    }
+
+    return false
+}
 
 const initialState: AuthState = {
-    token: '',
-    isAuthenticated: false
+    token: !isTokenEmpty(localStorage.getItem(tokenLocalStorage)) ? localStorage.getItem(tokenLocalStorage) as string : '',
+    isAuthenticated: !isTokenEmpty(localStorage.getItem(tokenLocalStorage))
 }
 
 export function authReducer (
@@ -15,10 +25,17 @@ export function authReducer (
                 ...state
             }
         case DONE_LOGIN:
+            localStorage.setItem(tokenLocalStorage, action.token)
             return {
                 ...state,
                 token: action.token,
                 isAuthenticated: true,
+            }
+        case LOGOUT:
+            localStorage.setItem(tokenLocalStorage, '')
+            return {
+                token: '',
+                isAuthenticated: false
             }
         default:
             return state

@@ -1,4 +1,4 @@
-import { DrawerState, DrawerActionTypes, DRAWER_TOGGLED, DRAWER_WIDTH_CHANGED } from './types'
+import {DrawerState, DrawerActionTypes, DRAWER_TOGGLED, DRAWER_WIDTH_CHANGED, INIT_DRAWERSTATE} from './types'
 
 const initialState: DrawerState = {
   open: false,
@@ -20,6 +20,8 @@ export function drawerReducer (
         ...state,
         width: action.width
       }
+    case INIT_DRAWERSTATE:
+      return initialState
     default:
       return state
   }

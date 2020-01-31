@@ -3,6 +3,7 @@ import { Album } from '../../types/Album'
 export const START_ALBUM_FETCHED = 'START_ALBUM_FETCHED '
 export const ALBUM_FETCHED = 'ALBUM_FETCHED '
 export const ALBUM_SELECTED = 'ALBUM_SELECTED'
+export const INIT_ALBUMSTATE = 'INIT_ALBUMSTATE'
 
 export interface AlbumState {
   albums: Album[],
@@ -24,4 +25,8 @@ interface SelectAlbumAction {
   album: Album
 }
 
-export type AlbumActionTypes = StartFetchAlbumsAction | AlbumFetchedAction | SelectAlbumAction
+interface InitAlbumStateAction {
+  type: typeof INIT_ALBUMSTATE
+}
+
+export type AlbumActionTypes = StartFetchAlbumsAction | AlbumFetchedAction | SelectAlbumAction | InitAlbumStateAction

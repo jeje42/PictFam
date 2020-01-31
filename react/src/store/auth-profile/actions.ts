@@ -1,4 +1,4 @@
-import {DONE_LOGIN, LoginObject, START_LOGIN} from "./types";
+import {DONE_LOGIN, LoginObject, LOGOUT, START_LOGIN} from "./types";
 
 export function startLogin(loginObject: LoginObject) {
     return {
@@ -11,5 +11,11 @@ export function doneLogin(token: string) {
     return {
         type: DONE_LOGIN,
         token: token
+    }
+}
+
+export function logoutAction() {
+    return {
+        type: LOGOUT
     }
 }

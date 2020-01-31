@@ -1,4 +1,13 @@
-import { PhotosState, PhotoActionTypes, PHOTOS_FETCHED, PHOTOS_SELECTED, PHOTOS_SELECTED_NEXT, PHOTOS_SELECTED_PREVIOUS, NEW_ALBUM_SELECTED } from './types'
+import {
+  PhotosState,
+  PhotoActionTypes,
+  PHOTOS_FETCHED,
+  PHOTOS_SELECTED,
+  PHOTOS_SELECTED_NEXT,
+  PHOTOS_SELECTED_PREVIOUS,
+  NEW_ALBUM_SELECTED,
+  INIT_PHOTOS_STATE
+} from './types'
 import { Photo } from '../../types/Photo'
 import { Album } from '../../types/Album'
 
@@ -68,6 +77,8 @@ export function photosReducer (
       return selectedPreviousPhoto(state)
     case NEW_ALBUM_SELECTED:
       return newAlbumSelected(state, action.albums)
+    case INIT_PHOTOS_STATE:
+      return initialState
     default:
       return state
   }

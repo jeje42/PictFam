@@ -1,7 +1,10 @@
-import {call, put, takeLatest} from 'redux-saga/effects'
-import {AuthActionTypes, DONE_LOGIN, LoginObject, START_LOGIN} from './types'
+import {call, put, takeLatest, takeEvery} from 'redux-saga/effects'
+import {AuthActionTypes, DONE_LOGIN, LoginObject, LOGOUT, START_LOGIN} from './types'
 import {axiosInstance} from '../../rest/methods'
 import {AxiosRequestConfig} from 'axios'
+import {INIT_ALBUMSTATE} from "../album/types";
+import {INIT_PHOTOS_STATE} from "../photo/types";
+import {INIT_DRAWERSTATE} from "../drawer/types";
 
 interface Response {
     data: {
@@ -42,6 +45,20 @@ function* tryToLoginSaga(action: AuthActionTypes) {
     })
 }
 
+function* logoutSaga(action: AuthActionTypes) {
+    const states = [INIT_ALBUMSTATE, INIT_PHOTOS_STATE, INIT_DRAWERSTATE]
+
+    for (let i=0; i<states.length ; i++) {
+        yield put({
+            type: states[i]
+        })
+    }
+}
+
 export function* watchTryLogin() {
     yield takeLatest(START_LOGIN, tryToLoginSaga)
+}
+
+export function* watchLogout() {
+    yield takeEvery(LOGOUT, logoutSaga)
 }

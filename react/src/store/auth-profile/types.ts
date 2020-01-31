@@ -1,5 +1,6 @@
 export const START_LOGIN = 'START_LOGIN'
 export const DONE_LOGIN = 'DONE_LOGIN'
+export const LOGOUT = 'LOGOUT'
 
 export interface LoginObject {
   userNameOrEmail: string,
@@ -21,4 +22,8 @@ interface DoneLoginAction {
   token: string
 }
 
-export type AuthActionTypes = StartLoginAction | DoneLoginAction
+interface LogoutAction {
+  type: typeof  LOGOUT
+}
+
+export type AuthActionTypes = StartLoginAction | DoneLoginAction | LogoutAction

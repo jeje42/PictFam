@@ -4,7 +4,6 @@ import {axiosInstance} from "../../rest/methods";
 import {Album} from "../../types/Album";
 import {ALBUM_FETCHED, ALBUM_SELECTED, AlbumActionTypes, AlbumState, START_ALBUM_FETCHED} from "./types";
 
-
 interface Response {
     data: Album[]
 }
