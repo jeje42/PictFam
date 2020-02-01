@@ -1,9 +1,11 @@
 import {AuthActionTypes, AuthState, DONE_LOGIN, LOGOUT, SET_LOGIN_HAS_FAILED, START_LOGIN} from './types'
 
 export const tokenLocalStorage = 'tokenLocalStorage'
+export const tokenExpirationDateLocalStorage = 'tokenExpirationDateLocalStorage'
+
 const jwtExpirationTimeMS = 1800000
 
-const isTokenEmpty = (token: string | null) => {
+const isEmpty = (token: string | null) => {
     if (token === null || token === '') {
         return true
     }
@@ -12,10 +14,10 @@ const isTokenEmpty = (token: string | null) => {
 }
 
 const initialState: AuthState = {
-    token: !isTokenEmpty(localStorage.getItem(tokenLocalStorage)) ? localStorage.getItem(tokenLocalStorage) as string : '',
-    isAuthenticated: !isTokenEmpty(localStorage.getItem(tokenLocalStorage)),
+    token: !isEmpty(localStorage.getItem(tokenLocalStorage)) ? localStorage.getItem(tokenLocalStorage) as string : '',
+    isAuthenticated: !isEmpty(localStorage.getItem(tokenLocalStorage)),
     loginHasFailed: false,
-    expirationDate: undefined,
+    expirationDate: isEmpty(localStorage.getItem(tokenExpirationDateLocalStorage)) ? undefined : new Date(localStorage.getItem(tokenExpirationDateLocalStorage)!),
 }
 
 export function authReducer (
@@ -29,12 +31,14 @@ export function authReducer (
             }
         case DONE_LOGIN:
             localStorage.setItem(tokenLocalStorage, action.token)
+            let expirationDate = new Date(Date.now() + jwtExpirationTimeMS)
+            localStorage.setItem(tokenExpirationDateLocalStorage, expirationDate.toString())
             return {
                 ...state,
                 token: action.token,
                 isAuthenticated: true,
                 loginHasFailed: false,
-                expirationDate: new Date(Date.now() + jwtExpirationTimeMS),
+                expirationDate: expirationDate,
             }
         case SET_LOGIN_HAS_FAILED:
             return {
@@ -43,6 +47,7 @@ export function authReducer (
             }
         case LOGOUT:
             localStorage.setItem(tokenLocalStorage, '')
+            localStorage.setItem(tokenExpirationDateLocalStorage, '')
             return {
                 token: '',
                 isAuthenticated: false,
