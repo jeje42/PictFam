@@ -37,6 +37,7 @@
     "redux-thunk": "^2.3.0",
     "sockjs-client": "^1.0.3",
     "stompjs": "^2.3.3",
+    "ts-interface-checker": "^0.1.10",
     "typesafe-actions": "^5.1.0"
   },
   "scripts": {
@@ -70,6 +71,7 @@
     "redux-devtools": "^3.5.0",
     "redux-devtools-extension": "^2.13.8",
     "source-map-loader": "^0.2.4",
+    "ts-interface-builder": "^0.2.1",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.3",
     "webpack": "^4.41.2",

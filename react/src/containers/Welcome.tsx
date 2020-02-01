@@ -42,6 +42,7 @@ interface WelcomeProps {
   drawerWidth: number,
   token: string,
   albumIdSelected: number,
+  userName: string,
 }
 
 const Welcome = (props: WelcomeProps) => {
@@ -148,6 +149,18 @@ const Welcome = (props: WelcomeProps) => {
       props.logoutAction()
     }
 
+    const userNameAvatar = (userName: string): string => {
+      if (userName === undefined || userName === null || userName === '') {
+        return "U"
+      }
+
+      if (userName.length === 1) {
+        return userName[0]
+      } else {
+        return userName[0] + userName[1]
+      }
+    }
+
     let drawerElem = null
     if (props.albums.albums.length>0) {
       const ITEM_HEIGHT = 48;
@@ -164,7 +177,7 @@ const Welcome = (props: WelcomeProps) => {
         >
           <div className={classesDrawer.drawerHeader}>
             <div className={classesDrawer.drawerHeaderAccount}>
-              <Avatar>H</Avatar>
+              <Avatar>{userNameAvatar(props.userName)}</Avatar>
               <IconButton
                   aria-label="more"
                   aria-controls="long-menu"
@@ -229,7 +242,8 @@ const mapStateToProps = (state: AppState) => ({
   openDrawer: state.drawer.open,
   drawerWidth: state.drawer.width,
   token: state.auth.token,
-  albumIdSelected: state.albums.albumIdSelected
+  albumIdSelected: state.albums.albumIdSelected,
+  userName: state.auth.userName
 })
 
 export default withSize({ monitorHeight: true })(connect(

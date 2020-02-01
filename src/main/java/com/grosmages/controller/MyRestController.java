@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.security.Principal;
 
 import com.grosmages.entities.Album;
 import com.grosmages.entities.Photo;
@@ -60,5 +61,11 @@ public class MyRestController {
 			photo.getAlbum().setSons(sonsEmpty);
 		});
 		return photos;
+	}
+
+	@RequestMapping(value = "/userdetails")
+	public String getUserDetails(Principal principal) throws IOException {
+		String userName = principal.getName();
+		return userName;
 	}
 }

@@ -1,5 +1,13 @@
 import {call, put, takeLatest, takeEvery} from 'redux-saga/effects'
-import {AuthActionTypes, DONE_LOGIN, LoginObject, LOGOUT, SET_LOGIN_HAS_FAILED, START_LOGIN} from './types'
+import {
+    AuthActionTypes,
+    DONE_LOGIN,
+    LoginObject,
+    LOGOUT,
+    SET_LOGIN_HAS_FAILED,
+    SET_USERNAME,
+    START_LOGIN
+} from './types'
 import {axiosInstance} from '../../rest/methods'
 import {AxiosRequestConfig} from 'axios'
 import {INIT_ALBUMSTATE} from "../album/types";
@@ -20,7 +28,17 @@ const requestOption: AxiosRequestConfig = {
     },
 }
 
+const requestOptionGet = (token: string): AxiosRequestConfig => {
+    return {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        },
+    }
+}
+
 const postLogin = (data: any, options: AxiosRequestConfig) => axiosInstance.post('/api/auth/signin', data,  options)
+
+const getUserName = (options: AxiosRequestConfig) => axiosInstance.get('/userdetails', options)
 
 function* tryToLoginSaga(action: AuthActionTypes) {
     if(action.type !== START_LOGIN) {
@@ -49,6 +67,13 @@ function* tryToLoginSaga(action: AuthActionTypes) {
         yield put({
             type: DONE_LOGIN,
             token: response.data.accessToken
+        })
+
+        const responseUserName: Response = yield call(getUserName, requestOptionGet(response.data.accessToken))
+        
+        yield put({
+            type: SET_USERNAME,
+            userName: responseUserName.data
         })
     }
 }
