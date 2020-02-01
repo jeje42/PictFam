@@ -12,6 +12,8 @@ import Avatar from '@material-ui/core/Avatar'
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { AppState } from '../store/index'
 import {startPhotosFetched, selectPhoto, selectNextPhoto, selectPreviousPhoto} from '../store/photo/actions'
@@ -39,23 +41,8 @@ interface WelcomeProps {
   openDrawer: boolean,
   drawerWidth: number,
   token: string,
+  albumIdSelected: number,
 }
-
-const useStyles = makeStyles(() => ({
-  flexMainContainer: {
-    height: '100%',
-  },
-  galery: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right:0,
-  },
-  mainPhoto: {
-    marginTop: 'auto',
-    marginBottom: 'auto',
-  }
-}))
 
 const Welcome = (props: WelcomeProps) => {
   const [drawerWidth, setDrawerWidth] = React.useState(0)
@@ -84,6 +71,10 @@ const Welcome = (props: WelcomeProps) => {
         padding: theme.spacing(0, 1),
         ...theme.mixins.toolbar,
         justifyContent: 'flex-start',
+      },
+      backdrop: {
+        zIndex: theme.zIndex.drawer - 1,
+        color: '#fff',
       },
 
     }),
@@ -115,6 +106,14 @@ const Welcome = (props: WelcomeProps) => {
     props.startFetchAlbums(props.token)
   }, [])
 
+  useEffect(() => {
+    if (props.albumIdSelected === -1) {
+      setOpenBackdrop(true)
+    } else {
+      setOpenBackdrop(false)
+    }
+  }, [props.albumIdSelected])
+
     let mainPhotoElem = null
     if(props.photos.length>0) {
       mainPhotoElem = (
@@ -131,16 +130,21 @@ const Welcome = (props: WelcomeProps) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const handleCloseBackdrop = () => {
+    setOpenBackdrop(false);
+  }
+
+    const handleClickMenu = (event: React.MouseEvent<HTMLElement>) => {
       setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleCloseMenu = () => {
       setAnchorEl(null);
     };
 
     const handleLogout = () => {
-      handleClose()
+      handleCloseMenu()
       props.logoutAction()
     }
 
@@ -165,7 +169,7 @@ const Welcome = (props: WelcomeProps) => {
                   aria-label="more"
                   aria-controls="long-menu"
                   aria-haspopup="true"
-                  onClick={handleClick}
+                  onClick={handleClickMenu}
               >
                 <MoreVertIcon />
               </IconButton>
@@ -174,7 +178,7 @@ const Welcome = (props: WelcomeProps) => {
                   anchorEl={anchorEl}
                   keepMounted
                   open={open}
-                  onClose={handleClose}
+                  onClose={handleCloseMenu}
                   PaperProps={{
                     style: {
                       maxHeight: ITEM_HEIGHT * 4.5,
@@ -211,6 +215,10 @@ const Welcome = (props: WelcomeProps) => {
         {mainPhotoElem}
 
         <CheckTokenValidComponent/>
+
+        <Backdrop className={classesDrawer.backdrop} open={openBackdrop} onClick={handleCloseBackdrop}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </div>
     )
 }
@@ -221,6 +229,7 @@ const mapStateToProps = (state: AppState) => ({
   openDrawer: state.drawer.open,
   drawerWidth: state.drawer.width,
   token: state.auth.token,
+  albumIdSelected: state.albums.albumIdSelected
 })
 
 export default withSize({ monitorHeight: true })(connect(

@@ -1,7 +1,7 @@
 import {DrawerState, DrawerActionTypes, DRAWER_TOGGLED, DRAWER_WIDTH_CHANGED, INIT_DRAWERSTATE} from './types'
 
 const initialState: DrawerState = {
-  open: false,
+  open: true,
   width: 0
 }
 
