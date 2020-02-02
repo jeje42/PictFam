@@ -65,7 +65,7 @@ const Welcome = (props: WelcomeProps) => {
         padding: theme.spacing(0, 1),
         ...theme.mixins.toolbar,
         justifyContent: 'space-between',
-        width: 100
+        minwidth: 100
       },
       drawerHeaderAccount: {
         display: 'flex',
