@@ -73,7 +73,7 @@ public class FilesScheduler {
 	@Autowired
 	private FilesUtil filesUtil;
 	
-//	@Scheduled(cron="0 * * * * *")
+	@Scheduled(cron="0 0 * * * *")
 //	@Scheduled(fixedRate = 600000)
 	public void scanFiles() {		
 		properties.getFolders().forEach(folder -> {

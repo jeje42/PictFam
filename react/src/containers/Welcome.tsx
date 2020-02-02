@@ -57,7 +57,7 @@ const Welcome = (props: WelcomeProps) => {
         height: '100%',
       },
       drawer: {
-        flexShrink: 0
+        flexShrink: 0,
       },
       drawerHeader: {
         display: 'flex',
@@ -65,6 +65,7 @@ const Welcome = (props: WelcomeProps) => {
         padding: theme.spacing(0, 1),
         ...theme.mixins.toolbar,
         justifyContent: 'space-between',
+        width: 100
       },
       drawerHeaderAccount: {
         display: 'flex',
@@ -161,11 +162,9 @@ const Welcome = (props: WelcomeProps) => {
       }
     }
 
-    let drawerElem = null
-    if (props.albums.albums.length>0) {
       const ITEM_HEIGHT = 48;
 
-        drawerElem = (
+      const drawerElem = (
         <Drawer
           className={classesDrawer.drawer}
           variant="persistent"
@@ -212,8 +211,7 @@ const Welcome = (props: WelcomeProps) => {
           <DrawerAlbums />
           <Divider />
         </Drawer>
-      )
-    }
+    )
 
     let toolbarElement = (
       <ThumnailsGalery

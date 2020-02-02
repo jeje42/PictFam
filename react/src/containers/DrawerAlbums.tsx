@@ -15,6 +15,8 @@ import { Album } from '../types/Album'
 import { selectAlbum } from '../store/album/actions'
 import { newAlbumSelected } from '../store/photo/actions'
 import { drawerWidthChanged } from '../store/drawer/actions'
+import Alert from "@material-ui/lab/Alert";
+import {Grow} from "@material-ui/core";
 
 
 interface DrawerAlbumsProps {
@@ -168,6 +170,9 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
   return (
     <div>
       {listRootElem}
+      <Grow in={!props.albums || props.albums.length === 0}>
+        <Alert severity="error">No albums available</Alert>
+      </Grow>
     </div>
   )
 }

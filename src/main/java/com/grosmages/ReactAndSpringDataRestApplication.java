@@ -41,7 +41,7 @@ import com.grosmages.repositories.SystemGroupLocalRepository;
 import com.grosmages.repositories.UserRepository;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.grosmages")
+//@ComponentScan(basePackages = "com.grosmages")
 @Import({RepositoryConfig.class})
 @EnableScheduling
 @Transactional
@@ -99,7 +99,7 @@ public class ReactAndSpringDataRestApplication implements CommandLineRunner {
 			});
 		});
 		
-		filesScheduler.scanFiles();
+//		filesScheduler.scanFiles();
 	}
 	
 	private void addGroupToUser(User user, SystemGroupLocal systemGroupLocal) {
