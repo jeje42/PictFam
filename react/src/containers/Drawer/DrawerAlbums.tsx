@@ -10,13 +10,15 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { withSize } from 'react-sizeme'
 
-import { AppState } from '../store/index'
-import { Album } from '../types/Album'
-import { selectAlbum } from '../store/album/actions'
-import { newAlbumSelected } from '../store/photo/actions'
-import { drawerWidthChanged } from '../store/drawer/actions'
+import { AppState } from '../../store'
+import { Album } from '../../types/Album'
+import { selectAlbum } from '../../store/album/actions'
+import { newAlbumSelected } from '../../store/photo/actions'
+import { drawerWidthChanged } from '../../store/drawer/actions'
 import Alert from "@material-ui/lab/Alert";
 import {Grow} from "@material-ui/core";
+import {AlbumsHash} from './DrawerInterface'
+import {AlbumLeaf} from './AlbumLeaf'
 
 
 interface DrawerAlbumsProps {
@@ -26,10 +28,6 @@ interface DrawerAlbumsProps {
   drawerWidthChanged: typeof drawerWidthChanged,
   albumIdSelected: number,
   size: any,
-}
-
-interface AlbumsHash {
-  [id: number]: boolean
 }
 
 const recursAlbumOpen = (album: Album, finalObject: AlbumsHash) => {
@@ -46,10 +44,20 @@ const generateAlbumListRecurs = (album: Album, finalList: Array<Album>) => {
   })
 }
 
-const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
+const DrawerAlbums: React.FC<DrawerAlbumsProps> = (props) => {
   const [albumsHash, setAlbumsHash] = React.useState({} as AlbumsHash)
 
+  useEffect( () => {
+    let newAlbumHash: AlbumsHash = {}
+    props.albums.forEach((album: Album) => {
+      recursAlbumOpen(album, newAlbumHash)
+    })
+
+    setAlbumsHash(newAlbumHash)
+  }, [])
+
   useEffect(() => {
+    debugger
     props.drawerWidthChanged(Math.trunc(props.size.width))
   }, [props.size.width])
 
@@ -75,75 +83,23 @@ const DrawerAlbums: React.SFC<DrawerAlbumsProps> = (props) => {
     }
   };
 
-  /**
-   * Used to generate an album tree in the drawer.
-   *  - Generates the item (variable item)
-   *  - if the album has sons, generates collapse and the nested by calling generateAlbumLeaf recursively.
-   **/
-  const generateAlbumLeaf = (album: Album, albumsHash: AlbumsHash, nestedIndex: number) => {
-    const useStyles = makeStyles((theme: any) =>
-      createStyles({
-        nested: {
-          paddingLeft: nestedIndex * theme.spacing(4),
-        },
-      }),
-    )
-    const localClasses = useStyles()
 
-    const albumHasSons = album.sons && album.sons.length
-
-    let item = (
-      <ListItem
-        key={album.id}
-        button
-        className={localClasses.nested}
-        onClick={(event: any) => handleListAlbumClick(event, album, false)}
-        selected={props.albumIdSelected === album.id}
-        >
-        <ListItemText primary={album.name} />
-        {albumHasSons?(albumsHash[album.id] ?
-          <ExpandLess onClick={(event: any) => handleListAlbumClick(event, album, true)} /> :
-          <ExpandMore onClick={(event: any) => handleListAlbumClick(event, album, true)}/>):null}
-      </ListItem>
-    )
-    let collapse = null
-    if (albumHasSons > 0) {
-      let sonsElem = album.sons.map(albumSon => {
-        return generateAlbumLeaf(albumSon, albumsHash, nestedIndex+1)
-      })
-
-      collapse = (
-        <Collapse in={albumsHash[album.id]} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {sonsElem}
-          </List>
-        </Collapse>
-      )
-    }
-
-    return (
-      <div>
-        {item}
-        {collapse}
-      </div>
-    )
-  }
-
-  useEffect( () => {
-    let newAlbumHash: AlbumsHash = {}
-    props.albums.forEach((album: Album) => {
-      recursAlbumOpen(album, newAlbumHash)
-    })
-
-    setAlbumsHash(newAlbumHash)
-  }, [])
 
   let listRootElem = null
   if (props.albums.length>0) {
     listRootElem = (
       <List>
         {props.albums.map(album => {
-          return generateAlbumLeaf(album, albumsHash, 1)
+          return (
+              <AlbumLeaf
+                  key={album.id}
+                  album={album}
+                  albumsHash={albumsHash}
+                  nestedIndex={1}
+                  albumIdSelected={props.albumIdSelected}
+                  handleListAlbumClick={handleListAlbumClick}
+              />
+          )
           })}
       </List>
     )

@@ -21,7 +21,7 @@ import { startFetchAlbums } from '../store/album/actions'
 import { toggleDrawer } from '../store/drawer/actions'
 import { AlbumState } from '../store/album/types'
 import ThumnailsGalery from './ThumnailsGalery'
-import DrawerAlbums from './DrawerAlbums'
+import DrawerAlbums from './Drawer/DrawerAlbums'
 import MainPhoto  from './MainPhoto'
 import { Photo } from "../types/Photo"
 import {logoutAction} from "../store/auth-profile/actions"
@@ -65,7 +65,6 @@ const Welcome = (props: WelcomeProps) => {
         padding: theme.spacing(0, 1),
         ...theme.mixins.toolbar,
         justifyContent: 'space-between',
-        minwidth: 100
       },
       drawerHeaderAccount: {
         display: 'flex',
