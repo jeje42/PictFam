@@ -15,6 +15,9 @@ public interface PhotoRepository extends PagingAndSortingRepository<Photo, Long>
 	
 	@PreAuthorize("isAuthenticated()")
 	@Query("SELECT distinct p FROM Photo p Where"
-			+ " (p.rights.owner.id = ?#{ principal?.id } and (p.rights.ownerRead is true or p.rights.othersRead is true))")
+			+ " (p.rights.owner.id = ?#{ principal?.id } and (p.rights.ownerRead is true or p.rights.othersRead is true))"
+			+ " or ( p.rights.systemGroupLocal is not empty "
+			+ " and p.rights.groupRead is true"
+			+ " and ?#{ principal?.id } in (select u.id from SystemGroupLocal g join g.users u where g = p.rights.systemGroupLocal))")
 	Collection<Photo> findAllPhotos();
 }
