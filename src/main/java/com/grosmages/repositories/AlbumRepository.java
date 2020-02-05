@@ -24,7 +24,7 @@ public interface AlbumRepository extends PagingAndSortingRepository<Album, Long>
 //	Collection<Album> findAllRoot();
 	
 	@PreAuthorize("isAuthenticated()")
-	@Query("SELECT distinct a FROM Album a WHERE a.isRoot is true")
+	@Query("SELECT distinct a FROM Album a WHERE a.isRoot = true")
 	Collection<Album> findAllRoot();
 	
 	@PreAuthorize("")
