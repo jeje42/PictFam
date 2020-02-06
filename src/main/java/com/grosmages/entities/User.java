@@ -1,5 +1,4 @@
 package com.grosmages.entities;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,18 +11,23 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
 @ToString
-//@EqualsAndHashCode(exclude = {"groups", "roles"})
 @Entity
+@Component
+@Scope("prototype")
 public class User {
 	private @Id @GeneratedValue Long id;
 	String name;
-	String uid;
-	String password;
+
+	@JsonIgnore String uid;
+	@JsonIgnore String password;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
@@ -31,6 +35,7 @@ public class User {
 	@JoinTable(name = "user_systemgrouplocal",
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "systemgrouplocal_id"))
+	@JsonIgnore
 	private Set<SystemGroupLocal> groups = new HashSet<>();
 	
 	@ManyToMany(fetch = FetchType.LAZY)

@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.grosmages.FilesScheduler;
+import com.grosmages.entities.User;
+import com.grosmages.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,12 @@ public class MyRestController {
 	
 	@Autowired
 	private PhotoRepository photoRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	FilesScheduler filesScheduler;
 	
 	@RequestMapping(value = "/albumstree")	
 	public Collection<Album> getAlbumTree() throws IOException {
@@ -65,9 +74,34 @@ public class MyRestController {
 	}
 
 	@RequestMapping(value = "/userdetails")
-	public String getUserDetails(Principal principal) throws IOException {
+	public User getUserDetails(Principal principal) throws IOException {
 		String userName = principal.getName();
-		return userName;
+
+		User user = userRepository.findByName(userName).orElse(null);
+		if (user == null) {
+			return null;
+		}
+
+		user.setRoles(user.getRoles().stream().map(role -> {
+			role.setUsers(new HashSet<>());
+			return role;
+		}).collect(Collectors.toSet()));
+
+		return user;
+	}
+
+	@RequestMapping(value = "/scanFiles")
+	public String scanFiles(Principal principal) throws IOException {
+		Thread thread = new Thread(){
+			@Override
+			public void run(){
+				log.error("Launching job !");
+				filesScheduler.scanFiles();
+			}
+		};
+		thread.start();
+
+		return "JobStarted";
 	}
 	
 	private void filterSons(Album album) {

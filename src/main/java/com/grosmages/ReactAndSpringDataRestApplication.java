@@ -16,9 +16,11 @@
 package com.grosmages;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.Hibernate;
+import com.grosmages.entities.Role;
+import com.grosmages.repositories.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,6 +68,9 @@ public class ReactAndSpringDataRestApplication implements CommandLineRunner {
 	
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
 	
 	@Autowired
 	private SystemGroupLocalRepository systemGroupLocalRepository;
@@ -77,9 +81,25 @@ public class ReactAndSpringDataRestApplication implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		photoRepository.findAll().forEach(photo -> log.info(photo.getPath() + File.separator + photo.getName()));
-		
+
+		Role roleAdmin = createRoleIfNotFound("ROLE_ADMIN");
+		Role roleUser = createRoleIfNotFound("ROLE_USER");
+
+
+
 		properties.getUsers().forEach(user -> {
-			userRepository.save(user);
+			User newUser = context.getBean(User.class);
+			newUser.setName(user.getName());
+			newUser.setPassword(user.getPassword());
+			newUser.setUid(user.getUid());
+
+			Set<Role> roles = new HashSet();
+			roles.add(roleUser);
+			if (user.getAdmin()) {
+				roles.add(roleAdmin);
+			}
+			newUser.setRoles(roles);
+			userRepository.save(newUser);
 		});
 		
 		properties.getGroups().forEach(group -> {
@@ -110,6 +130,16 @@ public class ReactAndSpringDataRestApplication implements CommandLineRunner {
 	private void addUserToGroup(User user, SystemGroupLocal systemGroupLocal) {
 		Set<User> users = systemGroupLocal.getUsers();
 		users.add(user);
+	}
 
+	private Role createRoleIfNotFound(String name) {
+
+		Role role = roleRepository.findByName(name).orElse(null);
+		if (role == null) {
+			role = new Role();
+			role.setName(name);
+			roleRepository.save(role);
+		}
+		return role;
 	}
 }
