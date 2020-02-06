@@ -8,11 +8,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.grosmages.FilesScheduler;
+import com.grosmages.entities.Role;
 import com.grosmages.entities.User;
+import com.grosmages.repositories.RoleRepository;
 import com.grosmages.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +41,9 @@ public class MyRestController {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Autowired
 	FilesScheduler filesScheduler;
@@ -91,7 +98,19 @@ public class MyRestController {
 	}
 
 	@RequestMapping(value = "/scanFiles")
-	public String scanFiles(Principal principal) throws IOException {
+	public ResponseEntity<String> scanFiles(Principal principal) throws IOException {
+		String userName = principal.getName();
+
+		User user = userRepository.findByName(userName).orElse(null);
+		Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElse(null);
+		if (user == null || adminRole == null) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+
+		if (!user.getRoles().contains(adminRole)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+
 		Thread thread = new Thread(){
 			@Override
 			public void run(){
@@ -101,7 +120,7 @@ public class MyRestController {
 		};
 		thread.start();
 
-		return "JobStarted";
+		return new ResponseEntity<>("JobStarted", HttpStatus.OK);
 	}
 	
 	private void filterSons(Album album) {
