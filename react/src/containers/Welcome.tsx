@@ -1,8 +1,8 @@
 import * as React from "react"
-import {useEffect } from 'react'
-import { connect } from 'react-redux'
-import { makeStyles, createStyles, useTheme } from '@material-ui/core/styles'
-import { withSize } from 'react-sizeme'
+import {useEffect} from "react"
+import {connect} from 'react-redux'
+import {createStyles, makeStyles, useTheme} from '@material-ui/core/styles'
+import {withSize} from 'react-sizeme'
 import Drawer from '@material-ui/core/Drawer'
 import IconButton from '@material-ui/core/IconButton'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
@@ -15,17 +15,19 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { AppState } from '../store/index'
-import {startPhotosFetched, selectPhoto, selectNextPhoto, selectPreviousPhoto} from '../store/photo/actions'
-import { startFetchAlbums } from '../store/album/actions'
-import { toggleDrawer } from '../store/drawer/actions'
-import { AlbumState } from '../store/album/types'
+import {AppState} from '../store/index'
+import {selectNextPhoto, selectPhoto, selectPreviousPhoto, startPhotosFetched} from '../store/photo/actions'
+import {startFetchAlbums} from '../store/album/actions'
+import {toggleDrawer} from '../store/drawer/actions'
+import {AlbumState} from '../store/album/types'
 import ThumnailsGalery from './ThumnailsGalery'
 import DrawerAlbums from './Drawer/DrawerAlbums'
-import MainPhoto  from './MainPhoto'
-import { Photo } from "../types/Photo"
-import {logoutAction} from "../store/auth-profile/actions"
+import MainPhoto from './MainPhoto'
+import {Photo} from "../types/Photo"
+import {startScanAction, logoutAction} from "../store/auth-profile/actions"
 import CheckTokenValidComponent from './CheckTokenValidComponent'
+import {User} from "../types/User";
+import {RoleName} from "../types/Role";
 
 interface WelcomeProps {
   startPhotosFetched: typeof startPhotosFetched,
@@ -33,6 +35,7 @@ interface WelcomeProps {
   selectPhoto: typeof selectPhoto,
   selectNextPhoto: typeof selectNextPhoto,
   selectPreviousPhoto: typeof selectPreviousPhoto,
+  startScanAction: typeof startScanAction,
   logoutAction: typeof logoutAction,
   photos: Array<Photo>,
   albums: AlbumState,
@@ -42,7 +45,7 @@ interface WelcomeProps {
   drawerWidth: number,
   token: string,
   albumIdSelected: number,
-  userName: string,
+  userDetails?: User,
 }
 
 const Welcome = (props: WelcomeProps) => {
@@ -144,6 +147,11 @@ const Welcome = (props: WelcomeProps) => {
       setAnchorEl(null);
     };
 
+  const handleStartScan = () => {
+    handleCloseMenu()
+    props.startScanAction(props.token)
+  }
+
     const handleLogout = () => {
       handleCloseMenu()
       props.logoutAction()
@@ -161,7 +169,20 @@ const Welcome = (props: WelcomeProps) => {
       }
     }
 
+    const userContainsRole = (user: User, roleName: RoleName) => {
+      return user.roles.filter(role => role.name === roleName.toString()).length > 0
+    }
+
       const ITEM_HEIGHT = 48;
+
+    let startScanMenuItem
+    if (props.userDetails && userContainsRole(props.userDetails, RoleName.ROLE_ADMIN)) {
+      startScanMenuItem = (
+          <MenuItem key={'startScan'} onClick={handleStartScan}>
+            Start Scan
+          </MenuItem>
+      )
+    }
 
       const drawerElem = (
         <Drawer
@@ -175,7 +196,7 @@ const Welcome = (props: WelcomeProps) => {
         >
           <div className={classesDrawer.drawerHeader}>
             <div className={classesDrawer.drawerHeaderAccount}>
-              <Avatar>{userNameAvatar(props.userName)}</Avatar>
+              <Avatar>{userNameAvatar((props.userDetails)?props.userDetails.name:'U')}</Avatar>
               <IconButton
                   aria-label="more"
                   aria-controls="long-menu"
@@ -197,6 +218,7 @@ const Welcome = (props: WelcomeProps) => {
                     },
                   }}
               >
+                {startScanMenuItem}
                 <MenuItem key={'logout'} onClick={handleLogout}>
                   Logout
                 </MenuItem>
@@ -240,7 +262,7 @@ const mapStateToProps = (state: AppState) => ({
   drawerWidth: state.drawer.width,
   token: state.auth.token,
   albumIdSelected: state.albums.albumIdSelected,
-  userName: state.auth.userName
+  userDetails: state.auth.userDetails
 })
 
 export default withSize({ monitorHeight: true })(connect(
@@ -248,6 +270,7 @@ export default withSize({ monitorHeight: true })(connect(
   { startPhotosFetched, selectPhoto, selectNextPhoto, selectPreviousPhoto,
     startFetchAlbums,
     toggleDrawer,
+    startScanAction,
     logoutAction,
   }
 )(Welcome))

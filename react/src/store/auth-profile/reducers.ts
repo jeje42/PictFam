@@ -1,5 +1,12 @@
-import {AuthActionTypes, DONE_LOGIN, LOGOUT, SET_LOGIN_HAS_FAILED, SET_USERNAME, START_LOGIN} from './types'
-import {createCheckers} from "ts-interface-checker";
+import {
+    AuthActionTypes,
+    DONE_LOGIN,
+    LOGOUT,
+    SET_LOGIN_HAS_FAILED,
+    SET_USER_DETAILS,
+    START_LOGIN
+} from './types'
+// import {createCheckers} from "ts-interface-checker";
 import {AuthState as AuthStateOriginal} from "./stateInterface";
 import authStateTi from './stateInterface-ti'
 
@@ -15,14 +22,14 @@ const isEmpty = (token: string | null) => {
     return false
 }
 
-const {AuthState} = createCheckers(authStateTi)
+// const {AuthState} = createCheckers(authStateTi)
 
 let initialState: AuthStateOriginal = {
     token: '',
     isAuthenticated: false,
     loginHasFailed: false,
     expirationDate: undefined,
-    userName: '',
+    userDetails: undefined,
 }
 
 
@@ -33,7 +40,7 @@ if (restoredStringState !== null) {
         if (initialStateParsed.expirationDate) {
             initialStateParsed.expirationDate = new Date(Date.parse(initialStateParsed.expirationDate))
         }
-        AuthState.check(initialStateParsed)
+        // AuthState.check(initialStateParsed)
         initialState = initialStateParsed
     } catch (e) {
         console.error(e)
@@ -58,10 +65,10 @@ function authReducerWrapped (
                 expirationDate: new Date(Date.now() + jwtExpirationTimeMS),
             }
 
-        case SET_USERNAME:
+        case SET_USER_DETAILS:
             return {
                 ...state,
-                userName: action.userName
+                userDetails: action.userDetails
             }
         case SET_LOGIN_HAS_FAILED:
             return {
@@ -74,7 +81,7 @@ function authReducerWrapped (
                 isAuthenticated: false,
                 loginHasFailed: false,
                 expirationDate: undefined,
-                userName: '',
+                userDetails: undefined,
             }
         default:
             return state

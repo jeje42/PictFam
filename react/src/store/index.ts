@@ -8,7 +8,7 @@ import { albumsReducer } from "./album/reducers";
 import { drawerReducer } from "./drawer/reducers";
 import { authReducer } from "./auth-profile/reducers"
 
-import {watchLogout, watchTryLogin} from './auth-profile/sagas'
+import {watchLogout, watchStartScan, watchTryLogin} from './auth-profile/sagas'
 import {watchTryFetchPhotos} from "./photo/sagas";
 import {watchTryFetchAlbums} from "./album/sagas";
 
@@ -36,6 +36,7 @@ export default function configureStore() {
   saga.run(watchTryFetchPhotos)
   saga.run(watchTryFetchAlbums)
   saga.run(watchLogout)
+  saga.run(watchStartScan)
 
   return store
 }

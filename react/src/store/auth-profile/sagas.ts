@@ -1,12 +1,12 @@
-import {call, put, takeLatest, takeEvery} from 'redux-saga/effects'
+import {call, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import {
     AuthActionTypes,
     DONE_LOGIN,
-    LoginObject,
     LOGOUT,
     SET_LOGIN_HAS_FAILED,
-    SET_USERNAME,
-    START_LOGIN
+    SET_USER_DETAILS,
+    START_LOGIN,
+    START_SCAN
 } from './types'
 import {axiosInstance} from '../../rest/methods'
 import {AxiosRequestConfig} from 'axios'
@@ -40,6 +40,8 @@ const postLogin = (data: any, options: AxiosRequestConfig) => axiosInstance.post
 
 const getUserName = (options: AxiosRequestConfig) => axiosInstance.get('/userdetails', options)
 
+const getStartScan = (options: AxiosRequestConfig) => axiosInstance.get('/scanFiles', options)
+
 function* tryToLoginSaga(action: AuthActionTypes) {
     if(action.type !== START_LOGIN) {
         return
@@ -72,9 +74,23 @@ function* tryToLoginSaga(action: AuthActionTypes) {
         const responseUserName: Response = yield call(getUserName, requestOptionGet(response.data.accessToken))
         
         yield put({
-            type: SET_USERNAME,
-            userName: responseUserName.data
+            type: SET_USER_DETAILS,
+            userDetails: responseUserName.data
         })
+    }
+}
+
+function* startScanSaga(action: AuthActionTypes) {
+    if (action.type !== START_SCAN) {
+        return
+    }
+    
+    const response: Response = yield call(getStartScan, requestOptionGet(action.token))
+    
+    if (response.status === 200) {
+        alert("Scan has begun!")
+    } else {
+        alert("Problem! Scan not started!")
     }
 }
 
@@ -90,6 +106,10 @@ function* logoutSaga(action: AuthActionTypes) {
 
 export function* watchTryLogin() {
     yield takeLatest(START_LOGIN, tryToLoginSaga)
+}
+
+export function* watchStartScan() {
+    yield takeEvery(START_SCAN, startScanSaga)
 }
 
 export function* watchLogout() {

@@ -57,7 +57,6 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = (props) => {
   }, [])
 
   useEffect(() => {
-    debugger
     props.drawerWidthChanged(Math.trunc(props.size.width))
   }, [props.size.width])
 
