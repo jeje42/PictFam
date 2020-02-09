@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {AppState} from "../store";
 import {connect} from "react-redux";
-import {makeStyles} from "@material-ui/core/styles";
+import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
+import {CircularProgress, Zoom} from "@material-ui/core";
 
 interface MyImgElementProps {
     imgUrl: string,
@@ -14,13 +15,45 @@ const defaultImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 const MyImgElement: React.FC<MyImgElementProps> = (props) => {
     const [base64img, setBase64img] = useState<Blob>()
 
+    useEffect(() => {
+        setBase64img(undefined)
+    }, [props.imgUrl])
+
     const useStyles = makeStyles((theme: any) => ({
         img: props.styleRaw,
     }))
 
-    const classes = useStyles()
+    const useStylesForSpinner = makeStyles((theme: Theme) =>
+        createStyles({
+            root: {
+                display: 'flex',
+                alignItems: 'center',
+            },
+            wrapper: {
+                margin: theme.spacing(1),
+                position: 'relative',
+            },
+            fabProgress: {
+                position: 'absolute',
+                top: -6,
+                left: -6,
+                zIndex: 1,
+            },
+            buttonProgress: {
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: -12,
+                marginLeft: -12,
+            },
+        }),
+    );
 
-    useEffect(() => {
+    const classes = useStyles()
+    const classesForSpinner = useStylesForSpinner()
+
+    if (base64img === undefined) {
+        debugger
         fetch(props.imgUrl, {
             method: 'GET',
             headers: {
@@ -30,19 +63,41 @@ const MyImgElement: React.FC<MyImgElementProps> = (props) => {
             .then(content => {
                 setBase64img(content)
             })
-    }, [props.imgUrl])
-
-    let imageUrl
-    if (base64img === undefined) {
-        imageUrl = defaultImage
-    } else {
-        imageUrl = URL.createObjectURL(base64img)
     }
+
+    let imgDefault
+    let imgLoaded
+    if (base64img === undefined) {
+        imgDefault = (
+            <Zoom in={true} style={{ transitionDelay: base64img === undefined ? '0ms' : '1000ms' }}>
+                <div className={classesForSpinner.root}>
+                    <div className={classesForSpinner.wrapper}>
+                    <img
+                        className={classes.img}
+                        src={defaultImage}
+                    />
+                    <CircularProgress size={60} className={classesForSpinner.buttonProgress} />
+                    </div>
+                </div>
+            </Zoom>
+        )
+    }
+    else {
+        imgLoaded = (
+            <Zoom in={true} style={{ transitionDelay: base64img !== undefined ? '0ms' : '500ms' }}>
+                <img
+                    className={classes.img}
+                    src={URL.createObjectURL(base64img)}
+                />
+            </Zoom>
+        )
+    }
+
     return (
-        <img
-            className={classes.img}
-            src={imageUrl}
-        />
+        <div>
+            {imgDefault}
+            {imgLoaded}
+        </div>
     )
 }
 
