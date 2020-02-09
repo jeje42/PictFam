@@ -4,21 +4,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.grosmages.entities.Album;
 import com.grosmages.entities.Photo;
@@ -26,16 +29,17 @@ import com.grosmages.repositories.AlbumRepository;
 import com.grosmages.repositories.PhotoRepository;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
-@EnableEntityLinks
 @WebAppConfiguration
 @TestPropertySource(locations = "classpath:application-test.yml")
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class FilesSchedulerTest {
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private final static String dir1 = "/tmp/album1/";
+	private final static String root = "/tmp/";
+	private final static String dir1 = root + "album1/";
 	private final static String subDir1 = dir1 + "evenement1/";
 	private final static String subDir2 = dir1 + "evenement2/";
 
@@ -54,13 +58,38 @@ public class FilesSchedulerTest {
 	@Autowired
 	private FilesScheduler fileScheduler;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
-		new File(subDir1).mkdirs();
-		new File(subDir2).mkdirs();
+		createDir(subDir1);
+		createFile(subDir1 + "/" + photo1Name);
+
+	}
+
+	private boolean createDir(String dir) {
+		new File(dir).mkdirs();
+		return true;
+	}
+
+	private boolean createFile(String file) {
 		try {
-			new File(subDir1 + "/" + photo1Name).createNewFile();
-			new File(subDir2 + "/" + photo2Name).createNewFile();
+			new File(file).createNewFile();
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@AfterEach
+	public void undoSetUp() {
+		albumRepository.deleteAll();
+		photoRepository.deleteAll();
+		Path pathToBeDeleted = Paths.get(dir1);
+		try {
+			Files.walk(pathToBeDeleted)
+					.sorted(Comparator.reverseOrder())
+					.map(Path::toFile)
+					.forEach(File::delete);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -85,6 +114,9 @@ public class FilesSchedulerTest {
 	
 	@Test
 	public void albumHierarchyTwoPhoto() {
+		assertThat(true).isEqualTo(createDir(subDir2));
+		assertThat(true).isEqualTo(createFile(subDir2 + "/" + photo2Name));
+
 		Photo photo0 = context.getBean(Photo.class);
 		photo0.setName(photo1Name);
 		photo0.setPath(subDir1);
@@ -128,9 +160,9 @@ public class FilesSchedulerTest {
 		assertThat(lAlbumsDatabase.get(2).getPath()).isEqualTo(subDir1);
 	}
 	
-	@Test
-	public void testFileAttrbutes() {
-		fileScheduler.readAttributes(Paths.get("/home/jeje/Pictures/ToSend.png"));
-	}
+//	@Test
+//	public void testFileAttrbutes() {
+//		fileScheduler.readAttributes(Paths.get("/home/jeje/Pictures/ToSend.png"));
+//	}
 
 }
