@@ -42,7 +42,6 @@ import com.grosmages.repositories.SystemGroupLocalRepository;
 import com.grosmages.repositories.UserRepository;
 
 @SpringBootApplication
-//@ComponentScan(basePackages = "com.grosmages")
 @Import({RepositoryConfig.class})
 @EnableScheduling
 @Transactional
@@ -88,38 +87,44 @@ public class ReactAndSpringDataRestApplication implements CommandLineRunner {
 
 
 		properties.getUsers().forEach(user -> {
-			User newUser = context.getBean(User.class);
-			newUser.setName(user.getName());
-			newUser.setPassword(user.getPassword());
-			newUser.setUid(user.getUid());
+			User oldUser = userRepository.findByUid(user.getUid()).orElse(null);
 
-			Set<Role> roles = new HashSet();
-			roles.add(roleUser);
-			if (user.getAdmin()) {
-				roles.add(roleAdmin);
+			if(oldUser == null) {
+				User newUser = context.getBean(User.class);
+				newUser.setName(user.getName());
+				newUser.setPassword(user.getPassword());
+				newUser.setUid(user.getUid());
+
+				Set<Role> roles = new HashSet();
+				roles.add(roleUser);
+				if (user.getAdmin()) {
+					roles.add(roleAdmin);
+				}
+				newUser.setRoles(roles);
+				userRepository.save(newUser);
 			}
-			newUser.setRoles(roles);
-			userRepository.save(newUser);
 		});
 		
 		properties.getGroups().forEach(group -> {
-			SystemGroupLocal systemGroupLocal = context.getBean(SystemGroupLocal.class);
-			systemGroupLocal.setName(group.getName());
-			systemGroupLocal.setGid(group.getGid());
-			
-			final SystemGroupLocal systemGroupLocalFinal = systemGroupLocalRepository.save(systemGroupLocal);
-			group.getUsers().forEach(userParsed -> {
-				User user = userRepository.findByUid(userParsed).orElse(null);
-				if (user == null) {
-					log.error("[Parsing group {}] User {} not found.", group.toString(), userParsed);
-				} else {
-					addGroupToUser(user, systemGroupLocalFinal);
-					userRepository.save(user);
-				}
-			});
+			SystemGroupLocal oldSystemGroupLocal = systemGroupLocalRepository.findByGid(group.getGid()).orElse(null);
+
+			if (oldSystemGroupLocal == null) {
+				SystemGroupLocal systemGroupLocal = context.getBean(SystemGroupLocal.class);
+				systemGroupLocal.setName(group.getName());
+				systemGroupLocal.setGid(group.getGid());
+
+				final SystemGroupLocal systemGroupLocalFinal = systemGroupLocalRepository.save(systemGroupLocal);
+				group.getUsers().forEach(userParsed -> {
+					User user = userRepository.findByUid(userParsed).orElse(null);
+					if (user == null) {
+						log.error("[Parsing group {}] User {} not found.", group.toString(), userParsed);
+					} else {
+						addGroupToUser(user, systemGroupLocalFinal);
+						userRepository.save(user);
+					}
+				});
+			}
 		});
-		
-//		filesScheduler.scanFiles();
 	}
 	
 	private void addGroupToUser(User user, SystemGroupLocal systemGroupLocal) {
