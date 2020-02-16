@@ -3,3 +3,16 @@
 :sourcedir: https://github.com/spring-guides/tut-react-and-spring-data-rest/tree/master
 
 https://www.baeldung.com/spring-boot-hsqldb
+
+https://spring.io/guides/gs/accessing-data-mysql/
+
+CREATE DATABASE pictfam;
+[Mysql config example]
+CREATE USER 'pictfam' IDENTIFIED BY 'pictfam';
+GRANT ALL ON pictfam.* TO pictfam;
+FLUSH PRIVILEGES;
+
+
+MysqlPictfam
+pour root user: MysqlPictFam42Prod
+pour pictfam user: MysqlPictFam42User

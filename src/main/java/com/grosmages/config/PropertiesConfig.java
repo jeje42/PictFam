@@ -19,7 +19,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class PropertiesConfig {
-	private List<String> folders;
+	private List<String> foldersImages;
+	private List<String> foldersVideos;
 	private List<UserParsed> users;
 	private List<GroupParsed> groups;
 }

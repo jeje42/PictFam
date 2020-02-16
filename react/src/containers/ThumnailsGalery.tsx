@@ -260,7 +260,7 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
 
 const mapStateToProps = (state: AppState) => ({
   photos: state.photos.photosSelected,
-  albumIdSelected: state.albums.albumIdSelected,
+  albumIdSelected: state.albums.albumImageIdSelected,
   openDrawer: state.drawer.open,
   drawerWidth: state.drawer.width
 })

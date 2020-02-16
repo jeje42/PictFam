@@ -8,10 +8,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.grosmages.FilesScheduler;
-import com.grosmages.entities.Role;
-import com.grosmages.entities.User;
-import com.grosmages.repositories.RoleRepository;
-import com.grosmages.repositories.UserRepository;
+import com.grosmages.entities.*;
+import com.grosmages.repositories.*;
+import com.grosmages.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.grosmages.entities.Album;
-import com.grosmages.entities.Photo;
-import com.grosmages.repositories.AlbumRepository;
-import com.grosmages.repositories.PhotoRepository;
 import com.grosmages.security.UserPrincipal;
 
 @RestController
@@ -40,6 +36,9 @@ public class MyRestController {
 	private PhotoRepository photoRepository;
 
 	@Autowired
+	private VideoRepository videoRepository;
+
+	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
@@ -47,13 +46,18 @@ public class MyRestController {
 
 	@Autowired
 	FilesScheduler filesScheduler;
-	
+
+	/**
+	 *
+	 * @param albumType: video or image
+	 * @return
+	 * @throws IOException
+	 */
 	@RequestMapping(value = "/albumstree")	
-	public Collection<Album> getAlbumTree() throws IOException {
-		Collection<Album> toReturn = albumRepository.findAllRoot();
-		final Collection<Album> array = toReturn;
-		
-		toReturn.stream().filter(album -> {
+	public Collection<Album> getAlbumTree(@RequestParam String albumType) throws IOException {
+		Collection<Album> toReturn = "video".equals(albumType) ? albumRepository.findAllRootForVideo() : albumRepository.findAllRootForImage();
+
+		toReturn = toReturn.stream().filter(album -> {
 			if (!isAlbumAuthorizedForUser(album)) {
 				return false;
 			}
@@ -68,9 +72,9 @@ public class MyRestController {
 		return toReturn;
 	}
 	
-	@RequestMapping(value = "/photostree")	
-	public Collection<Photo> getPhotosTree() throws IOException {
-		Collection<Photo> photos = photoRepository.findAllPhotos();
+	@RequestMapping(value = "/photostree")
+	public Collection<MutlimediaAbstract> getPhotosTree(@RequestParam String dataType) throws IOException {
+		Collection<MutlimediaAbstract> photos = ("video".equals(dataType) ? videoRepository.findAllVideos() : photoRepository.findAllPhotos());
 		
 		Set<Album> sonsEmpty = new HashSet<>();
 		
@@ -98,7 +102,7 @@ public class MyRestController {
 	}
 
 	@RequestMapping(value = "/scanFiles")
-	public ResponseEntity<String> scanFiles(Principal principal) throws IOException {
+	public ResponseEntity<String> scanFiles(Principal principal, @RequestParam String scanType) throws IOException {
 		String userName = principal.getName();
 
 		User user = userRepository.findByName(userName).orElse(null);
@@ -115,7 +119,7 @@ public class MyRestController {
 			@Override
 			public void run(){
 				log.error("Launching job !");
-				filesScheduler.scanFiles();
+				filesScheduler.scanFiles("video".equals(scanType) ? FilesScheduler.SCAN_TYPE.VIDEO : FilesScheduler.SCAN_TYPE.IMAGE);
 			}
 		};
 		thread.start();

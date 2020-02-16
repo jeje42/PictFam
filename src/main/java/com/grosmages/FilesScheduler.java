@@ -16,12 +16,17 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.UserPrincipal;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
+import com.grosmages.entities.*;
+import com.grosmages.repositories.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +38,7 @@ import org.thymeleaf.util.StringUtils;
 
 import com.grosmages.config.PropertiesConfig;
 import com.grosmages.constants.Patterns;
-import com.grosmages.entities.Album;
-import com.grosmages.entities.Photo;
-import com.grosmages.entities.Rights;
-import com.grosmages.entities.SystemGroupLocal;
-import com.grosmages.entities.User;
 import com.grosmages.filesscan.FilesUtil;
-import com.grosmages.repositories.AlbumRepository;
-import com.grosmages.repositories.PhotoRepository;
-import com.grosmages.repositories.SystemGroupLocalRepository;
-import com.grosmages.repositories.UserRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,6 +56,9 @@ public class FilesScheduler {
 	
 	@Autowired
 	private PhotoRepository photoRepository;
+
+	@Autowired
+	private VideoRepository videoRepository;
 	
 	@Autowired
 	private AlbumRepository albumRepository;
@@ -72,13 +71,20 @@ public class FilesScheduler {
 	
 	@Autowired
 	private FilesUtil filesUtil;
+
+	public enum SCAN_TYPE {
+		IMAGE, VIDEO
+	}
 	
 //	@Scheduled(cron="0 0 * * * *")  // Every hour at 0 minutes
 //	@Scheduled(fixedRate = 600000)
-	public void scanFiles() {		
-		properties.getFolders().forEach(folder -> {
-			logger.info("Scanning " + folder);
-			filesUtil.findFilesInDirectory(folder, Pattern.compile(Patterns.IMAGE_PATTERN, Pattern.CASE_INSENSITIVE))
+	public void scanFiles(SCAN_TYPE scantype) {
+		List<String> folders = scantype == SCAN_TYPE.IMAGE ? properties.getFoldersImages() : properties.getFoldersVideos();
+		String pattern = scantype == SCAN_TYPE.IMAGE ? Patterns.IMAGE_PATTERN : Patterns.VIDEO_PATTERN;
+
+		folders.forEach(folderRoot -> {
+			logger.info("Scanning " + folderRoot);
+			filesUtil.findFilesInDirectory(folderRoot, Pattern.compile(pattern, Pattern.CASE_INSENSITIVE))
 			.stream()
 			.forEach(path -> {
 				String wholePath = path.getParent().toString() + File.separator + path.getFileName().toString();
@@ -87,7 +93,7 @@ public class FilesScheduler {
 				
 				if(photoInDatabase == null) {
 					logger.info("Inserting photo " + wholePath);
-					createPhoto(path);
+					createPhoto(path, scantype, folderRoot);
 				} else {
 					logger.info("Photo " + wholePath + "already in the database");
 				}
@@ -95,55 +101,69 @@ public class FilesScheduler {
 		});
 	}
 	
-	private void createPhoto(Path path) {
-		Photo photo = context.getBean(Photo.class);
-		photo.setName(path.getFileName().toString());
-		photo.setPath(path.getParent().toString());
-		photo.setRights(generateRightsFromRightsPath(readAttributes(path)));
-		
-		try {
-			Image image = ImageIO.read(new File(photo.getPath() + File.separator + photo.getName()))
-					.getScaledInstance(200, 200, BufferedImage.SCALE_SMOOTH);
-			
-			BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-			Graphics2D g2 = bufferedImage.createGraphics();
-			g2.drawImage(image, null, null);
+	private void createPhoto(Path path, SCAN_TYPE scantype, String folderRoot) {
+		MutlimediaAbstract photoOrVideo = scantype == SCAN_TYPE.IMAGE ? context.getBean(Photo.class) : context.getBean(Video.class);
+		photoOrVideo.setName(path.getFileName().toString());
+		photoOrVideo.setPath(path.getParent().toString());
+		photoOrVideo.setRights(generateRightsFromRightsPath(readAttributes(path)));
 
-			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-			ImageIO.write(bufferedImage, "jpg", outStream); 
-			InputStream is = new ByteArrayInputStream(outStream.toByteArray());
-			
-			photo.setThumnail(IOUtils.toByteArray(is));
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			return;
-		} catch (NullPointerException npe) {
-			logger.error(npe.getMessage());
-			npe.printStackTrace();
-			return;
+		if(scantype == SCAN_TYPE.IMAGE) {
+			try {
+				Image image = ImageIO.read(new File(photoOrVideo.getPath() + File.separator + photoOrVideo.getName()))
+						.getScaledInstance(200, 200, BufferedImage.SCALE_SMOOTH);
+
+				BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+				Graphics2D g2 = bufferedImage.createGraphics();
+				g2.drawImage(image, null, null);
+
+				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+				ImageIO.write(bufferedImage, "jpg", outStream);
+				InputStream is = new ByteArrayInputStream(outStream.toByteArray());
+
+				photoOrVideo.setThumnail(IOUtils.toByteArray(is));
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+				return;
+			} catch (NullPointerException npe) {
+				logger.error(npe.getMessage());
+				npe.printStackTrace();
+				return;
+			}
 		}
-		createAlbums(photo);
-		photoRepository.save(photo);
+
+		createAlbums(photoOrVideo, scantype, folderRoot);
+
+		if (scantype == SCAN_TYPE.IMAGE) {
+			photoRepository.save((Photo)photoOrVideo);
+		} else {
+			videoRepository.save((Video)photoOrVideo);
+		}
+
 	}
 	
 	/**
 	 * Creates the album hierarchy of albums regarding the photo.
-	 * @param photo
+	 * @param photoOrVideo
 	 */
-	void createAlbums(Photo photo) {
+	void createAlbums(MutlimediaAbstract photoOrVideo, SCAN_TYPE scantype, String folderRoot) {
 		Album parentAlbum = null;
-		String folderPathParts = File.separator;
-		for(String folder : photo.getPath().split(File.separator)) {
+		String folderPathParts = createFolderRootWithoutLast(folderRoot) + File.separator;
+
+		String pathToCreateTree = createAlbumPathToScan(photoOrVideo.getPath(), folderRoot);
+
+		for(String folder : pathToCreateTree.split(File.separator)) {
 			if (!StringUtils.isEmpty(folder)) {
 				folderPathParts = folderPathParts + folder + File.separator;
-				if (!folder.equals(photo.getName())) {
+				if (!folder.equals(photoOrVideo.getName())) {
 					Album album = albumRepository.findByPath(folderPathParts);
 					if(album == null) {
 						album = context.getBean(Album.class);
 						album.setName(folder);
 						album.setPath(folderPathParts);
 						album.setRights(generateRightsFromRightsPath(readAttributes(Paths.get(folderPathParts))));
+						album.setForPhoto(scantype == SCAN_TYPE.IMAGE);
+						album.setForVideo(scantype == SCAN_TYPE.VIDEO);
 						
 						if (parentAlbum != null) {
 							album.setIsRoot(false);
@@ -167,8 +187,25 @@ public class FilesScheduler {
 			}
 		}
 		if (parentAlbum != null) {
-			photo.setAlbum(parentAlbum);
+			photoOrVideo.setAlbum(parentAlbum);
 		}
+	}
+
+	/**
+	 * Removes the root given in the properties file from the albums tree creation.
+	 * @param albumPath
+	 * @param folderRoot
+	 * @return
+	 */
+	String createAlbumPathToScan(String albumPath, String folderRoot) {
+		String folderRootWithoutLast = createFolderRootWithoutLast(folderRoot);
+
+		return albumPath.replaceFirst(folderRootWithoutLast, "");
+	}
+
+	String createFolderRootWithoutLast(String folderRoot) {
+		String[] listFolderRoot = folderRoot.split(File.separator);
+		return Arrays.stream(listFolderRoot).filter(folder -> !folder.equals(listFolderRoot[listFolderRoot.length-1])).collect(Collectors.joining(File.separator));
 	}
 	
 	RightsPath readAttributes(Path path) {

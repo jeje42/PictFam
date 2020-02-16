@@ -101,7 +101,7 @@ public class FilesSchedulerTest {
 		photo.setName(photo1Name);
 		photo.setPath(subDir1);
 		
-		fileScheduler.createAlbums(photo);
+		fileScheduler.createAlbums(photo, FilesScheduler.SCAN_TYPE.IMAGE, "");
 		
 		List<Album> lAlbumsDatabase = new ArrayList<>();
 		
@@ -125,8 +125,8 @@ public class FilesSchedulerTest {
 		photo1.setName(photo2Name);
 		photo1.setPath(subDir2);
 		
-		fileScheduler.createAlbums(photo0);
-		fileScheduler.createAlbums(photo1);
+		fileScheduler.createAlbums(photo0, FilesScheduler.SCAN_TYPE.IMAGE, "");
+		fileScheduler.createAlbums(photo1,FilesScheduler.SCAN_TYPE.IMAGE, "");
 		
 		List<Album> lAlbumsDatabase = new ArrayList<>();
 		
@@ -148,8 +148,8 @@ public class FilesSchedulerTest {
 		photo1.setName(photo1Name);
 		photo1.setPath(subDir1);
 		
-		fileScheduler.createAlbums(photo0);
-		fileScheduler.createAlbums(photo1);
+		fileScheduler.createAlbums(photo0, FilesScheduler.SCAN_TYPE.IMAGE, "");
+		fileScheduler.createAlbums(photo1, FilesScheduler.SCAN_TYPE.IMAGE, "");
 		
 		List<Album> lAlbumsDatabase = new ArrayList<>();
 		
@@ -158,6 +158,24 @@ public class FilesSchedulerTest {
 		assertThat(lAlbumsDatabase.size()).isEqualTo(3);
 		assertThat(lAlbumsDatabase.get(1).getPath()).isEqualTo(dir1);
 		assertThat(lAlbumsDatabase.get(2).getPath()).isEqualTo(subDir1);
+	}
+
+	@Test
+	public void createAlbumPathToScanTest() {
+		String albumPath = "/home/user/album1/albumSub1";
+		String folderRoot = "/home/user";
+		String result = fileScheduler.createAlbumPathToScan(albumPath, folderRoot);
+
+		assertThat(result).isEqualTo("/user/album1/albumSub1");
+	}
+
+	@Test
+	public void createAlbumPathToScanTestRoot() {
+		String albumPath = "/home/user/album1/albumSub1";
+		String folderRoot = "/";
+		String result = fileScheduler.createAlbumPathToScan(albumPath, folderRoot);
+
+		assertThat(result).isEqualTo("/home/user/album1/albumSub1");
 	}
 	
 //	@Test

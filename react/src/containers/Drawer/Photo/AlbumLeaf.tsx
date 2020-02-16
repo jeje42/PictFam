@@ -1,4 +1,4 @@
-import {Album} from "../../types/Album";
+import {Album} from "../../../types/Album";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";

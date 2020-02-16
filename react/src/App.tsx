@@ -4,15 +4,11 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link,
     Redirect,
-    useHistory,
-    useLocation
 } from "react-router-dom";
 import {AppState} from "./store";
 import {connect} from "react-redux";
 import Login from './containers/Login'
-import {useEffect} from "react";
 
 interface AppProps {
     isAuthenticated: boolean

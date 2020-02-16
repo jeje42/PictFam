@@ -53,7 +53,6 @@ const MyImgElement: React.FC<MyImgElementProps> = (props) => {
     const classesForSpinner = useStylesForSpinner()
 
     if (base64img === undefined) {
-        debugger
         fetch(props.imgUrl, {
             method: 'GET',
             headers: {

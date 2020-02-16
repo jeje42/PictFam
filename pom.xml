@@ -15,7 +15,7 @@
 	<packaging>jar</packaging>
 
 	<name>React.js and Spring Data REST - Events</name>
-	<description>An SPA with ReactJS in the frontend and Spring Data REST in the backend</description>
+	<description>An streaming and picture viewing solution for all the family. </description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

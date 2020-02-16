@@ -85,7 +85,14 @@ function* startScanSaga(action: AuthActionTypes) {
         return
     }
     
-    const response: Response = yield call(getStartScan, requestOptionGet(action.token))
+    const optionsScan = requestOptionGet(action.token)
+
+    const response: Response = yield call(getStartScan, {
+        ...optionsScan,
+        params: {
+            scanType: action.scanType
+        }
+    })
     
     if (response.status === 200) {
         alert("Scan has begun!")

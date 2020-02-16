@@ -2,7 +2,13 @@ import {call, put, takeLatest} from 'redux-saga/effects'
 import {AxiosRequestConfig} from "axios";
 import {axiosInstance} from "../../rest/methods";
 import {Album} from "../../types/Album";
-import {ALBUM_FETCHED, ALBUM_SELECTED, AlbumActionTypes, AlbumState, START_ALBUM_FETCHED} from "./types";
+import {
+    ALBUM_IMAGE_FETCHED,
+    ALBUM_VIDEO_FETCHED,
+    AlbumActionTypes,
+    START_ALBUM_IMAGE_FETCHED,
+    START_ALBUM_VIDEO_FETCHED
+} from "./types";
 
 interface Response {
     data: Album[]
@@ -18,19 +24,52 @@ const requestOption = (token: string): AxiosRequestConfig => {
 
 const getAlbums = (options: AxiosRequestConfig) => axiosInstance.get('/albumstree', options)
 
-function* tryToFetchAlbums(action: AlbumActionTypes) {
-    if(action.type !== START_ALBUM_FETCHED) {
+function* tryToFetchAlbumsImage(action: AlbumActionTypes) {
+    if(action.type !== START_ALBUM_IMAGE_FETCHED) {
         return
     }
 
-    const response: Response = yield call(getAlbums, requestOption(action.token))
+    const optionsToken = requestOption(action.token)
+    const options: AxiosRequestConfig = {
+        ...optionsToken,
+        params: {
+            albumType: 'image'
+        }
+    }
+
+    const response: Response = yield call(getAlbums, options)
 
     yield put({
-        type: ALBUM_FETCHED,
+        type: ALBUM_IMAGE_FETCHED,
         albums: response.data
     })
 }
 
-export function* watchTryFetchAlbums() {
-    yield takeLatest(START_ALBUM_FETCHED, tryToFetchAlbums)
+function* tryToFetchAlbumsVideo(action: AlbumActionTypes) {
+    if(action.type !== START_ALBUM_VIDEO_FETCHED) {
+        return
+    }
+
+    const optionsToken = requestOption(action.token)
+    const options: AxiosRequestConfig = {
+        ...optionsToken,
+        params: {
+            albumType: 'video'
+        }
+    }
+
+    const response: Response = yield call(getAlbums, options)
+
+    yield put({
+        type: ALBUM_VIDEO_FETCHED,
+        albums: response.data
+    })
+}
+
+export function* watchTryFetchAlbumsImage() {
+    yield takeLatest(START_ALBUM_IMAGE_FETCHED, tryToFetchAlbumsImage)
+}
+
+export function* watchTryFetchAlbumsVideo() {
+    yield takeLatest(START_ALBUM_VIDEO_FETCHED, tryToFetchAlbumsVideo)
 }

@@ -10,11 +10,11 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { withSize } from 'react-sizeme'
 
-import { AppState } from '../../store'
-import { Album } from '../../types/Album'
-import { selectAlbum } from '../../store/album/actions'
-import { newAlbumSelected } from '../../store/photo/actions'
-import { drawerWidthChanged } from '../../store/drawer/actions'
+import { AppState } from '../../../store'
+import { Album } from '../../../types/Album'
+import { selectAlbumImage } from '../../../store/album/actions'
+import { newAlbumSelected } from '../../../store/photo/actions'
+import { drawerWidthChanged } from '../../../store/drawer/actions'
 import Alert from "@material-ui/lab/Alert";
 import {Grow} from "@material-ui/core";
 import {AlbumsHash} from './DrawerInterface'
@@ -23,7 +23,7 @@ import {AlbumLeaf} from './AlbumLeaf'
 
 interface DrawerAlbumsProps {
   albums: Array<Album>,
-  selectAlbum: typeof selectAlbum,
+  selectAlbumImage: typeof selectAlbumImage,
   newAlbumSelected: typeof newAlbumSelected,
   drawerWidthChanged: typeof drawerWidthChanged,
   albumIdSelected: number,
@@ -75,7 +75,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = (props) => {
       event.stopPropagation()
       toggleAlbumHash(album.id)
     } else {
-      props.selectAlbum(album)
+      props.selectAlbumImage(album)
       let albums = [album] as Array<Album>
       generateAlbumListRecurs(album, albums)
       props.newAlbumSelected(albums)
@@ -133,13 +133,13 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = (props) => {
 }
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.albums,
-  albumIdSelected: state.albums.albumIdSelected
+  albums: state.albums.albumsImage,
+  albumIdSelected: state.albums.albumImageIdSelected
 })
 
 export default withSize()(connect(
   mapStateToProps,
-  { selectAlbum, newAlbumSelected,
+  { selectAlbumImage, newAlbumSelected,
     drawerWidthChanged
   }
 )(DrawerAlbums))

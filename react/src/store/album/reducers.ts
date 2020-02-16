@@ -1,30 +1,52 @@
-import {ALBUM_FETCHED, ALBUM_SELECTED, AlbumActionTypes, AlbumState, INIT_ALBUMSTATE} from './types'
+import {
+  ALBUM_IMAGE_FETCHED,
+  ALBUM_IMAGE_SELECTED,
+  ALBUM_VIDEO_FETCHED, ALBUM_VIDEO_SELECTED,
+  AlbumActionTypes,
+  AlbumState,
+  INIT_ALBUMSTATE
+} from './types'
 import {Album} from '../../types/Album'
 
 const initialState: AlbumState = {
-  albums: [],
-  albumIdSelected: -1
+  albumsImage: [],
+  albumImageIdSelected: -1,
+  albumsVideo: [],
+  albumVideoIdSelected: -1
 }
 
-const albumSelected = (state: AlbumState, newAlbumSelected: Album) => {
+const albumImageSelected = (state: AlbumState, newAlbumSelected: Album) => {
   return {
     ...state,
-    albumIdSelected: newAlbumSelected.id
+    albumImageIdSelected: newAlbumSelected.id
   }
 }
 
+const albumVideoSelected = (state: AlbumState, newAlbumSelected: Album) => {
+  return {
+    ...state,
+    albumVideoIdSelected: newAlbumSelected.id
+  }
+}
 export function albumsReducer (
   state = initialState,
   action: AlbumActionTypes
 ): AlbumState {
   switch (action.type) {
-    case ALBUM_FETCHED:
+    case ALBUM_IMAGE_FETCHED:
       return {
         ...state,
-        albums: action.albums
+        albumsImage: action.albums
       }
-    case ALBUM_SELECTED:
-      return albumSelected(state, action.album)
+    case ALBUM_VIDEO_FETCHED:
+      return {
+        ...state,
+        albumsVideo: action.albums
+      }
+    case ALBUM_IMAGE_SELECTED:
+      return albumImageSelected(state, action.album)
+    case ALBUM_VIDEO_SELECTED:
+      return albumVideoSelected(state, action.album)
     case INIT_ALBUMSTATE:
       return initialState
     default:

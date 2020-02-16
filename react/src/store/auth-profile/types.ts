@@ -35,6 +35,7 @@ interface LoginHasFailed {
 interface StartScanAction {
   type: typeof START_SCAN,
   token: string
+  scanType: string
 }
 
 interface LogoutAction {

@@ -1,5 +1,6 @@
 package com.grosmages.entities;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -38,6 +39,9 @@ public class Album {
 	
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Album> sons;
+
+	private boolean isForPhoto;
+    private boolean isForVideo;
 	
 	@Override
     public boolean equals(Object obj) {
@@ -50,7 +54,15 @@ public class Album {
         }
 
         final Album other = (Album) obj;
-        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+
+        if (this.isForPhoto != other.isForPhoto) {
+            return false;
+        }
+
+        if (this.isForVideo != other.isForVideo) {
             return false;
         }
 

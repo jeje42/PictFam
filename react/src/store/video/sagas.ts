@@ -1,18 +1,18 @@
 import {call, put, takeLatest} from 'redux-saga/effects'
 import {AxiosRequestConfig} from "axios";
-import {PhotoActionTypes, START_PHOTOS_FETCHED, PHOTOS_FETCHED, PhotosState} from "./types";
+import {VideoActionTypes, START_VIDEOS_FETCHED, VIDEOS_FETCHED, VideosState} from "./types";
 import {axiosInstance} from "../../rest/methods";
 import {Album} from "../../types/Album";
-import {Photo} from "../../types/Photo";
+import {Video} from "../../types/Video";
 
-interface PhotoResponse {
+interface VideoResponse {
     id: number,
     name: string,
     album: Album
 }
 
 interface Response {
-    data: PhotoResponse[]
+    data: VideoResponse[]
 }
 
 const requestOption = (token: string): AxiosRequestConfig => {
@@ -23,10 +23,10 @@ const requestOption = (token: string): AxiosRequestConfig => {
     }
 }
 
-const getPhotos = (options: AxiosRequestConfig) => axiosInstance.get('/photostree', options)
+const getVideos = (options: AxiosRequestConfig) => axiosInstance.get('/photostree', options)
 
-function* tryToFetchPhotos(action: PhotoActionTypes) {
-    if(action.type !== START_PHOTOS_FETCHED) {
+function* tryToFetchVideos(action: VideoActionTypes) {
+    if(action.type !== START_VIDEOS_FETCHED) {
         return
     }
 
@@ -34,30 +34,30 @@ function* tryToFetchPhotos(action: PhotoActionTypes) {
     const options: AxiosRequestConfig = {
         ...optionsToken,
         params: {
-            dataType: 'image'
+            dataType: 'video'
         }
     }
 
-    const response: Response = yield call(getPhotos, options)
+    const response: Response = yield call(getVideos, options)
 
-    const newPhotosState: PhotosState = {
-        photos: response.data.map((value: PhotoResponse) => {
+    const newVideosState: VideosState = {
+        videos: response.data.map((value: VideoResponse) => {
             return {
                 id:value.id,
                 name: value.name,
                 selected: false,
                 album: value.album
-            } as Photo
+            } as Video
         }),
-        photosSelected: []
+        videosSelected: []
     }
-
+    
     yield put({
-        type: PHOTOS_FETCHED,
-        photos: newPhotosState
+        type: VIDEOS_FETCHED,
+        videos: newVideosState
     })
 }
 
-export function* watchTryFetchPhotos() {
-    yield takeLatest(START_PHOTOS_FETCHED, tryToFetchPhotos)
+export function* watchTryFetchVideos() {
+    yield takeLatest(START_VIDEOS_FETCHED, tryToFetchVideos)
 }

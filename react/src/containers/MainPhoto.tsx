@@ -8,18 +8,24 @@ import { Photo } from '../types/Photo'
 import NavButton from './NavButton'
 import { AppState } from "../store/index";
 import MyImgElement from './MyImgElement'
+import {selectNextPhoto, selectPreviousPhoto} from "../store/photo/actions";
 
 interface MainPhotoProps {
-  photo: Photo,
-  selectPrevious: () => void,
-  selectNext: () => void,
   screenWidth: number,
   screenHeight: number,
   drawerWidth: number,
-  openDrawer: boolean
+  openDrawer: boolean,
+    photos: Array<Photo>,
+    selectNextPhoto: typeof selectNextPhoto,
+    selectPreviousPhoto: typeof selectPreviousPhoto
 }
 
 const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
+    if(props.photos.length === 0) {
+        return <></>
+    }
+    const photo = props.photos.filter(photo => photo.selected)[0]
+
     const computeImageHeight: () => number = () => {
       if(props.screenHeight === undefined){
         return 400
@@ -79,7 +85,7 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
     const classesDrawer = useStylesDrawer()
 
     let imgElem = null
-    if (props.photo) {
+    if (photo) {
         const imgStyle = {
             borderRadius: '5px',
             maxHeight: imageHeight + 'px',
@@ -89,7 +95,7 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
         }
         imgElem = (
             <MyImgElement
-                imgUrl={'photo/' + props.photo.id}
+                imgUrl={'photo/' + photo.id}
                 styleRaw={imgStyle}
             />
         )
@@ -103,13 +109,13 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
           })}
         >
           <NavButton
-            onClick={props.selectPrevious}
+            onClick={props.selectNextPhoto}
             previous={true}
             disabled={false}
           />
           {imgElem}
           <NavButton
-            onClick={props.selectNext}
+            onClick={props.selectPreviousPhoto}
             previous={false}
             disabled={false}
           />
@@ -119,10 +125,11 @@ const MainPhoto: React.SFC<MainPhotoProps>  = (props) => {
 
 const mapStateToProps = (state: AppState) => ({
   openDrawer: state.drawer.open,
-  drawerWidth: state.drawer.width
+  drawerWidth: state.drawer.width,
+    photos: state.photos.photosSelected,
 })
 
 export default connect(
   mapStateToProps,
-  { toggleDrawer }
+  { toggleDrawer, selectNextPhoto, selectPreviousPhoto, }
 )(MainPhoto)
