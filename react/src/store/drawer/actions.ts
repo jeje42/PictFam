@@ -1,14 +1,14 @@
-import { DRAWER_TOGGLED, DRAWER_WIDTH_CHANGED } from "./types"
+import { DRAWER_TOGGLED, DRAWER_WIDTH_CHANGED } from './types';
 
 export function toggleDrawer() {
   return {
-    type: DRAWER_TOGGLED
-  }
+    type: DRAWER_TOGGLED,
+  };
 }
 
 export function drawerWidthChanged(width: number) {
   return {
     type: DRAWER_WIDTH_CHANGED,
-    width: width
-  }
+    width: width,
+  };
 }

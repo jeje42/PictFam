@@ -1,49 +1,56 @@
-import { Video } from '../../types/Video'
-import { Album } from '../../types/Album'
+import { Video } from '../../types/Video';
+import { Album } from '../../types/Album';
+import { ActionRequest } from '../types';
 
-export const START_VIDEOS_FETCHED = 'START_VIDEOS_FETCHED'
-export const VIDEOS_FETCHED = 'VIDEOS_FETCHED'
-export const VIDEOS_SELECTED = 'VIDEOS_SELECTED'
-export const VIDEOS_SELECTED_NEXT = 'VIDEOS_SELECTED_NEXT'
-export const VIDEOS_SELECTED_PREVIOUS = 'VIDEOS_SELECTED_PREVIOUS'
-export const NEW_ALBUM_SELECTED = 'NEW_ALBUM_SELECTED'
-export const INIT_VIDEOS_STATE = 'INIT_VIDEOS_STATE'
+export const START_VIDEOS_FETCHED = 'START_VIDEOS_FETCHED';
+export const VIDEOS_FETCHED = 'VIDEOS_FETCHED';
+export const VIDEOS_SELECTED = 'VIDEOS_SELECTED';
+export const VIDEOS_SELECTED_NEXT = 'VIDEOS_SELECTED_NEXT';
+export const VIDEOS_SELECTED_PREVIOUS = 'VIDEOS_SELECTED_PREVIOUS';
+export const NEW_ALBUM_SELECTED = 'NEW_ALBUM_SELECTED';
+export const INIT_VIDEOS_STATE = 'INIT_VIDEOS_STATE';
 
 export interface VideosState {
-  videos: Array<Video>,
-  videosSelected: Array<Video>
+  videos: Video[];
+  videosSelected: Video[];
 }
 
-interface StartPhotosFetchedAction {
-  type: typeof START_VIDEOS_FETCHED
-  token: string
+export interface StartVideossFetchedAction extends ActionRequest {
+  type: typeof START_VIDEOS_FETCHED;
 }
 
-interface PhotosFetchedAction {
-  type: typeof VIDEOS_FETCHED
-  videos: VideosState
+interface VideosFetchedAction {
+  type: typeof VIDEOS_FETCHED;
+  videos: VideosState;
 }
 
-interface SelectPhotoAction {
-  type: typeof VIDEOS_SELECTED
-  video: Video
+interface SelectVideoAction {
+  type: typeof VIDEOS_SELECTED;
+  video: Video;
 }
 
-interface SelectNextPhotoAction {
-  type: typeof VIDEOS_SELECTED_NEXT
+interface SelectNextVideoAction {
+  type: typeof VIDEOS_SELECTED_NEXT;
 }
 
-interface SelectPreviousPhotoAction {
-  type: typeof VIDEOS_SELECTED_PREVIOUS
+interface SelectPreviousVideoAction {
+  type: typeof VIDEOS_SELECTED_PREVIOUS;
 }
 
 interface NewAlbumSelected {
-  type: typeof NEW_ALBUM_SELECTED,
-  albums: Array<Album>
+  type: typeof NEW_ALBUM_SELECTED;
+  albums: Album[];
 }
 
 interface InitStateAction {
-  type: typeof INIT_VIDEOS_STATE
+  type: typeof INIT_VIDEOS_STATE;
 }
 
-export type VideoActionTypes = StartPhotosFetchedAction | PhotosFetchedAction | SelectPhotoAction | SelectNextPhotoAction | SelectPreviousPhotoAction | NewAlbumSelected | InitStateAction
+export type VideoActionTypes =
+  | StartVideossFetchedAction
+  | VideosFetchedAction
+  | SelectVideoAction
+  | SelectNextVideoAction
+  | SelectPreviousVideoAction
+  | NewAlbumSelected
+  | InitStateAction;

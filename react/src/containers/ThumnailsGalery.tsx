@@ -1,49 +1,31 @@
-import * as React from "react"
-import { useState, useEffect } from "react"
-import { makeStyles, createStyles } from '@material-ui/core/styles'
-import { connect } from 'react-redux'
-import { AppState } from '../store/index'
+import * as React from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
+import { AppState } from '../store';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import clsx from 'clsx';
 
-import { selectPhoto } from '../store/photo/actions'
-import { toggleDrawer } from '../store/drawer/actions'
-import { Photo } from '../types/Photo'
-import Thumnail from './Thumnail'
-import NavButton from './NavButton'
+import { selectPhoto } from '../store/photo/actions';
+import { toggleDrawer } from '../store/drawer/actions';
+import { Photo } from '../types/Photo';
+import Thumnail from './Thumnail';
+import NavButton from './NavButton';
 
 interface ThumnailsGaleryProps {
-  photos: Array<Photo>,
-  albumIdSelected: number,
-  screenWidth: number,
-  selectPhoto: typeof selectPhoto,
-  drawerWidth: number,
-  toggleDrawer: typeof toggleDrawer,
-  openDrawer: boolean
+  photos: Photo[];
+  albumIdSelected: number;
+  screenWidth: number;
+  selectPhoto: typeof selectPhoto;
+  drawerWidth: number;
+  toggleDrawer: typeof toggleDrawer;
+  openDrawer: boolean;
 }
 
-const useStyles = makeStyles((theme: any) => ({
-  img: {
-    margin: '10px',
-    borderRadius: '5px',
-    width: '100px',
-    height: '56px'
-  },
-  flexThumbs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    display: 'flex',
-    overflowX: 'auto',
-    background: '#949994',
-    alignItems: 'center',
-    boxShadow: '5px 10px 10px #1b4f1b',
-  },
-}))
-
-const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
+const ThumnailsGalery: React.SFC<ThumnailsGaleryProps> = props => {
   const useStylesDrawer = makeStyles((theme: any) =>
     createStyles({
       appBar: {
@@ -62,190 +44,173 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
       },
       menuButton: {
         marginRight: theme.spacing(2),
-        marginLeft: theme.spacing(1)
+        marginLeft: theme.spacing(1),
       },
       hide: {
         display: 'none',
       },
     }),
-  )
+  );
 
-  const computeNumberOfImages: (number: number) => number = (screenWidth: number) => {
-    if (screenWidth === undefined) {
-       return 10
-    }
-    let widthTrunc = Math.trunc(screenWidth)
-    //8*2(marginNavButton) + 56(buttonsWidth)
-    // 100(image width) + 10*2 (margin)
-    return Math.trunc((widthTrunc - 16 - 112 - 20 - (props.openDrawer?props.drawerWidth:0))/(120)) - 1
-  }
+  const computeNumberOfImages: (number: number) => number = React.useCallback(
+    (screenWidth: number) => {
+      if (screenWidth === undefined) {
+        return 10;
+      }
+      const widthTrunc = Math.trunc(screenWidth);
+      //8*2(marginNavButton) + 56(buttonsWidth)
+      // 100(image width) + 10*2 (margin)
+      return Math.trunc((widthTrunc - 16 - 112 - 20 - (props.openDrawer ? props.drawerWidth : 0)) / 120) - 1;
+    },
+    [props.openDrawer, props.drawerWidth],
+  );
 
-  const classesDrawer = useStylesDrawer()
-  const classes = useStyles()
+  const classesDrawer = useStylesDrawer();
 
-  const [indexBeginPhoto, setIndexBeginPhoto] = useState(-1)
-  const [indexEndPhoto, setIndexEndPhoto] = useState(-1)
-  const [albumIdSelected, setAlbumIdSelected] = useState(-1)
+  const [indexBeginPhoto, setIndexBeginPhoto] = useState(-1);
+  const [indexEndPhoto, setIndexEndPhoto] = useState(-1);
+  const [albumIdSelected, setAlbumIdSelected] = useState(-1);
 
   /**
    * Checks if the indexes of begin and end are within the limits of the number of images.
    * If no, begin is lower limited by 0 and end upper limited by props.photos.length
    * **/
-  const checkLimits: (i1: number, i2: number, numberOfImages: number) => {newIndexBeginPhoto: number, newIndexEndPhoto: number} =
-  (newIndexBeginPhoto: number, newIndexEndPhoto: number, numberOfImages: number) => {
-    if (newIndexBeginPhoto < 0) {
-      newIndexBeginPhoto = 0
-      newIndexEndPhoto = 0 + numberOfImages
-    } else if (newIndexEndPhoto >= props.photos.length) {
-      newIndexEndPhoto = props.photos.length - 1
-      newIndexBeginPhoto = newIndexEndPhoto - numberOfImages
-      if (newIndexBeginPhoto<0) newIndexBeginPhoto = 0
-    }
+  const checkLimits: (i1: number, i2: number, numberOfImages: number) => { newIndexBeginPhoto: number; newIndexEndPhoto: number } = useCallback(
+    (newIndexBeginPhoto: number, newIndexEndPhoto: number, numberOfImages: number) => {
+      if (newIndexBeginPhoto < 0) {
+        newIndexBeginPhoto = 0;
+        newIndexEndPhoto = numberOfImages;
+      } else if (newIndexEndPhoto >= props.photos.length) {
+        newIndexEndPhoto = props.photos.length - 1;
+        newIndexBeginPhoto = newIndexEndPhoto - numberOfImages;
+        if (newIndexBeginPhoto < 0) newIndexBeginPhoto = 0;
+      }
 
-    return {
-      newIndexBeginPhoto,
-      newIndexEndPhoto
-    }
-  }
+      return {
+        newIndexBeginPhoto,
+        newIndexEndPhoto,
+      };
+    },
+    [props.photos.length],
+  );
 
-  useEffect( () => {
+  useEffect(() => {
     if (props.photos !== undefined && props.photos.length > 0) {
-      let indexSelected = props.photos.indexOf(props.photos.filter(photo => photo.selected)[0])
+      let indexSelected = props.photos.indexOf(props.photos.filter(photo => photo.selected)[0]);
 
-      let oldIndexBeginPhoto = indexBeginPhoto
-      let oldIndexEndPhoto = indexEndPhoto
-      let newIndexBeginPhoto = -1
-      let newIndexEndPhoto = -1
-      let numberOfImages = -1
+      let oldIndexBeginPhoto = indexBeginPhoto;
+      let oldIndexEndPhoto = indexEndPhoto;
+      let newIndexBeginPhoto = -1;
+      let newIndexEndPhoto = -1;
+      let numberOfImages = -1;
 
-      if(props.albumIdSelected !== albumIdSelected) {
-        setAlbumIdSelected(props.albumIdSelected)
-        oldIndexBeginPhoto = -1
-        oldIndexEndPhoto = -1
+      if (props.albumIdSelected !== albumIdSelected) {
+        setAlbumIdSelected(props.albumIdSelected);
+        oldIndexBeginPhoto = -1;
+        oldIndexEndPhoto = -1;
       }
 
       if (oldIndexBeginPhoto === -1) {
         if (indexSelected === -1) {
-          indexSelected = 0
+          indexSelected = 0;
         }
-        newIndexBeginPhoto = indexSelected
-        numberOfImages = computeNumberOfImages(props.screenWidth)
-        newIndexEndPhoto = newIndexBeginPhoto + numberOfImages
+        newIndexBeginPhoto = indexSelected;
+        numberOfImages = computeNumberOfImages(props.screenWidth);
+        newIndexEndPhoto = newIndexBeginPhoto + numberOfImages;
       } else if (indexSelected > oldIndexEndPhoto) {
-        newIndexBeginPhoto = indexSelected
-        numberOfImages = computeNumberOfImages(props.screenWidth)
-        newIndexEndPhoto = newIndexBeginPhoto + numberOfImages
+        newIndexBeginPhoto = indexSelected;
+        numberOfImages = computeNumberOfImages(props.screenWidth);
+        newIndexEndPhoto = newIndexBeginPhoto + numberOfImages;
       } else if (indexSelected < oldIndexBeginPhoto) {
-        newIndexEndPhoto = indexSelected
-        numberOfImages = computeNumberOfImages(props.screenWidth)
-        newIndexBeginPhoto = newIndexEndPhoto - numberOfImages
+        newIndexEndPhoto = indexSelected;
+        numberOfImages = computeNumberOfImages(props.screenWidth);
+        newIndexBeginPhoto = newIndexEndPhoto - numberOfImages;
       }
 
       if (newIndexBeginPhoto !== -1 || newIndexEndPhoto !== -1) {
-        let result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages)
+        const result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages);
 
-        setIndexBeginPhoto(result.newIndexBeginPhoto)
-        setIndexEndPhoto(result.newIndexEndPhoto)
+        setIndexBeginPhoto(result.newIndexBeginPhoto);
+        setIndexEndPhoto(result.newIndexEndPhoto);
       }
     }
-  }, [props.photos, props.albumIdSelected])
+  }, [props.photos, props.albumIdSelected, props.screenWidth, indexBeginPhoto, indexEndPhoto, albumIdSelected, computeNumberOfImages, checkLimits]);
 
-  useEffect( () => {
+  useEffect(() => {
     if (props.photos !== undefined && props.photos.length > 0) {
-      let indexSelected = props.photos.indexOf(props.photos.filter(photo => photo.selected)[0])
-      let numberOfImages: number = computeNumberOfImages(props.screenWidth)
-      let newIndexBeginPhoto: number = indexSelected - Math.trunc(numberOfImages/2)
-      if (newIndexBeginPhoto < 0)   newIndexBeginPhoto = 0
+      const indexSelected = props.photos.indexOf(props.photos.filter(photo => photo.selected)[0]);
+      const numberOfImages: number = computeNumberOfImages(props.screenWidth);
+      let newIndexBeginPhoto: number = indexSelected - Math.trunc(numberOfImages / 2);
+      if (newIndexBeginPhoto < 0) newIndexBeginPhoto = 0;
 
-      let newIndexEndPhoto: number = newIndexBeginPhoto + numberOfImages
+      const newIndexEndPhoto: number = newIndexBeginPhoto + numberOfImages;
 
-      let result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages)
+      const result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages);
 
-      setIndexBeginPhoto(result.newIndexBeginPhoto)
-      setIndexEndPhoto(result.newIndexEndPhoto)
+      setIndexBeginPhoto(result.newIndexBeginPhoto);
+      setIndexEndPhoto(result.newIndexEndPhoto);
     }
-  }, [props.screenWidth, props.openDrawer])
+  }, [props.screenWidth, props.openDrawer, props.photos, computeNumberOfImages, checkLimits]);
 
   const selectPhotoHandler: (photo: Photo) => void = (photo: Photo) => {
-    props.selectPhoto(photo)
-  }
+    props.selectPhoto(photo);
+  };
 
-  let thumbsElem = null
-  let buttonPrev = null
-  let buttonNext = null
-  if (
-      props.photos !== undefined
-      && props.photos.length > 0
-      && indexBeginPhoto >= 0
-      && indexEndPhoto < props.photos.length
-        ) {
-    let photosArrayShowed: Array<Photo> = []
-    for(let i:number = indexBeginPhoto ; i<=indexEndPhoto; i++) {
-      photosArrayShowed.push(props.photos[i])
+  let thumbsElem;
+  let buttonPrev;
+  let buttonNext;
+
+  const nextPhotos = () => {
+    const numberOfImages: number = computeNumberOfImages(props.screenWidth);
+
+    const newIndexBeginPhoto = indexEndPhoto + 1;
+    const newIndexEndPhoto = newIndexBeginPhoto + numberOfImages;
+    const result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages);
+
+    setIndexBeginPhoto(result.newIndexBeginPhoto);
+    setIndexEndPhoto(result.newIndexEndPhoto);
+  };
+
+  const previousPhotos = () => {
+    const numberOfImages: number = computeNumberOfImages(props.screenWidth);
+    let newIndexBeginPhoto = indexBeginPhoto - numberOfImages;
+    if (newIndexBeginPhoto < 0) newIndexBeginPhoto = 0;
+    const newIndexEndPhoto = newIndexBeginPhoto + numberOfImages;
+    const result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages);
+
+    setIndexBeginPhoto(result.newIndexBeginPhoto);
+    setIndexEndPhoto(result.newIndexEndPhoto);
+  };
+
+  if (props.photos !== undefined && props.photos.length > 0 && indexBeginPhoto >= 0 && indexEndPhoto < props.photos.length) {
+    const photosArrayShowed: Photo[] = [];
+    for (let i: number = indexBeginPhoto; i <= indexEndPhoto; i++) {
+      photosArrayShowed.push(props.photos[i]);
     }
 
     thumbsElem = photosArrayShowed.map((photo: Photo) => {
-      return (
-        <Thumnail
-          key={photo.id}
-          photo={photo}
-        selectPhoto={selectPhotoHandler}/>
-      )})
+      return <Thumnail key={photo.id} photo={photo} selectPhoto={selectPhotoHandler} />;
+    });
 
-    buttonPrev = (
-      <NavButton
-        onClick={() => previousPhotos()}
-        previous={true}
-        disabled={indexBeginPhoto == 0}
-      />
-    )
+    buttonPrev = <NavButton onClick={() => previousPhotos()} previous={true} disabled={indexBeginPhoto === 0} />;
 
-    buttonNext = (
-      <NavButton
-        onClick={() => nextPhotos()}
-        disabled={indexEndPhoto >= props.photos.length-1}
-        previous={false}
-      />
-    )
-  }
-
-  const nextPhotos = () => {
-    let numberOfImages: number = computeNumberOfImages(props.screenWidth)
-
-    let newIndexBeginPhoto = indexEndPhoto + 1
-    let newIndexEndPhoto = newIndexBeginPhoto + numberOfImages
-    let result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages)
-
-    setIndexBeginPhoto(result.newIndexBeginPhoto)
-    setIndexEndPhoto(result.newIndexEndPhoto)
-  }
-
-  const previousPhotos = () => {
-    let numberOfImages: number = computeNumberOfImages(props.screenWidth)
-    let newIndexBeginPhoto = indexBeginPhoto - numberOfImages
-    if (newIndexBeginPhoto < 0 ) newIndexBeginPhoto = 0
-    let newIndexEndPhoto = newIndexBeginPhoto + numberOfImages
-    let result = checkLimits(newIndexBeginPhoto, newIndexEndPhoto, numberOfImages)
-
-    setIndexBeginPhoto(result.newIndexBeginPhoto)
-    setIndexEndPhoto(result.newIndexEndPhoto)
+    buttonNext = <NavButton onClick={() => nextPhotos()} disabled={indexEndPhoto >= props.photos.length - 1} previous={false} />;
   }
 
   return (
     // <div className={classes.flexThumbs}>
     <AppBar
-      position="fixed"
+      position='fixed'
       className={clsx(classesDrawer.appBar, {
         [classesDrawer.appBarShift]: props.openDrawer,
       })}
     >
-      <Toolbar
-        disableGutters={true}>
+      <Toolbar disableGutters={true}>
         <IconButton
-          color="inherit"
-          aria-label="open drawer"
+          color='inherit'
+          aria-label='open drawer'
           onClick={props.toggleDrawer}
-          edge="start"
+          edge='start'
           className={clsx(classesDrawer.menuButton, props.openDrawer && classesDrawer.hide)}
         >
           <MenuIcon />
@@ -255,17 +220,14 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps>  = (props) => {
         {buttonNext}
       </Toolbar>
     </AppBar>
-  )
-}
+  );
+};
 
 const mapStateToProps = (state: AppState) => ({
   photos: state.photos.photosSelected,
   albumIdSelected: state.albums.albumImageIdSelected,
   openDrawer: state.drawer.open,
-  drawerWidth: state.drawer.width
-})
+  drawerWidth: state.drawer.width,
+});
 
-export default connect(
-  mapStateToProps,
-  { selectPhoto, toggleDrawer }
-)(ThumnailsGalery)
+export default connect(mapStateToProps, { selectPhoto, toggleDrawer })(ThumnailsGalery);

@@ -1,21 +1,17 @@
-import {AppActionTypes, AppState, CHANGE_MODULE, Module} from './types'
+import { AppActionTypes, AppState, CHANGE_MODULE, Module } from './types';
 
 const initialState: AppState = {
-  module: Module.Image
+  module: Module.Image,
+};
 
-}
-
-export function appReducer (
-  state = initialState,
-  action: AppActionTypes
-): AppState {
+export function appReducer(state = initialState, action: AppActionTypes): AppState {
   switch (action.type) {
     case CHANGE_MODULE:
       return {
         ...state,
-        module: action.module
-      }
+        module: action.module,
+      };
     default:
-      return state
+      return state;
   }
 }

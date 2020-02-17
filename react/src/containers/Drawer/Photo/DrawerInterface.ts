@@ -1,3 +1,3 @@
 export interface AlbumsHash {
-    [id: number]: boolean
+  [id: number]: boolean;
 }

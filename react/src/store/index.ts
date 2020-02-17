@@ -1,19 +1,20 @@
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import thunkMiddleware from "redux-thunk";
-import { composeWithDevTools } from "redux-devtools-extension";
+import { createStore, combineReducers, applyMiddleware, Middleware, MiddlewareAPI, Dispatch, Action } from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import { composeWithDevTools } from 'redux-devtools-extension';
 import createSagaMiddleware from 'redux-saga';
 
-import { photosReducer } from "./photo/reducers";
-import { videosReducer } from "./video/reducers";
-import { albumsReducer } from "./album/reducers";
-import { drawerReducer } from "./drawer/reducers";
-import { authReducer } from "./auth-profile/reducers"
-import {appReducer} from "./app/reducers";
+import { photosReducer } from './photo/reducers';
+import { videosReducer } from './video/reducers';
+import { albumsReducer } from './album/reducers';
+import { drawerReducer } from './drawer/reducers';
+import { authReducer } from './auth-profile/reducers';
+import { appReducer } from './app/reducers';
 
-import {watchLogout, watchStartScan, watchTryLogin} from './auth-profile/sagas'
-import {watchTryFetchPhotos} from "./photo/sagas";
-import {watchTryFetchAlbumsImage, watchTryFetchAlbumsVideo} from "./album/sagas";
-import {watchTryFetchVideos} from './video/sagas'
+import { watchLogout, watchStartScan, watchTryLogin } from './auth-profile/sagas';
+import { watchTryFetchPhotos } from './photo/sagas';
+import { watchTryFetchAlbumsImage, watchTryFetchAlbumsVideo } from './album/sagas';
+import { watchTryFetchVideos } from './video/sagas';
+import { ActionRequest } from './types';
 
 const rootReducer = combineReducers({
   photos: photosReducer,
@@ -21,29 +22,41 @@ const rootReducer = combineReducers({
   albums: albumsReducer,
   drawer: drawerReducer,
   auth: authReducer,
-  app: appReducer
-})
+  app: appReducer,
+});
+
+export type AppState = ReturnType<typeof rootReducer>;
 
 const saga = createSagaMiddleware();
 
-export type AppState = ReturnType<typeof rootReducer>
+const requestsMiddleware: Middleware<AppState> = (store: MiddlewareAPI<Dispatch, AppState>) => (next: Dispatch<Action>) => (action: ActionRequest) => {
+  if (action.request) {
+    debugger;
+    action.request = {
+      ...action.request,
+      headers: {
+        ...action.request.headers,
+        Authorization: `Bearer ${store.getState().auth.token}`,
+      },
+    };
+  }
+  const result = next(action);
+  return result;
+};
 
 export default function configureStore() {
-  const middlewares = [thunkMiddleware]
-  const middleWareEnhancer = applyMiddleware(...middlewares, saga)
+  const middlewares = [thunkMiddleware, requestsMiddleware];
+  const middleWareEnhancer = applyMiddleware(...middlewares, saga);
 
-  const store = createStore(
-    rootReducer,
-    composeWithDevTools(middleWareEnhancer)
-  )
+  const store = createStore(rootReducer, composeWithDevTools(middleWareEnhancer));
 
-  saga.run(watchTryLogin)
-  saga.run(watchTryFetchPhotos)
-  saga.run(watchTryFetchVideos)
-  saga.run(watchTryFetchAlbumsImage)
-  saga.run(watchTryFetchAlbumsVideo)
-  saga.run(watchLogout)
-  saga.run(watchStartScan)
+  saga.run(watchTryLogin);
+  saga.run(watchTryFetchPhotos);
+  saga.run(watchTryFetchVideos);
+  saga.run(watchTryFetchAlbumsImage);
+  saga.run(watchTryFetchAlbumsVideo);
+  saga.run(watchLogout);
+  saga.run(watchStartScan);
 
-  return store
+  return store;
 }

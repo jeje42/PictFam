@@ -1,7 +1,7 @@
-import {Role} from "./Role";
+import { Role } from './Role';
 
 export interface User {
-    id: number,
-    name: string,
-    roles: Role[]
+  id: number;
+  name: string;
+  roles: Role[];
 }

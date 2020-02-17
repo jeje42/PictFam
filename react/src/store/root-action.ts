@@ -3,5 +3,5 @@ import * as photosActions from './photo/actions';
 
 export default {
   router: routerActions,
-  photos: photosActions
-}
+  photos: photosActions,
+};

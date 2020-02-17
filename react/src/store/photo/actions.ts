@@ -6,46 +6,50 @@ import {
   PHOTOS_SELECTED_NEXT,
   PHOTOS_SELECTED_PREVIOUS,
   NEW_ALBUM_SELECTED,
-} from "./types"
-import { Photo } from '../../types/Photo'
-import { Album } from "../../types/Album"
+  StartPhotosFetchedAction,
+} from './types';
+import { Photo } from '../../types/Photo';
+import { Album } from '../../types/Album';
 
-export function startPhotosFetched(token: string) {
+export function startPhotosFetched(): StartPhotosFetchedAction {
   return {
     type: START_PHOTOS_FETCHED,
-    token: token
-  }
+    request: {
+      method: 'get',
+      url: '/photostree',
+    },
+  };
 }
 
 export function photosFetched(newPhotos: PhotosState) {
   return {
     type: PHOTOS_FETCHED,
-    photos: newPhotos
-  }
+    photos: newPhotos,
+  };
 }
 
 export function selectPhoto(photo: Photo) {
   return {
     type: PHOTOS_SELECTED,
-    photo: photo
-  }
+    photo: photo,
+  };
 }
 
 export function selectNextPhoto() {
   return {
-    type: PHOTOS_SELECTED_NEXT
-  }
+    type: PHOTOS_SELECTED_NEXT,
+  };
 }
 
 export function selectPreviousPhoto() {
   return {
-    type: PHOTOS_SELECTED_PREVIOUS
-  }
+    type: PHOTOS_SELECTED_PREVIOUS,
+  };
 }
 
-export function newAlbumSelected(albums: Array<Album>) {
+export function newAlbumSelected(albums: Album[]) {
   return {
     type: NEW_ALBUM_SELECTED,
-    albums: albums
-  }
+    albums: albums,
+  };
 }

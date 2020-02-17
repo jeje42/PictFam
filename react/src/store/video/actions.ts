@@ -6,46 +6,50 @@ import {
   VIDEOS_SELECTED_NEXT,
   VIDEOS_SELECTED_PREVIOUS,
   NEW_ALBUM_SELECTED,
-} from "./types"
-import { Video } from '../../types/Video'
-import { Album } from "../../types/Album"
+  StartVideossFetchedAction,
+} from './types';
+import { Video } from '../../types/Video';
+import { Album } from '../../types/Album';
 
-export function startVideosFetched(token: string) {
+export function startVideosFetched(): StartVideossFetchedAction {
   return {
     type: START_VIDEOS_FETCHED,
-    token: token
-  }
+    request: {
+      method: 'get',
+      url: '/photostree',
+    },
+  };
 }
 
 export function videosFetched(newVideos: VideosState) {
   return {
     type: VIDEOS_FETCHED,
-    videos: newVideos
-  }
+    videos: newVideos,
+  };
 }
 
 export function selectVideo(video: Video) {
   return {
     type: VIDEOS_SELECTED,
-    video
-  }
+    video,
+  };
 }
 
 export function selectNextVideo() {
   return {
-    type: VIDEOS_SELECTED_NEXT
-  }
+    type: VIDEOS_SELECTED_NEXT,
+  };
 }
 
 export function selectPreviousVideo() {
   return {
-    type: VIDEOS_SELECTED_PREVIOUS
-  }
+    type: VIDEOS_SELECTED_PREVIOUS,
+  };
 }
 
-export function newAlbumSelected(albums: Array<Album>) {
+export function newAlbumSelected(albums: Album[]) {
   return {
     type: NEW_ALBUM_SELECTED,
-    albums: albums
-  }
+    albums: albums,
+  };
 }
