@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.grosmages.entities.User;
+import com.grosmages.entities.Video;
 import com.grosmages.repositories.UserRepository;
 import com.grosmages.repositories.VideoRepository;
 import com.grosmages.security.JwtTokenProvider;
@@ -73,45 +74,29 @@ public class FilesController {
 		return null;
 	}
 
-//	@GetMapping(
-//			value = "/video",
-//			produces = MediaType.IMAGE_JPEG_VALUE
-//	)
-//	public String getVideo(@RequestParam String token) {
-//		log.error(token);
-//		Boolean isValid = tokenProvider.validateToken(token);
-//		Long userId = tokenProvider.getUserIdFromJWT(token);
-//
-////		String userName = principal.getName();
-////
-////		User user = userRepository.findByName(userName).orElse(null);
-////		if (user == null) {
-////			return null;
-////		}
-////
-////		user.setRoles(user.getRoles().stream().map(role -> {
-////			role.setUsers(new HashSet<>());
-////			return role;
-////		}).collect(Collectors.toSet()));
-//
-//		return userId.toString();
-//	}
-
-//	@PathVariable String name
 	@GetMapping("/video")
 	public ResponseEntity<ResourceRegion> getVideo(@RequestHeader HttpHeaders headers, @RequestParam String token, @RequestParam String videoId) throws IOException {
 		if (token == null || videoId == null || !tokenProvider.validateToken(token)) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
+		Video video = null;
+		try {
+			Long lVideoId = Long.parseLong(videoId);
+			video = videoRepository.findById(lVideoId).orElse(null);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 
-//		Long userId = tokenProvider.getUserIdFromJWT(token);
+		if (video == null) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
-		FileSystemResource video = new FileSystemResource("/home/jeje/Videos/Clips/TEAM_FORTRESS 2.mp4");
-		ResourceRegion region = resourceRegion(video, headers);
+		FileSystemResource videoResource = new FileSystemResource(video.getPath() + File.separator + video.getName());
+		ResourceRegion region = resourceRegion(videoResource, headers);
 		return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
 				.contentType(MediaTypeFactory
-						.getMediaType(video)
+						.getMediaType(videoResource)
 						.orElse(MediaType.APPLICATION_OCTET_STREAM))
 				.body(region);
 	}
