@@ -31,7 +31,6 @@ const saga = createSagaMiddleware();
 
 const requestsMiddleware: Middleware<AppState> = (store: MiddlewareAPI<Dispatch, AppState>) => (next: Dispatch<Action>) => (action: ActionRequest) => {
   if (action.request) {
-    debugger;
     action.request = {
       ...action.request,
       headers: {

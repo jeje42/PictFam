@@ -9,11 +9,12 @@ import { startPhotosFetched } from '../store/photo/actions';
 import { startVideosFetched } from '../store/video/actions';
 import { startFetchAlbumsImage, startFetchAlbumsVideo } from '../store/album/actions';
 import ThumnailsGalery from './ThumnailsGalery';
-import MainPhoto from './MainPhoto';
+import MainPhoto from './Photo/MainPhoto';
 import CheckTokenValidComponent from './CheckTokenValidComponent';
 import { Module } from '../store/app/types';
 import MyBackdrop from './MyBackdrop';
 import MyDrawer from './Drawer/MyDrawer';
+import MainVideo from './Video/MainVideos';
 
 interface WelcomeProps {
   startPhotosFetched: typeof startPhotosFetched;
@@ -53,12 +54,6 @@ const Welcome = (props: WelcomeProps) => {
 
   const classesDrawer = useStylesDrawer();
 
-  // useEffect(() => {
-  //   props.startPhotosFetched(props.token)
-  //   props.startFetchAlbumsImage(props.token)
-  //   props.startVideosFetched(props.token)
-  // }, [])
-
   const { currentModule, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched } = props;
 
   useEffect(() => {
@@ -71,7 +66,12 @@ const Welcome = (props: WelcomeProps) => {
     }
   }, [currentModule, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched]);
 
-  const mainElem = Module.Image === props.currentModule ? <MainPhoto screenWidth={props.size.width} screenHeight={props.size.height} /> : undefined;
+  const mainElem =
+    Module.Image === props.currentModule ? (
+      <MainPhoto screenWidth={props.size.width} screenHeight={props.size.height} />
+    ) : (
+      <MainVideo screenWidth={props.size.width} screenHeight={props.size.height}></MainVideo>
+    );
 
   const toolbarElement = props.currentModule === Module.Image ? <ThumnailsGalery screenWidth={props.size.width} /> : undefined;
 

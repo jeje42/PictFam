@@ -7,6 +7,7 @@ import {
   NEW_ALBUM_SELECTED,
   INIT_VIDEOS_STATE,
   VideoActionTypes,
+  SELECT_VIDEO_FOR_READING,
 } from './types';
 import { Video } from '../../types/Video';
 import { Album } from '../../types/Album';
@@ -14,8 +15,14 @@ import { Album } from '../../types/Album';
 const initialState: VideosState = {
   videos: [],
   videosSelected: [],
+  videoReading: undefined,
 };
 
+/**
+ * Updates the selected attribute of the videos of the current album.
+ * @param state
+ * @param newVideoSelected
+ */
 const videoSelected = (state: VideosState, newVideoSelected: Video) => {
   return {
     ...state,
@@ -62,6 +69,13 @@ const newAlbumSelected = (state: VideosState, albums: Album[]) => {
   );
 };
 
+const selectVideoForReading = (state: VideosState, video: Video): VideosState => {
+  return {
+    ...state,
+    videoReading: video,
+  };
+};
+
 export function videosReducer(state = initialState, action: VideoActionTypes): VideosState {
   switch (action.type) {
     case VIDEOS_FETCHED:
@@ -79,6 +93,8 @@ export function videosReducer(state = initialState, action: VideoActionTypes): V
       return newAlbumSelected(state, action.albums);
     case INIT_VIDEOS_STATE:
       return initialState;
+    case SELECT_VIDEO_FOR_READING:
+      return selectVideoForReading(state, action.video);
     default:
       return state;
   }

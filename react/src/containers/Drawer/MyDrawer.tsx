@@ -7,6 +7,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import DrawerAlbumsImage from './Photo/DrawerAlbums';
+import DrawerAlbumsVideo from './Video/DrawerAlbums';
 import Drawer from '@material-ui/core/Drawer';
 import * as React from 'react';
 import { createStyles, makeStyles, useTheme } from '@material-ui/core/styles';
@@ -90,18 +91,6 @@ const MyDrawer: React.FC<MyDrawerProps> = props => {
     },
   })();
 
-  // useEffect(() => {
-  //     if (props.openDrawer) {
-  //         if(props.drawerWidth) {
-  //             setDrawerWidth(props.drawerWidth)
-  //         } else {
-  //             setDrawerWidth(240)
-  //         }
-  //     } else {
-  //         setDrawerWidth(0)
-  //     }
-  // }, [props.openDrawer, props.drawerWidth])
-
   const [anchorEl, setAnchorEl] = React.useState<undefined | HTMLElement>(undefined);
 
   const handleClickMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -150,7 +139,7 @@ const MyDrawer: React.FC<MyDrawerProps> = props => {
 
   const open = Boolean(anchorEl);
 
-  const drawerAlbums = props.currentModule === Module.Image ? <DrawerAlbumsImage /> : undefined;
+  const drawerAlbums = props.currentModule === Module.Image ? <DrawerAlbumsImage /> : <DrawerAlbumsVideo />;
 
   return (
     <Drawer

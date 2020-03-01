@@ -23,15 +23,13 @@ interface AlbumLeafProps {
  *  - if the album has sons, generates collapse and the nested by calling generateAlbumLeaf recursively.
  **/
 const AlbumLeaf: React.FC<AlbumLeafProps> = props => {
-  const useStyles = makeStyles((theme: any) =>
+  const localClasses = makeStyles((theme: any) =>
     createStyles({
       nested: {
         paddingLeft: props.nestedIndex * theme.spacing(4),
       },
     }),
-  );
-
-  const localClasses = useStyles();
+  )();
 
   const albumHasSons = props.album.sons && props.album.sons.length;
 

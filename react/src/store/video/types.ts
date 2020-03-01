@@ -9,10 +9,12 @@ export const VIDEOS_SELECTED_NEXT = 'VIDEOS_SELECTED_NEXT';
 export const VIDEOS_SELECTED_PREVIOUS = 'VIDEOS_SELECTED_PREVIOUS';
 export const NEW_ALBUM_SELECTED = 'NEW_ALBUM_SELECTED';
 export const INIT_VIDEOS_STATE = 'INIT_VIDEOS_STATE';
+export const SELECT_VIDEO_FOR_READING = 'SELECT_VIDEO_FOR_READING';
 
 export interface VideosState {
   videos: Video[];
   videosSelected: Video[];
+  videoReading?: Video;
 }
 
 export interface StartVideossFetchedAction extends ActionRequest {
@@ -46,6 +48,11 @@ interface InitStateAction {
   type: typeof INIT_VIDEOS_STATE;
 }
 
+export interface SelectVideoForReading {
+  type: typeof SELECT_VIDEO_FOR_READING;
+  video: Video;
+}
+
 export type VideoActionTypes =
   | StartVideossFetchedAction
   | VideosFetchedAction
@@ -53,4 +60,5 @@ export type VideoActionTypes =
   | SelectNextVideoAction
   | SelectPreviousVideoAction
   | NewAlbumSelected
-  | InitStateAction;
+  | InitStateAction
+  | SelectVideoForReading;

@@ -7,6 +7,8 @@ import {
   VIDEOS_SELECTED_PREVIOUS,
   NEW_ALBUM_SELECTED,
   StartVideossFetchedAction,
+  SELECT_VIDEO_FOR_READING,
+  SelectVideoForReading,
 } from './types';
 import { Video } from '../../types/Video';
 import { Album } from '../../types/Album';
@@ -51,5 +53,12 @@ export function newAlbumSelected(albums: Album[]) {
   return {
     type: NEW_ALBUM_SELECTED,
     albums: albums,
+  };
+}
+
+export function selectVideoForReading(video: Video): SelectVideoForReading {
+  return {
+    type: SELECT_VIDEO_FOR_READING,
+    video: video,
   };
 }

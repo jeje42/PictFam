@@ -3,12 +3,12 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { connect } from 'react-redux';
 
-import { toggleDrawer } from '../store/drawer/actions';
-import { Photo } from '../types/Photo';
-import NavButton from './NavButton';
-import { AppState } from '../store';
-import MyImgElement from './MyImgElement';
-import { selectNextPhoto, selectPreviousPhoto } from '../store/photo/actions';
+import { toggleDrawer } from '../../store/drawer/actions';
+import { Photo } from '../../types/Photo';
+import NavButton from '../NavButton';
+import { AppState } from '../../store';
+import MyImgElement from '../MyImgElement';
+import { selectNextPhoto, selectPreviousPhoto } from '../../store/photo/actions';
 
 interface MainPhotoProps {
   screenWidth: number;
@@ -20,7 +20,7 @@ interface MainPhotoProps {
   selectPreviousPhoto: typeof selectPreviousPhoto;
 }
 
-const MainPhoto: React.SFC<MainPhotoProps> = props => {
+const MainPhoto: React.FC<MainPhotoProps> = props => {
   if (props.photos.length === 0) {
     return <></>;
   }
