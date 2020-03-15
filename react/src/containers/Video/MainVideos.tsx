@@ -1,28 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import { Video } from '../../types/Video';
 import clsx from 'clsx';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
-import { selectPhoto } from '../../store/photo/actions';
 import { toggleDrawer } from '../../store/drawer/actions';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
+import { ViewColumn, ViewCompact, Menu } from '@material-ui/icons';
 import Toolbar from '@material-ui/core/Toolbar';
 import VideoTab from './VideoTab';
 import Player from './Player';
+import { Drawer, Grid } from '@material-ui/core';
 
 interface MainVideoProps {
   screenWidth: number;
   screenHeight: number;
   drawerWidth: number;
   openDrawer: boolean;
-  // videos: Video[];
   toggleDrawer: typeof toggleDrawer;
   albumIdSelected: number;
 }
@@ -36,7 +30,6 @@ interface TabPanelProps {
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
-  // return <>{value === index && <>{children}</>}</>;
   return <>{value === index && <>{children}</>}</>;
 }
 
@@ -49,10 +42,6 @@ function a11yProps(index: any) {
 
 const MainVideo: React.FC<MainVideoProps> = props => {
   const classes = makeStyles((theme: Theme) => ({
-    // root: {
-    //   flexGrow: 1,
-    //   backgroundColor: theme.palette.background.paper,
-    // },
     appBar: {
       transition: theme.transitions.create(['margin', 'width'], {
         easing: theme.transitions.easing.sharp,
@@ -82,14 +71,6 @@ const MainVideo: React.FC<MainVideoProps> = props => {
         duration: theme.transitions.duration.leavingScreen,
       }),
       marginLeft: 0,
-
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      height: '100%',
-      paddingTop: '96px',
-      paddingBottom: '20px',
-      // paddingBottom: '116px',
     },
     contentShift: {
       transition: theme.transitions.create('margin', {
@@ -97,22 +78,15 @@ const MainVideo: React.FC<MainVideoProps> = props => {
         duration: theme.transitions.duration.enteringScreen,
       }),
       marginLeft: props.drawerWidth,
-
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      height: '100%',
-      paddingTop: '96px',
-      paddingBottom: '20px',
-      // paddingBottom: '116px',
     },
+    toolbar: theme.mixins.toolbar,
   }))();
 
-  const [value, setValue] = React.useState(0);
   const [isAbumSelected, setIsAbumSelected] = useState<boolean>(props.albumIdSelected !== -1);
+  const [imageFullWidth, setImageFullWidth] = useState(false);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
+  const toggleLayout = () => {
+    setImageFullWidth(!imageFullWidth);
   };
 
   useEffect(() => {
@@ -121,10 +95,6 @@ const MainVideo: React.FC<MainVideoProps> = props => {
       setIsAbumSelected(newIsAlbumSelected);
     }
   }, [isAbumSelected, props.albumIdSelected]);
-
-  const handleSwitchToPlayer = () => {
-    setValue(0);
-  };
 
   return (
     <>
@@ -135,33 +105,35 @@ const MainVideo: React.FC<MainVideoProps> = props => {
         })}
       >
         <Toolbar disableGutters={true}>
-          <IconButton
-            color='inherit'
-            aria-label='open drawer'
-            onClick={props.toggleDrawer}
-            edge='start'
-            className={clsx(classes.menuButton, props.openDrawer && classes.hide)}
-          >
-            <MenuIcon />
+          <IconButton color='inherit' onClick={props.toggleDrawer} edge='start' className={clsx(classes.menuButton, props.openDrawer && classes.hide)}>
+            <Menu />
           </IconButton>
-          <Tabs value={value} onChange={handleChange} aria-label='simple tabs example'>
-            <Tab label='Lecteur' {...a11yProps(0)} />
-            <Tab label='Films' {...a11yProps(1)} disabled={!isAbumSelected} />
-          </Tabs>
+          <IconButton color='inherit' onClick={toggleLayout} edge='start' className={clsx(classes.menuButton)}>
+            {imageFullWidth ? <ViewColumn /> : <ViewCompact />}
+          </IconButton>
         </Toolbar>
       </AppBar>
-      <div
+      <main
         className={clsx(classes.content, {
           [classes.contentShift]: props.openDrawer,
         })}
       >
-        <TabPanel value={value} index={0}>
-          {!isAbumSelected ? <div>{`Sélectionnez d'abord un album.`}</div> : <Player />}
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <VideoTab switchToPlayer={handleSwitchToPlayer} />
-        </TabPanel>
-      </div>
+        <div className={classes.toolbar} />
+        <Grid container spacing={3}>
+          {!isAbumSelected ? (
+            <div>{`Sélectionnez d'abord un album.`}</div>
+          ) : (
+            <>
+              <Grid item md={imageFullWidth ? 12 : 6} sm={12}>
+                <Player screenWidth={imageFullWidth ? props.screenWidth : undefined} screenHeight={imageFullWidth ? props.screenHeight : undefined} />
+              </Grid>
+              <Grid item md={6} sm={12}>
+                <VideoTab />
+              </Grid>
+            </>
+          )}
+        </Grid>
+      </main>
     </>
   );
 };

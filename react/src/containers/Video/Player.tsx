@@ -11,26 +11,32 @@ interface PlayerProps {
   token: string;
   videoReading?: Video;
   size: any;
+  screenWidth?: number;
+  screenHeight?: number;
+  drawerWidth: number;
+  openDrawer: boolean;
 }
 
 const videoAddress = '/video';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      // maxWidth: '1000px',
-      // width: '80%',
-      // height: '80%',
-      // maxHeight: '1000px',
-      // maxHeight: '1000px',
-      // width: '100%',
-    },
-  }),
-);
-
 const MyPlayer: React.FC<PlayerProps> = props => {
-  const classes = useStyles();
   const [videoFullAdress, setVideoFullAddress] = useState<string>();
+
+  const computeImageHeight: () => number = () => {
+    if (props.screenHeight === undefined) {
+      return 400;
+    }
+
+    return props.screenHeight - 156;
+  };
+
+  const computeImageWidth: () => number = () => {
+    if (props.screenWidth === undefined) {
+      return 711;
+    }
+
+    return props.screenWidth - 200 - (props.openDrawer ? props.drawerWidth : 0);
+  };
 
   useEffect(() => {
     if (props.videoReading) {
@@ -38,20 +44,38 @@ const MyPlayer: React.FC<PlayerProps> = props => {
     }
   }, [props.token, props.videoReading]);
 
-  console.log(props.size.width);
-  console.log(props.size.height);
+  let imageHeight: number | undefined;
+  let imageWidth: number | undefined;
 
-  // @ts-ignore
-  return (
-    <div className={classes.container}>
-      {/*<Player playsInline poster='/assets/poster.png' src={videoFullAdress} height={'100%'} fluid={true} />*/}
-      {/*<video src={videoFullAdress} />*/}
-      <ReactPlayer url={videoFullAdress} playing width={'100%'} height={'100%'} controls />
-    </div>
+  if (props.screenHeight && props.screenWidth) {
+    imageHeight = computeImageHeight();
+    imageWidth = computeImageWidth();
+  }
+
+  const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+      container: {
+        width: imageWidth,
+        height: imageHeight,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+      },
+    }),
   );
+
+  const classes = useStyles();
+
+  let reactPlayer = <ReactPlayer url={videoFullAdress} playing controls width={'100%'} height={'100%'} />;
+  if (imageHeight && imageWidth) {
+    reactPlayer = <ReactPlayer url={videoFullAdress} playing controls width={`${imageWidth}px`} height={`${imageHeight}px`} />;
+  }
+
+  return <div className={classes.container}>{reactPlayer}</div>;
 };
 
 const mapStateToProps = (state: AppState) => ({
+  openDrawer: state.drawer.open,
+  drawerWidth: state.drawer.width,
   token: state.auth.token,
   videoReading: state.videos.videoReading,
 });
