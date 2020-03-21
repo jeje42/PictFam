@@ -1,18 +1,41 @@
-import Hello from './containers/Welcome';
 import * as React from 'react';
-import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { useEffect } from 'react';
+import { HashRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { AppState } from './store';
 import { connect } from 'react-redux';
 import Login from './containers/Login';
 import { ROUTE_IMAGES, ROUTE_VIDEOS } from './utils/routesUtils';
 import ImagesPage from './containers/Photo/ImagesPage';
 import VideoPage from './containers/Video/VideoPage';
+import { Module } from './store/app/types';
+import { startPhotosFetched } from './store/photo/actions';
+import { startFetchAlbumsImage, startFetchAlbumsVideo } from './store/album/actions';
+import { startVideosFetched } from './store/video/actions';
 
 interface AppProps {
   isAuthenticated: boolean;
+  currentModule: Module;
+  startPhotosFetched: typeof startPhotosFetched;
+  startFetchAlbumsImage: typeof startFetchAlbumsImage;
+  startFetchAlbumsVideo: typeof startFetchAlbumsVideo;
+  startVideosFetched: typeof startVideosFetched;
 }
 
 const App: React.FC<AppProps> = props => {
+  const { currentModule, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched } = props;
+  useEffect(() => {
+    switch (currentModule) {
+      case Module.Image:
+        startPhotosFetched();
+        startFetchAlbumsImage();
+        break;
+      case Module.Video:
+        startFetchAlbumsVideo();
+        startVideosFetched();
+        break;
+    }
+  }, [currentModule, startFetchAlbumsImage, startFetchAlbumsVideo, startPhotosFetched, startVideosFetched]);
+
   // @ts-ignore
   function PrivateRoute({ children, ...rest }) {
     return (
@@ -60,6 +83,7 @@ const App: React.FC<AppProps> = props => {
 
 const mapStateToProps = (state: AppState) => ({
   isAuthenticated: state.auth.isAuthenticated,
+  currentModule: state.app.module,
 });
 
-export default connect(mapStateToProps, {})(App);
+export default connect(mapStateToProps, { startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched })(App);
