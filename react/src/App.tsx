@@ -1,9 +1,12 @@
 import Hello from './containers/Welcome';
 import * as React from 'react';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import { AppState } from './store';
 import { connect } from 'react-redux';
 import Login from './containers/Login';
+import { ROUTE_IMAGES, ROUTE_VIDEOS } from './utils/routesUtils';
+import ImagesPage from './containers/Photo/ImagesPage';
+import VideoPage from './containers/Video/VideoPage';
 
 interface AppProps {
   isAuthenticated: boolean;
@@ -37,8 +40,18 @@ const App: React.FC<AppProps> = props => {
         <Route path='/login'>
           <Login />
         </Route>
+        <PrivateRoute path={ROUTE_IMAGES}>
+          <ImagesPage />
+        </PrivateRoute>
+        <PrivateRoute path={ROUTE_VIDEOS}>
+          <VideoPage />
+        </PrivateRoute>
         <PrivateRoute path='/'>
-          <Hello />
+          <Redirect
+            to={{
+              pathname: ROUTE_IMAGES,
+            }}
+          />
         </PrivateRoute>
       </Switch>
     </Router>

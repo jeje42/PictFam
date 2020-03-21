@@ -23,6 +23,8 @@ import { toggleDrawer } from '../../store/drawer/actions';
 import { logoutAction, startScanAction } from '../../store/auth-profile/actions';
 import { changeModule } from '../../store/app/actions';
 import { User } from '../../types/User';
+import { useHistory } from 'react-router-dom';
+import { ROUTE_IMAGES, ROUTE_VIDEOS } from '../../utils/routesUtils';
 
 const ITEM_HEIGHT = 48;
 
@@ -85,6 +87,8 @@ const userContainsRole = (user: User, roleName: RoleName) => {
 const MyDrawer: React.FC<MyDrawerProps> = props => {
   const classes = useStyles();
   const theme = useTheme();
+  const history = useHistory();
+
   const classesDrawerOverride = makeStyles({
     drawerRoot: {
       backgroundColor: theme.palette.secondary.main,
@@ -132,7 +136,7 @@ const MyDrawer: React.FC<MyDrawerProps> = props => {
   }
 
   const moduleSwitchItem = (
-    <MenuItem key={'switchModule'} onClick={() => props.changeModule(props.currentModule === Module.Image ? Module.Video : Module.Image)}>
+    <MenuItem key={'switchModule'} onClick={() => history.push(props.currentModule === Module.Image ? ROUTE_VIDEOS : ROUTE_IMAGES)}>
       {props.currentModule === Module.Image ? 'Films' : 'Photos'}
     </MenuItem>
   );

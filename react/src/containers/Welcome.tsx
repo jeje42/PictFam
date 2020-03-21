@@ -14,19 +14,19 @@ import CheckTokenValidComponent from './CheckTokenValidComponent';
 import { Module } from '../store/app/types';
 import MyBackdrop from './MyBackdrop';
 import MyDrawer from './Drawer/MyDrawer';
-import MainVideo from './Video/MainVideos';
 
 interface WelcomeProps {
-  startPhotosFetched: typeof startPhotosFetched;
   startVideosFetched: typeof startVideosFetched;
-  startFetchAlbumsImage: typeof startFetchAlbumsImage;
+
   startFetchAlbumsVideo: typeof startFetchAlbumsVideo;
-  size: any;
+  // size: any;
   currentModule: Module;
+  mainElem: React.ReactNode;
+  toolbarElem: React.ReactNode;
 }
 
 const Welcome = (props: WelcomeProps) => {
-  const useStylesDrawer = makeStyles((theme: any) =>
+  const classesDrawer = makeStyles((theme: any) =>
     createStyles({
       root: {
         display: 'flex',
@@ -50,37 +50,14 @@ const Welcome = (props: WelcomeProps) => {
         justifyContent: 'flex-start',
       },
     }),
-  );
-
-  const classesDrawer = useStylesDrawer();
-
-  const { currentModule, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched } = props;
-
-  useEffect(() => {
-    if (Module.Image === currentModule) {
-      startPhotosFetched();
-      startFetchAlbumsImage();
-    } else if (Module.Video === currentModule) {
-      startFetchAlbumsVideo();
-      startVideosFetched();
-    }
-  }, [currentModule, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched]);
-
-  const mainElem =
-    Module.Image === props.currentModule ? (
-      <MainPhoto screenWidth={props.size.width} screenHeight={props.size.height} />
-    ) : (
-      <MainVideo screenWidth={props.size.width} screenHeight={props.size.height}></MainVideo>
-    );
-
-  const toolbarElement = props.currentModule === Module.Image ? <ThumnailsGalery screenWidth={props.size.width} /> : undefined;
+  )();
 
   return (
     <div className={classesDrawer.root}>
-      {toolbarElement}
+      {props.toolbarElem}
       <MyDrawer />
 
-      {mainElem}
+      {props.mainElem}
 
       <CheckTokenValidComponent />
 
