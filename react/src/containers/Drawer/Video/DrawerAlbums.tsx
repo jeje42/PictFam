@@ -53,7 +53,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   }, [props.albums]);
 
   const handleListAlbumClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, album: Album) => {
-    props.selectAlbumVideo(album);
+    props.selectAlbumVideo(album.id);
     const albums = [album] as Album[];
     generateAlbumListRecurs(album, albums);
     props.newAlbumSelected(albums);

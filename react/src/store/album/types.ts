@@ -27,7 +27,7 @@ export interface AlbumImageFetchedAction {
 
 export interface SelectAlbumImageAction {
   type: typeof ALBUM_IMAGE_SELECTED;
-  album: Album;
+  albumId: number;
 }
 
 export interface StartFetchAlbumsVideoAction extends ActionRequest {
@@ -41,7 +41,7 @@ export interface AlbumVideoFetchedAction {
 
 export interface SelectAlbumVideoAction {
   type: typeof ALBUM_VIDEO_SELECTED;
-  album: Album;
+  albumId: number;
 }
 
 export interface InitAlbumStateAction {

@@ -1,5 +1,4 @@
 import { ALBUM_IMAGE_FETCHED, ALBUM_IMAGE_SELECTED, ALBUM_VIDEO_FETCHED, ALBUM_VIDEO_SELECTED, AlbumActionTypes, AlbumState, INIT_ALBUMSTATE } from './types';
-import { Album } from '../../types/Album';
 
 const initialState: AlbumState = {
   albumsImage: [],
@@ -8,17 +7,17 @@ const initialState: AlbumState = {
   albumVideoIdSelected: -1,
 };
 
-const albumImageSelected = (state: AlbumState, newAlbumSelected: Album) => {
+const albumImageSelected = (state: AlbumState, albumId: number) => {
   return {
     ...state,
-    albumImageIdSelected: newAlbumSelected.id,
+    albumImageIdSelected: albumId,
   };
 };
 
-const albumVideoSelected = (state: AlbumState, newAlbumSelected: Album) => {
+const albumVideoSelected = (state: AlbumState, albumId: number) => {
   return {
     ...state,
-    albumVideoIdSelected: newAlbumSelected.id,
+    albumVideoIdSelected: albumId,
   };
 };
 export function albumsReducer(state = initialState, action: AlbumActionTypes): AlbumState {
@@ -34,9 +33,9 @@ export function albumsReducer(state = initialState, action: AlbumActionTypes): A
         albumsVideo: action.albums,
       };
     case ALBUM_IMAGE_SELECTED:
-      return albumImageSelected(state, action.album);
+      return albumImageSelected(state, action.albumId);
     case ALBUM_VIDEO_SELECTED:
-      return albumVideoSelected(state, action.album);
+      return albumVideoSelected(state, action.albumId);
     case INIT_ALBUMSTATE:
       return initialState;
     default:

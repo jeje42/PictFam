@@ -31,10 +31,10 @@ export function albumsImageFetch(newAlbums: Album[]): AlbumImageFetchedAction {
   };
 }
 
-export function selectAlbumImage(album: Album): SelectAlbumImageAction {
+export function selectAlbumImage(albumId: number): SelectAlbumImageAction {
   return {
     type: ALBUM_IMAGE_SELECTED,
-    album: album,
+    albumId,
   };
 }
 
@@ -55,9 +55,9 @@ export function albumsVideoFetch(newAlbums: Album[]): AlbumVideoFetchedAction {
   };
 }
 
-export function selectAlbumVideo(album: Album): SelectAlbumVideoAction {
+export function selectAlbumVideo(albumId: number): SelectAlbumVideoAction {
   return {
     type: ALBUM_VIDEO_SELECTED,
-    album: album,
+    albumId,
   };
 }

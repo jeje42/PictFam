@@ -195,7 +195,6 @@ const mapStateToProps = (state: AppState) => ({
   photos: state.photos.photosSelected,
   albums: state.albums,
   openDrawer: state.drawer.open,
-  drawerWidth: state.drawer.width,
   token: state.auth.token,
   userDetails: state.auth.userDetails,
   currentModule: state.app.module,

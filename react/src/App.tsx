@@ -11,10 +11,13 @@ import { Module } from './store/app/types';
 import { startPhotosFetched } from './store/photo/actions';
 import { startFetchAlbumsImage, startFetchAlbumsVideo } from './store/album/actions';
 import { startVideosFetched } from './store/video/actions';
+import { Album } from './types/Album';
 
 interface AppProps {
   isAuthenticated: boolean;
   currentModule: Module;
+  albumsImage: Album[];
+  albumsVideo: Album[];
   startPhotosFetched: typeof startPhotosFetched;
   startFetchAlbumsImage: typeof startFetchAlbumsImage;
   startFetchAlbumsVideo: typeof startFetchAlbumsVideo;
@@ -22,19 +25,23 @@ interface AppProps {
 }
 
 const App: React.FC<AppProps> = props => {
-  const { currentModule, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched } = props;
+  const { currentModule, albumsImage, albumsVideo, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched } = props;
   useEffect(() => {
     switch (currentModule) {
       case Module.Image:
-        startPhotosFetched();
-        startFetchAlbumsImage();
+        if (albumsImage.length == 0) {
+          startPhotosFetched();
+          startFetchAlbumsImage();
+        }
         break;
       case Module.Video:
-        startFetchAlbumsVideo();
-        startVideosFetched();
+        if (albumsVideo.length == 0) {
+          startFetchAlbumsVideo();
+          startVideosFetched();
+        }
         break;
     }
-  }, [currentModule, startFetchAlbumsImage, startFetchAlbumsVideo, startPhotosFetched, startVideosFetched]);
+  }, [albumsImage.length, albumsVideo.length, currentModule, startFetchAlbumsImage, startFetchAlbumsVideo, startPhotosFetched, startVideosFetched]);
 
   // @ts-ignore
   function PrivateRoute({ children, ...rest }) {
@@ -84,6 +91,8 @@ const App: React.FC<AppProps> = props => {
 const mapStateToProps = (state: AppState) => ({
   isAuthenticated: state.auth.isAuthenticated,
   currentModule: state.app.module,
+  albumsImage: state.albums.albumsImage,
+  albumsVideo: state.albums.albumsVideo,
 });
 
 export default connect(mapStateToProps, { startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched })(App);

@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { connect } from 'react-redux';
 import List from '@material-ui/core/List';
 import { withSize } from 'react-sizeme';
+import { useHistory } from 'react-router-dom';
+
 import { AppState } from '../../../store';
 import { Album } from '../../../types/Album';
 import { selectAlbumImage } from '../../../store/album/actions';
@@ -12,6 +14,8 @@ import Alert from '@material-ui/lab/Alert';
 import { Grow } from '@material-ui/core';
 import { AlbumsHash } from './DrawerInterface';
 import { AlbumLeaf } from './AlbumLeaf';
+import { ROUTE_IMAGES } from '../../../utils/routesUtils';
+import { isSonSelectedRecurs } from '../../../store/album/utils';
 
 interface DrawerAlbumsProps {
   albums: Album[];
@@ -22,31 +26,27 @@ interface DrawerAlbumsProps {
   size: any;
 }
 
-const recursAlbumOpen = (album: Album, finalObject: AlbumsHash) => {
-  finalObject[album.id] = false;
+const recursAlbumOpen = (album: Album, finalObject: AlbumsHash, albumIdSelected: number) => {
+  const isOneOfSonsSelected = isSonSelectedRecurs(album.sons, albumIdSelected);
+  finalObject[album.id] = isOneOfSonsSelected;
   album.sons.forEach(son => {
-    recursAlbumOpen(son, finalObject);
-  });
-};
-
-const generateAlbumListRecurs = (album: Album, finalList: Album[]) => {
-  album.sons.forEach(album => {
-    finalList.push(album);
-    generateAlbumListRecurs(album, finalList);
+    recursAlbumOpen(son, finalObject, albumIdSelected);
   });
 };
 
 const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   const [albumsHash, setAlbumsHash] = React.useState({} as AlbumsHash);
+  const history = useHistory();
+  const { albums, albumIdSelected } = props;
 
   useEffect(() => {
     const newAlbumHash: AlbumsHash = {};
-    props.albums.forEach((album: Album) => {
-      recursAlbumOpen(album, newAlbumHash);
+    albums.forEach((album: Album) => {
+      recursAlbumOpen(album, newAlbumHash, albumIdSelected);
     });
 
     setAlbumsHash(newAlbumHash);
-  }, [props.albums]);
+  }, [albums, albumIdSelected]);
 
   useEffect(() => {
     props.drawerWidthChanged(Math.trunc(props.size.width));
@@ -59,14 +59,11 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   };
 
   const handleListAlbumClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, album: Album, toggleAlbum: boolean) => {
+    event.stopPropagation();
     if (toggleAlbum) {
-      event.stopPropagation();
       toggleAlbumHash(album.id);
     } else {
-      props.selectAlbumImage(album);
-      const albums = [album] as Album[];
-      generateAlbumListRecurs(album, albums);
-      props.newAlbumSelected(albums);
+      history.push(`${ROUTE_IMAGES}?albumId=${album.id}`);
     }
   };
 
