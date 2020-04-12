@@ -12,19 +12,23 @@ import { useQuery } from '../../utils/routesUtils';
 import { selectAlbumImage } from '../../store/album/actions';
 import { Album } from '../../types/Album';
 import { findAlbumRecurs, generateAlbumListRecurs } from '../../store/album/utils';
-import { newAlbumSelected } from '../../store/photo/actions';
+import { newAlbumSelected, selectPhoto } from '../../store/photo/actions';
+import { Photo } from '../../types/Photo';
 
 interface ImagesPageProps {
   changeModule: typeof changeModule;
   selectAlbumImage: typeof selectAlbumImage;
   newAlbumSelected: typeof newAlbumSelected;
+  selectPhoto: typeof selectPhoto;
   size: any;
   albums: Album[];
+  photos: Photo[];
 }
 
 const ImagesPage: React.FC<ImagesPageProps> = props => {
-  const { albums, selectAlbumImage, newAlbumSelected } = props;
+  const { albums, photos, selectAlbumImage, newAlbumSelected, selectPhoto } = props;
   const albumId = Number(useQuery().get('albumId'));
+  const photoId = Number(useQuery().get('photoId'));
 
   useEffect(() => {
     props.changeModule(Module.Image);
@@ -39,9 +43,23 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
         albumsSons.push(album);
         generateAlbumListRecurs(album, albumsSons);
         newAlbumSelected(albumsSons);
+
+        if (photoId) {
+          const photoFound: Photo | undefined = photos.find(photo => photo.id === photoId);
+          if (photoFound) {
+            selectPhoto(photoFound);
+          }
+        }
       }
     }
-  }, [albums, selectAlbumImage, albumId, newAlbumSelected]);
+
+    if (photoId) {
+      const photoFound: Photo | undefined = photos.find(photo => photo.id === photoId);
+      if (photoFound) {
+        selectPhoto(photoFound);
+      }
+    }
+  }, [albums, selectAlbumImage, albumId, newAlbumSelected, photos, photoId, selectPhoto]);
 
   const mainElem = <MainPhoto screenWidth={props.size.width} screenHeight={props.size.height} />;
 
@@ -52,6 +70,7 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
 
 const mapStateToProps = (state: AppState) => ({
   albums: state.albums.albumsImage,
+  photos: state.photos.photos,
 });
 
-export default withSize({ monitorHeight: true })(connect(mapStateToProps, { changeModule, selectAlbumImage, newAlbumSelected })(ImagesPage));
+export default withSize({ monitorHeight: true })(connect(mapStateToProps, { changeModule, selectAlbumImage, newAlbumSelected, selectPhoto })(ImagesPage));

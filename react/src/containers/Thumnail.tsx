@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Thumnail: React.SFC<ThumnailProps> = props => {
+const Thumnail: React.FC<ThumnailProps> = props => {
   const classes = useStyles();
 
   const classesDiv = [classes.divContainer];

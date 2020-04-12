@@ -58,7 +58,7 @@ const AlbumLeaf: React.FC<AlbumLeafProps> = props => {
     const sonsElem = props.album.sons.map(albumSon => {
       return (
         <AlbumLeaf
-          key={props.album.id}
+          key={albumSon.id}
           album={albumSon}
           albumsHash={props.albumsHash}
           nestedIndex={props.nestedIndex + 1}

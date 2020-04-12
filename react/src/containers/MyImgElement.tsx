@@ -6,7 +6,7 @@ import { CircularProgress, Zoom } from '@material-ui/core';
 
 interface MyImgElementProps {
   imgUrl: string;
-  styleRaw: any;
+  styleRaw?: any;
   token: string;
 }
 

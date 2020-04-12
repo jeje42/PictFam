@@ -5,10 +5,12 @@ import { connect } from 'react-redux';
 
 import { toggleDrawer } from '../../store/drawer/actions';
 import { Photo } from '../../types/Photo';
-import NavButton from '../NavButton';
 import { AppState } from '../../store';
 import MyImgElement from '../MyImgElement';
-import { selectNextPhoto, selectPreviousPhoto } from '../../store/photo/actions';
+import { selectPhoto } from '../../store/photo/actions';
+import { ROUTE_IMAGES } from '../../utils/routesUtils';
+import { useHistory } from 'react-router-dom';
+import MainPhotoDialog from './MainPhotoDialog';
 
 interface MainPhotoProps {
   screenWidth: number;
@@ -16,36 +18,20 @@ interface MainPhotoProps {
   drawerWidth: number;
   openDrawer: boolean;
   photos: Photo[];
-  selectNextPhoto: typeof selectNextPhoto;
-  selectPreviousPhoto: typeof selectPreviousPhoto;
+  albumIdSelected: number;
+  selectPhoto: typeof selectPhoto;
 }
 
 const MainPhoto: React.FC<MainPhotoProps> = props => {
+  const history = useHistory();
+
   if (props.photos.length === 0) {
     return <></>;
   }
-  const photo = props.photos.filter(photo => photo.selected)[0];
 
-  const computeImageHeight: () => number = () => {
-    if (props.screenHeight === undefined) {
-      return 400;
-    }
-
-    //56(thumnailHeight) + 20(thumnailMargin) + 80(mainPhotoMargin)
-    return props.screenHeight - 156;
+  const selectPhotoHandler: (photo: Photo) => void = (photo: Photo) => {
+    history.push(`${ROUTE_IMAGES}?albumId=${props.albumIdSelected}&photoId=${photo.id}`);
   };
-
-  const computeImageWidth: () => number = () => {
-    if (props.screenWidth === undefined) {
-      return 711;
-    }
-
-    //16(marginNavButton) + 56(buttonsWidth)
-    return props.screenWidth - 200 - (props.openDrawer ? props.drawerWidth : 0);
-  };
-
-  const imageHeight = computeImageHeight();
-  const imageWidth = computeImageWidth();
 
   const classesDrawer = makeStyles((theme: any) =>
     createStyles({
@@ -59,8 +45,8 @@ const MainPhoto: React.FC<MainPhotoProps> = props => {
         marginLeft: 0,
 
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        alignContent: 'flex-start',
+        flexWrap: 'wrap',
         height: '100%',
         paddingTop: '96px',
         paddingBottom: '20px',
@@ -71,39 +57,53 @@ const MainPhoto: React.FC<MainPhotoProps> = props => {
           duration: theme.transitions.duration.enteringScreen,
         }),
         marginLeft: props.drawerWidth,
-
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: '100%',
-        paddingTop: '96px',
-        paddingBottom: '20px',
       },
     }),
   )();
 
-  let imgElem;
-  if (photo) {
-    const imgStyle = {
-      borderRadius: '5px',
-      maxHeight: `${imageHeight}px`,
-      maxWidth: `${imageWidth}px`,
-      objectFit: 'contain',
-      boxShadow: '5px 10px 10px #1b4f1b',
-    };
-    imgElem = <MyImgElement imgUrl={`photo/${photo.id}`} styleRaw={imgStyle} />;
+  const imageWidth = 250;
+  const imgStyle = {
+    margin: '10px',
+    borderRadius: '20px',
+    width: `${imageWidth}px`,
+    height: `${(imageWidth * 9) / 16}px`,
+    cursor: 'pointer',
+    transition: 'all 2s',
+    '&:hover': {
+      boxShadow: '5px 10px 18px #90EE90',
+    },
+  };
+  const imgElem = (
+    <>
+      {props.photos.map(photo => (
+        <div key={photo.id} onClick={() => selectPhotoHandler(photo)}>
+          <MyImgElement
+            key={photo.id}
+            imgUrl={`thumnail/${photo.id}`}
+            styleRaw={{
+              ...imgStyle,
+              boxShadow: `${photo.selected ? '5px 10px 18px yellow' : ''}`,
+            }}
+          />
+        </div>
+      ))}
+    </>
+  );
+
+  const photoSelected = props.photos.find(photo => photo.selected);
+  let dialog;
+  if (photoSelected) {
+    dialog = <MainPhotoDialog photo={photoSelected}></MainPhotoDialog>;
   }
 
   return (
-    // <div className={classes.flexContainer}>
     <div
       className={clsx(classesDrawer.content, {
         [classesDrawer.contentShift]: props.openDrawer,
       })}
     >
-      <NavButton onClick={props.selectNextPhoto} previous={true} disabled={false} />
       {imgElem}
-      <NavButton onClick={props.selectPreviousPhoto} previous={false} disabled={false} />
+      {dialog}
     </div>
   );
 };
@@ -112,6 +112,7 @@ const mapStateToProps = (state: AppState) => ({
   openDrawer: state.drawer.open,
   drawerWidth: state.drawer.width,
   photos: state.photos.photosSelected,
+  albumIdSelected: state.albums.albumImageIdSelected,
 });
 
-export default connect(mapStateToProps, { toggleDrawer, selectNextPhoto, selectPreviousPhoto })(MainPhoto);
+export default connect(mapStateToProps, { toggleDrawer, selectPhoto })(MainPhoto);

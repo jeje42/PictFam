@@ -52,14 +52,10 @@ const selectedPreviousPhoto = (state: PhotosState) => {
 
 const newAlbumSelected = (state: PhotosState, albums: Album[]) => {
   const newPhotosSelected = state.photos.filter(photo => albums.filter(album => album.id === photo.album.id).length > 0);
-
-  return photoSelected(
-    {
-      ...state,
-      photosSelected: newPhotosSelected,
-    },
-    newPhotosSelected[0],
-  );
+  return {
+    ...state,
+    photosSelected: newPhotosSelected,
+  };
 };
 
 export function photosReducer(state = initialState, action: PhotoActionTypes): PhotosState {
