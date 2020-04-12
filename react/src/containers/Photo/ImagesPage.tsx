@@ -43,22 +43,14 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
         albumsSons.push(album);
         generateAlbumListRecurs(album, albumsSons);
         newAlbumSelected(albumsSons);
-
-        if (photoId) {
-          const photoFound: Photo | undefined = photos.find(photo => photo.id === photoId);
-          if (photoFound) {
-            selectPhoto(photoFound);
-          }
-        }
       }
+    } else {
+      selectAlbumImage(-1);
+      newAlbumSelected([]);
     }
 
-    if (photoId) {
-      const photoFound: Photo | undefined = photos.find(photo => photo.id === photoId);
-      if (photoFound) {
-        selectPhoto(photoFound);
-      }
-    }
+    const photoFound: Photo | undefined = photos.find(photo => photo.id === photoId);
+    selectPhoto(photoFound);
   }, [albums, selectAlbumImage, albumId, newAlbumSelected, photos, photoId, selectPhoto]);
 
   const mainElem = <MainPhoto screenWidth={props.size.width} screenHeight={props.size.height} />;

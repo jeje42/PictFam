@@ -28,10 +28,10 @@ export function photosFetched(newPhotos: PhotosState) {
   };
 }
 
-export function selectPhoto(photo: Photo) {
+export function selectPhoto(photo?: Photo) {
   return {
     type: PHOTOS_SELECTED,
-    photo: photo,
+    photo,
   };
 }
 

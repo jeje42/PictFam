@@ -16,16 +16,20 @@ const initialState: PhotosState = {
   photosSelected: [],
 };
 
-const photoSelected = (state: PhotosState, newPhotoSelected: Photo) => {
+const photoSelected = (state: PhotosState, newPhotoSelected?: Photo) => {
   return {
     ...state,
     photosSelected: state.photosSelected.map(photo => {
-      if (photo.selected && newPhotoSelected.id !== photo.id) {
+      if (!newPhotoSelected) {
         photo.selected = false;
-      }
+      } else {
+        if (photo.selected && newPhotoSelected.id !== photo.id) {
+          photo.selected = false;
+        }
 
-      if (newPhotoSelected.id === photo.id) {
-        photo.selected = true;
+        if (newPhotoSelected.id === photo.id) {
+          photo.selected = true;
+        }
       }
 
       return photo;
