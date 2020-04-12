@@ -6,10 +6,6 @@ module.exports = {
   resolve: {
       extensions: [".ts", ".tsx", ".js"]
   },
-  output: {
-      path: __dirname,
-      filename: '../target/classes/static/built/bundle.js'
-  },
 	module: {
 		rules: [
       {

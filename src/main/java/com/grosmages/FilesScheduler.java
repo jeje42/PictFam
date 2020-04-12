@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
@@ -164,24 +163,24 @@ public class FilesScheduler {
 						album.setRights(generateRightsFromRightsPath(readAttributes(Paths.get(folderPathParts))));
 						album.setForPhoto(scantype == SCAN_TYPE.IMAGE);
 						album.setForVideo(scantype == SCAN_TYPE.VIDEO);
-						
+
 						if (parentAlbum != null) {
 							album.setIsRoot(false);
 							album = albumRepository.save(album);
-							
+
 							Set<Album> sons = parentAlbum.getSons();
 							if (sons == null)	sons = new HashSet<>();
-							
+
 							sons.add(album);
 							parentAlbum.setSons(sons);
-							
+
 							parentAlbum = albumRepository.save(parentAlbum);
 						} else {
 							album.setIsRoot(true);
 							album = albumRepository.save(album);
 						}
 					}
-					
+
 					parentAlbum = album;
 				}
 			}
