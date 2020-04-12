@@ -19,8 +19,8 @@ const theme = createMuiTheme({
       main: red.A700,
     },
     background: {
-      default: teal['300'],
-      paper: teal['300'],
+      default: teal['400'],
+      paper: teal['400'],
     },
     // @ts-ignore
     success: {

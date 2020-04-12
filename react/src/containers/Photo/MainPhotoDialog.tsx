@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Photo } from '../../types/Photo';
-import { Backdrop, Dialog, DialogContent, DialogTitle, Fade, Modal, Paper, PaperProps } from '@material-ui/core';
-import { AppState } from '../../store';
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
 import { connect } from 'react-redux';
 import MyImgElement from '../MyImgElement';
 import { withSize } from 'react-sizeme';
@@ -98,8 +97,8 @@ const MainPhotoDialog: React.FC<MainPhotoDialogProps> = props => {
 
   return (
     <Dialog open={open} onClose={handleClose} aria-labelledby='draggable-dialog-title' fullWidth={true} maxWidth={false}>
-      <DialogTitle style={{ cursor: 'move' }} id='draggable-dialog-title'>
-        {photo?.name}
+      <DialogTitle style={{ cursor: 'move', textAlign: 'center' }} id='draggable-dialog-title'>
+        {photo?.name} - {photo?.album.name}
       </DialogTitle>
       <DialogContent className={classes.content}>
         <div className={classes.buttonPrevious}>
