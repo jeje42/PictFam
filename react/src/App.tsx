@@ -25,23 +25,43 @@ interface AppProps {
 }
 
 const App: React.FC<AppProps> = props => {
-  const { currentModule, albumsImage, albumsVideo, startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched } = props;
+  const {
+    currentModule,
+    albumsImage,
+    albumsVideo,
+    isAuthenticated,
+    startPhotosFetched,
+    startFetchAlbumsImage,
+    startFetchAlbumsVideo,
+    startVideosFetched,
+  } = props;
   useEffect(() => {
-    switch (currentModule) {
-      case Module.Image:
-        if (albumsImage.length == 0) {
-          startPhotosFetched();
-          startFetchAlbumsImage();
-        }
-        break;
-      case Module.Video:
-        if (albumsVideo.length == 0) {
-          startFetchAlbumsVideo();
-          startVideosFetched();
-        }
-        break;
+    if (isAuthenticated) {
+      switch (currentModule) {
+        case Module.Image:
+          if (albumsImage.length == 0) {
+            startPhotosFetched();
+            startFetchAlbumsImage();
+          }
+          break;
+        case Module.Video:
+          if (albumsVideo.length == 0) {
+            startFetchAlbumsVideo();
+            startVideosFetched();
+          }
+          break;
+      }
     }
-  }, [albumsImage.length, albumsVideo.length, currentModule, startFetchAlbumsImage, startFetchAlbumsVideo, startPhotosFetched, startVideosFetched]);
+  }, [
+    albumsImage.length,
+    albumsVideo.length,
+    currentModule,
+    isAuthenticated,
+    startFetchAlbumsImage,
+    startFetchAlbumsVideo,
+    startPhotosFetched,
+    startVideosFetched,
+  ]);
 
   // @ts-ignore
   function PrivateRoute({ children, ...rest }) {
