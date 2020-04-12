@@ -42,7 +42,7 @@ const MyBackdrop: React.FC<MyBackdropProps> = props => {
 
   return (
     <Backdrop className={classes.backdrop} open={openBackdrop} onClick={handleCloseBackdrop}>
-      <CircularProgress color='inherit' />
+      <CircularProgress color='secondary' />
     </Backdrop>
   );
 };

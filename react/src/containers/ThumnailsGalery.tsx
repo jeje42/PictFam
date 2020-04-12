@@ -7,13 +7,8 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import clsx from 'clsx';
-import { useHistory } from 'react-router-dom';
-
 import { toggleDrawer } from '../store/drawer/actions';
 import { Photo } from '../types/Photo';
-import { ROUTE_IMAGES } from '../utils/routesUtils';
-import { GridList, GridListTile, GridListTileBar } from '@material-ui/core';
-import MyImgElement from './MyImgElement';
 
 interface ThumnailsGaleryProps {
   photos: Photo[];
@@ -50,61 +45,9 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps> = props => {
       },
     }),
   );
-  const history = useHistory();
-
   const classesDrawer = useStylesDrawer();
 
-  const selectPhotoHandler: (photo: Photo) => void = (photo: Photo) => {
-    history.push(`${ROUTE_IMAGES}?albumId=${props.albumIdSelected}&photoId=${photo.id}`);
-  };
-
-  let thumbsElem;
-
-  const classes = makeStyles((theme: Theme) =>
-    createStyles({
-      root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-        overflow: 'hidden',
-        backgroundColor: theme.palette.background.paper,
-      },
-      gridList: {
-        flexWrap: 'nowrap',
-        // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-        transform: 'translateZ(0)',
-      },
-      title: {
-        color: theme.palette.primary.light,
-      },
-      titleBar: {
-        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-      },
-    }),
-  )();
-
-  if (props.photos !== undefined && props.photos.length > 0) {
-    thumbsElem = (
-      <GridList className={classes.gridList}>
-        {props.photos.map(photo => (
-          <GridListTile key={photo.id}>
-            {/*<img src={tile.img} alt={tile.title} />*/}
-            <MyImgElement imgUrl={`thumnail/${photo.id}`} />
-            <GridListTileBar
-              title={photo.name}
-              classes={{
-                root: classes.titleBar,
-                title: classes.title,
-              }}
-            />
-          </GridListTile>
-        ))}
-      </GridList>
-    );
-  }
-
   return (
-    // <div className={classes.flexThumbs}>
     <AppBar
       position='fixed'
       className={clsx(classesDrawer.appBar, {
@@ -121,7 +64,6 @@ const ThumnailsGalery: React.SFC<ThumnailsGaleryProps> = props => {
         >
           <MenuIcon />
         </IconButton>
-        {/*{thumbsElem}*/}
       </Toolbar>
     </AppBar>
   );
