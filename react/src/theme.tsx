@@ -3,21 +3,24 @@ import green from '@material-ui/core/colors/green';
 import yellow from '@material-ui/core/colors/yellow';
 import orange from '@material-ui/core/colors/orange';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { lime, teal } from '@material-ui/core/colors';
 
 // A custom theme for this app
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#556cd6',
+      main: lime['500'],
+      light: lime['300'],
     },
     secondary: {
-      main: '#19857b',
+      main: orange['500'],
     },
     error: {
       main: red.A700,
     },
     background: {
-      default: '#339933',
+      default: teal['300'],
+      paper: teal['300'],
     },
     // @ts-ignore
     success: {

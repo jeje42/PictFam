@@ -65,6 +65,9 @@ const useStyles = makeStyles((theme: any) =>
       zIndex: theme.zIndex.drawer - 1,
       color: '#fff',
     },
+    avatar: {
+      backgroundColor: theme.palette.secondary.main,
+    },
   }),
 );
 
@@ -91,7 +94,7 @@ const MyDrawer: React.FC<MyDrawerProps> = props => {
 
   const classesDrawerOverride = makeStyles({
     drawerRoot: {
-      backgroundColor: theme.palette.secondary.main,
+      backgroundColor: theme.palette.primary.light,
     },
   })();
 
@@ -157,7 +160,13 @@ const MyDrawer: React.FC<MyDrawerProps> = props => {
     >
       <div className={classes.drawerHeader}>
         <div className={classes.drawerHeaderAccount}>
-          <Avatar>{userNameAvatar(props.userDetails ? props.userDetails.name : 'U')}</Avatar>
+          <Avatar
+            classes={{
+              root: classes.avatar,
+            }}
+          >
+            {userNameAvatar(props.userDetails ? props.userDetails.name : 'U')}
+          </Avatar>
           <IconButton aria-label='more' aria-controls='long-menu' aria-haspopup='true' onClick={handleClickMenu}>
             <MoreVertIcon />
           </IconButton>

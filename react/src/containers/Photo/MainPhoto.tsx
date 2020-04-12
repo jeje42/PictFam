@@ -11,6 +11,7 @@ import { selectPhoto } from '../../store/photo/actions';
 import { ROUTE_IMAGES } from '../../utils/routesUtils';
 import { useHistory } from 'react-router-dom';
 import MainPhotoDialog from './MainPhotoDialog';
+import theme from '../../theme';
 
 interface MainPhotoProps {
   screenWidth: number;
@@ -70,7 +71,7 @@ const MainPhoto: React.FC<MainPhotoProps> = props => {
     cursor: 'pointer',
     transition: 'all 2s',
     '&:hover': {
-      boxShadow: '5px 10px 18px #90EE90',
+      boxShadow: `5px 10px 18px ${theme.palette.primary.light}`,
     },
   };
   const imgElem = (
@@ -82,7 +83,7 @@ const MainPhoto: React.FC<MainPhotoProps> = props => {
             imgUrl={`thumnail/${photo.id}`}
             styleRaw={{
               ...imgStyle,
-              boxShadow: `${photo.selected ? '5px 10px 18px yellow' : ''}`,
+              boxShadow: `${photo.selected ? `5px 10px 18px ${theme.palette.secondary.main}` : ''}`,
             }}
           />
         </div>
