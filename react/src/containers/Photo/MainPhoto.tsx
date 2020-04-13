@@ -80,7 +80,7 @@ const MainPhoto: React.FC<MainPhotoProps> = props => {
         <div key={photo.id} onClick={() => selectPhotoHandler(photo)}>
           <MyImgElement
             key={photo.id}
-            imgUrl={`thumnail/${photo.id}`}
+            imgUrl={`thumnailPhoto/${photo.id}`}
             styleRaw={{
               ...imgStyle,
               boxShadow: `${photo.selected ? `5px 10px 18px ${theme.palette.secondary.main}` : ''}`,

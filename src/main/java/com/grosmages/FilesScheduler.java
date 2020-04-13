@@ -3,11 +3,7 @@ package com.grosmages;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,10 +38,14 @@ import com.grosmages.filesscan.FilesUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import static org.apache.commons.io.IOUtils.toByteArray;
+
 @Component
 public class FilesScheduler {
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	private final static String VIDEO_THUMNAIL_TEMP_PATH = "/tmp/thumnailVideo.png";
 	
 	@Autowired
 	private ApplicationContext context;
@@ -108,28 +108,9 @@ public class FilesScheduler {
 		photoOrVideo.setRights(generateRightsFromRightsPath(readAttributes(path)));
 
 		if(scantype == SCAN_TYPE.IMAGE) {
-			try {
-				Image image = ImageIO.read(new File(photoOrVideo.getPath() + File.separator + photoOrVideo.getName()))
-						.getScaledInstance(200, 200, BufferedImage.SCALE_SMOOTH);
-
-				BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-				Graphics2D g2 = bufferedImage.createGraphics();
-				g2.drawImage(image, null, null);
-
-				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-				ImageIO.write(bufferedImage, "jpg", outStream);
-				InputStream is = new ByteArrayInputStream(outStream.toByteArray());
-
-				photoOrVideo.setThumnail(IOUtils.toByteArray(is));
-			} catch (IOException e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-				return;
-			} catch (NullPointerException npe) {
-				logger.error(npe.getMessage());
-				npe.printStackTrace();
-				return;
-			}
+			photoOrVideo.setThumnail(produceThumnailFromImage(photoOrVideo.getPath() + File.separator + photoOrVideo.getName()));
+		} else if(scantype == SCAN_TYPE.VIDEO) {
+			photoOrVideo.setThumnail(produceThumnailFromVideo(photoOrVideo.getPath() + File.separator + photoOrVideo.getName()));
 		}
 
 		createAlbums(photoOrVideo, scantype, folderRoot);
@@ -140,6 +121,68 @@ public class FilesScheduler {
 			videoRepository.save((Video)photoOrVideo);
 		}
 
+	}
+
+	private byte[] produceThumnailFromImage(String fullPath) {
+		try {
+			Image image = ImageIO.read(new File(fullPath))
+					.getScaledInstance(200, 200, BufferedImage.SCALE_SMOOTH);
+
+			BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+			Graphics2D g2 = bufferedImage.createGraphics();
+			g2.drawImage(image, null, null);
+
+			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+			ImageIO.write(bufferedImage, "jpg", outStream);
+			InputStream is = new ByteArrayInputStream(outStream.toByteArray());
+
+			return toByteArray(is);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
+			return null;
+		} catch (NullPointerException npe) {
+			logger.error(npe.getMessage());
+			npe.printStackTrace();
+			return null;
+		}
+	}
+
+	public byte[] produceThumnailFromVideo(String fullPath) {
+		ProcessBuilder processBuilder = new ProcessBuilder();
+		String command = "ffmpeg -i '" + fullPath + "' -ss 00:00:01.000 -vframes 1 " + VIDEO_THUMNAIL_TEMP_PATH;
+		processBuilder.command("sh", "-c", command);
+		try {
+			Process process = processBuilder.start();
+			StringBuilder output = new StringBuilder();
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()));
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				output.append(line + "\n");
+			}
+
+			int exitVal = process.waitFor();
+			if (exitVal == 0) {
+				System.out.println("Success!");
+				System.out.println(output);
+
+				byte[] toReturn = produceThumnailFromImage(VIDEO_THUMNAIL_TEMP_PATH);
+				Files.deleteIfExists(Paths.get(VIDEO_THUMNAIL_TEMP_PATH));
+
+				return toReturn;
+			} else {
+				logger.error("Could not get thumnail from file " + fullPath + ". Return code from ffmpeg: " + exitVal);
+				logger.error(output.toString());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 	
 	/**

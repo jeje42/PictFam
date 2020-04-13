@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +180,19 @@ public class FilesSchedulerTest {
 
 		assertThat(result).isEqualTo("/home/user/album1/albumSub1");
 	}
+
+//	@Test
+//	public void imageFromVideoTest(){
+//		URL url = this.getClass().getResource("test.mp4");
+//		String file = getClass().getClassLoader().getResource("test.mp4").getFile();
+//
+//		logger.info("Opened " + file);
+//
+//		fileScheduler.produceThumnailFromVideo(file);
+//
+//		logger.info("Done with " + file);
+//
+//	}
 	
 //	@Test
 //	public void testFileAttrbutes() {

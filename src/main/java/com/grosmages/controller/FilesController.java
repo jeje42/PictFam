@@ -48,15 +48,28 @@ public class FilesController {
 	private UserRepository userRepository;
 	
 	@GetMapping(
-			value = "/thumnail/{id}",
+			value = "/thumnailPhoto/{id}",
 			produces = MediaType.IMAGE_JPEG_VALUE
 	)
-	public @ResponseBody byte[] getThumnail(@PathVariable("id") long id) throws IOException {
+	public @ResponseBody byte[] getThumnailPhoto(@PathVariable("id") long id) throws IOException {
 		Photo photo = photoRepository.findById(id).orElse(null);		
 		if(photo != null) {
 			return photo.getThumnail();
 		}
 		
+		return null;
+	}
+
+	@GetMapping(
+			value = "/thumnailVideo/{id}",
+			produces = MediaType.IMAGE_JPEG_VALUE
+	)
+	public @ResponseBody byte[] getThumnailVideo(@PathVariable("id") long id) throws IOException {
+		Video video = videoRepository.findById(id).orElse(null);
+		if(video != null) {
+			return video.getThumnail();
+		}
+
 		return null;
 	}
 	
