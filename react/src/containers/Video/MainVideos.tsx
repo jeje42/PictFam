@@ -10,7 +10,7 @@ import { ViewColumn, ViewCompact, Menu } from '@material-ui/icons';
 import Toolbar from '@material-ui/core/Toolbar';
 import VideoTab from './VideoTab';
 import Player from './Player';
-import { Drawer, Grid } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 
 interface MainVideoProps {
   screenWidth: number;
@@ -128,7 +128,7 @@ const MainVideo: React.FC<MainVideoProps> = props => {
                 <Player screenWidth={imageFullWidth ? props.screenWidth : undefined} screenHeight={imageFullWidth ? props.screenHeight : undefined} />
               </Grid>
               <Grid item md={6} sm={12}>
-                <VideoTab />
+                <VideoTab height={props.screenHeight} />
               </Grid>
             </>
           )}

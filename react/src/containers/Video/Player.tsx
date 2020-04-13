@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-// @ts-ignore
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
 import { Video } from '../../types/Video';
 import { withSize } from 'react-sizeme'; // import css
-import ReactPlayer from 'react-player'; //https://github.com/CookPete/react-player
+import ReactPlayer from 'react-player';
+import { Card } from '@material-ui/core'; //https://github.com/CookPete/react-player
 
 interface PlayerProps {
   token: string;
@@ -70,7 +70,11 @@ const MyPlayer: React.FC<PlayerProps> = props => {
     reactPlayer = <ReactPlayer url={videoFullAdress} playing controls width={`${imageWidth}px`} height={`${imageHeight}px`} />;
   }
 
-  return <div className={classes.container}>{reactPlayer}</div>;
+  return (
+    <Card raised={true}>
+      <div className={classes.container}>{reactPlayer}</div>
+    </Card>
+  );
 };
 
 const mapStateToProps = (state: AppState) => ({
