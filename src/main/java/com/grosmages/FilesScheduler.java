@@ -78,6 +78,7 @@ public class FilesScheduler {
 //	@Scheduled(cron="0 0 * * * *")  // Every hour at 0 minutes
 //	@Scheduled(fixedRate = 600000)
 	public void scanFiles(SCAN_TYPE scantype) {
+		logger.info("Beginning scanning type " + scantype);
 		List<String> folders = scantype == SCAN_TYPE.IMAGE ? properties.getFoldersImages() : properties.getFoldersVideos();
 		String pattern = scantype == SCAN_TYPE.IMAGE ? Patterns.IMAGE_PATTERN : Patterns.VIDEO_PATTERN;
 

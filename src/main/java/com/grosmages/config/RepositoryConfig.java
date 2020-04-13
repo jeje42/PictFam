@@ -15,5 +15,4 @@ public class RepositoryConfig implements RepositoryRestConfigurer {
 	    config.exposeIdsFor(Photo.class);
 	    config.exposeIdsFor(Album.class);
 	  }
-
 }
