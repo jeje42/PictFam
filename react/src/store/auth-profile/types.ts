@@ -7,6 +7,7 @@ export const SET_USER_DETAILS = 'SET_USER_DETAILS';
 export const SET_LOGIN_HAS_FAILED = 'SET_LOGIN_HAS_FAILED';
 export const START_SCAN = 'START_SCAN';
 export const LOGOUT = 'LOGOUT';
+export const FETCH_ACTION = 'FETCH_ACTION';
 
 export interface LoginObject {
   userNameOrEmail: string;
@@ -36,6 +37,10 @@ interface LoginHasFailed {
 export interface StartScanAction extends ActionRequest {
   type: typeof START_SCAN;
   scanType: string;
+}
+
+export interface StartFetchAction {
+  type: typeof FETCH_ACTION;
 }
 
 interface LogoutAction {

@@ -1,10 +1,16 @@
 import { call, put, takeEvery, takeLatest } from 'redux-saga/effects';
-import { AuthActionTypes, DONE_LOGIN, LOGOUT, SET_LOGIN_HAS_FAILED, SET_USER_DETAILS, START_LOGIN, START_SCAN } from './types';
+import { AuthActionTypes, DONE_LOGIN, FETCH_ACTION, LOGOUT, SET_LOGIN_HAS_FAILED, SET_USER_DETAILS, START_LOGIN, START_SCAN } from './types';
 import { AxiosRequestConfig } from 'axios';
 import { INIT_ALBUMSTATE } from '../album/types';
 import { INIT_PHOTOS_STATE } from '../photo/types';
 import { INIT_DRAWERSTATE } from '../drawer/types';
 import { getRequest, postRequest } from '../../utils/axiosUtils';
+import { select } from 'redux-saga/effects';
+import { AppState } from '../index';
+import { Module } from '../app/types';
+import { startPhotosFetched } from '../photo/actions';
+import { startFetchAlbumsImage, startFetchAlbumsVideo } from '../album/actions';
+import { startVideosFetched } from '../video/actions';
 
 interface Response {
   data: {
@@ -92,6 +98,27 @@ function* startScanSaga(action: AuthActionTypes) {
   }
 }
 
+function* startFetchSaga() {
+  const state: AppState = yield select();
+
+  if (state.auth.isAuthenticated) {
+    switch (state.app.module) {
+      case Module.Image:
+        if (state.albums.albumsImage.length == 0) {
+          yield put(startPhotosFetched());
+          yield put(startFetchAlbumsImage());
+        }
+        break;
+      case Module.Video:
+        if (state.albums.albumsVideo.length == 0) {
+          yield put(startFetchAlbumsVideo());
+          yield put(startVideosFetched());
+        }
+        break;
+    }
+  }
+}
+
 function* logoutSaga(action: AuthActionTypes) {
   const states = [INIT_ALBUMSTATE, INIT_PHOTOS_STATE, INIT_DRAWERSTATE];
 
@@ -112,4 +139,8 @@ export function* watchStartScan() {
 
 export function* watchLogout() {
   yield takeEvery(LOGOUT, logoutSaga);
+}
+
+export function* watchFetchAll() {
+  yield takeEvery(FETCH_ACTION, startFetchSaga);
 }

@@ -10,7 +10,7 @@ import { drawerReducer } from './drawer/reducers';
 import { authReducer } from './auth-profile/reducers';
 import { appReducer } from './app/reducers';
 
-import { watchLogout, watchStartScan, watchTryLogin } from './auth-profile/sagas';
+import { watchLogout, watchStartScan, watchTryLogin, watchFetchAll } from './auth-profile/sagas';
 import { watchTryFetchPhotos } from './photo/sagas';
 import { watchTryFetchAlbumsImage, watchTryFetchAlbumsVideo } from './album/sagas';
 import { watchTryFetchVideos } from './video/sagas';
@@ -56,6 +56,7 @@ export default function configureStore() {
   saga.run(watchTryFetchAlbumsVideo);
   saga.run(watchLogout);
   saga.run(watchStartScan);
+  saga.run(watchFetchAll);
 
   return store;
 }

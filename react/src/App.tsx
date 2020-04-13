@@ -8,60 +8,22 @@ import { ROUTE_IMAGES, ROUTE_VIDEOS } from './utils/routesUtils';
 import ImagesPage from './containers/Photo/ImagesPage';
 import VideoPage from './containers/Video/VideoPage';
 import { Module } from './store/app/types';
-import { startPhotosFetched } from './store/photo/actions';
-import { startFetchAlbumsImage, startFetchAlbumsVideo } from './store/album/actions';
-import { startVideosFetched } from './store/video/actions';
 import { Album } from './types/Album';
+import { fetchAllAction } from './store/auth-profile/actions';
 
 interface AppProps {
   isAuthenticated: boolean;
   currentModule: Module;
   albumsImage: Album[];
   albumsVideo: Album[];
-  startPhotosFetched: typeof startPhotosFetched;
-  startFetchAlbumsImage: typeof startFetchAlbumsImage;
-  startFetchAlbumsVideo: typeof startFetchAlbumsVideo;
-  startVideosFetched: typeof startVideosFetched;
+  fetchAllAction: typeof fetchAllAction;
 }
 
 const App: React.FC<AppProps> = props => {
-  const {
-    currentModule,
-    albumsImage,
-    albumsVideo,
-    isAuthenticated,
-    startPhotosFetched,
-    startFetchAlbumsImage,
-    startFetchAlbumsVideo,
-    startVideosFetched,
-  } = props;
+  const { currentModule, albumsImage, albumsVideo, isAuthenticated, fetchAllAction } = props;
   useEffect(() => {
-    if (isAuthenticated) {
-      switch (currentModule) {
-        case Module.Image:
-          if (albumsImage.length == 0) {
-            startPhotosFetched();
-            startFetchAlbumsImage();
-          }
-          break;
-        case Module.Video:
-          if (albumsVideo.length == 0) {
-            startFetchAlbumsVideo();
-            startVideosFetched();
-          }
-          break;
-      }
-    }
-  }, [
-    albumsImage.length,
-    albumsVideo.length,
-    currentModule,
-    isAuthenticated,
-    startFetchAlbumsImage,
-    startFetchAlbumsVideo,
-    startPhotosFetched,
-    startVideosFetched,
-  ]);
+    fetchAllAction();
+  }, [albumsImage.length, albumsVideo.length, currentModule, isAuthenticated, fetchAllAction]);
 
   // @ts-ignore
   function PrivateRoute({ children, ...rest }) {
@@ -115,4 +77,4 @@ const mapStateToProps = (state: AppState) => ({
   albumsVideo: state.albums.albumsVideo,
 });
 
-export default connect(mapStateToProps, { startPhotosFetched, startFetchAlbumsImage, startFetchAlbumsVideo, startVideosFetched })(App);
+export default connect(mapStateToProps, { fetchAllAction })(App);

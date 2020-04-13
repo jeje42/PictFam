@@ -1,4 +1,4 @@
-import { DONE_LOGIN, LoginObject, LOGOUT, SET_LOGIN_HAS_FAILED, START_LOGIN, START_SCAN, StartScanAction } from './types';
+import { DONE_LOGIN, FETCH_ACTION, LoginObject, LOGOUT, SET_LOGIN_HAS_FAILED, START_LOGIN, START_SCAN, StartFetchAction, StartScanAction } from './types';
 
 export function startLogin(loginObject: LoginObject) {
   return {
@@ -35,5 +35,11 @@ export function startScanAction(scanType: string): StartScanAction {
 export function logoutAction() {
   return {
     type: LOGOUT,
+  };
+}
+
+export function fetchAllAction(): StartFetchAction {
+  return {
+    type: FETCH_ACTION,
   };
 }
