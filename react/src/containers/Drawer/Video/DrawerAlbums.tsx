@@ -11,6 +11,8 @@ import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
 import { Grow } from '@material-ui/core';
 import { AlbumLeaf } from './AlbumLeaf';
+import { ROUTE_IMAGES, ROUTE_VIDEOS } from '../../../utils/routesUtils';
+import { useHistory } from 'react-router-dom';
 
 interface DrawerAlbumsProps {
   albums: Album[];
@@ -37,6 +39,7 @@ const generateAlbumListRecurs = (album: Album, finalList: Album[]) => {
 
 const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   const [albumListDisplayed, setAlbumListDisplayed] = useState<Album[]>([]);
+  const history = useHistory();
 
   useEffect(() => {
     props.drawerWidthChanged(Math.trunc(props.size.width));
@@ -53,10 +56,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   }, [props.albums]);
 
   const handleListAlbumClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, album: Album) => {
-    props.selectAlbumVideo(album.id);
-    const albums = [album] as Album[];
-    generateAlbumListRecurs(album, albums);
-    props.newAlbumSelected(albums);
+    history.push(`${ROUTE_VIDEOS}?albumId=${album.id}`);
   };
 
   let listRootElem;
