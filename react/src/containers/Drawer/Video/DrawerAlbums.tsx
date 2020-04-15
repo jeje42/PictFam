@@ -9,10 +9,14 @@ import { selectAlbumVideo } from '../../../store/album/actions';
 import { newAlbumSelected } from '../../../store/video/actions';
 import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
-import { Grow } from '@material-ui/core';
-import { AlbumLeaf } from './AlbumLeaf';
-import { ROUTE_IMAGES, ROUTE_VIDEOS } from '../../../utils/routesUtils';
+import { Collapse } from '@material-ui/core';
+import { DrawerLeaf } from './DrawerLeaf';
+import { ROUTE_VIDEOS } from '../../../utils/routesUtils';
 import { useHistory } from 'react-router-dom';
+import { ExpandMore } from '@material-ui/icons';
+import ListItemText from '@material-ui/core/ListItemText';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ListItem from '@material-ui/core/ListItem';
 
 interface DrawerAlbumsProps {
   albums: Album[];
@@ -39,6 +43,8 @@ const generateAlbumListRecurs = (album: Album, finalList: Album[]) => {
 
 const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   const [albumListDisplayed, setAlbumListDisplayed] = useState<Album[]>([]);
+  const [albumsDeployed, setAlbumsDeployed] = useState<boolean>(false);
+  const [playlistsDeployed, setPlaylistsDeployed] = useState<boolean>(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -59,23 +65,40 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
     history.push(`${ROUTE_VIDEOS}?albumId=${album.id}`);
   };
 
-  let listRootElem;
+  let listAlbums;
   if (props.albums.length > 0) {
-    listRootElem = (
+    listAlbums = (
       <List>
         {albumListDisplayed.map(album => {
-          return <AlbumLeaf key={album.id} album={album} albumIdSelected={props.albumIdSelected} handleListAlbumClick={handleListAlbumClick} />;
+          return <DrawerLeaf key={album.id} album={album} nested={true} albumIdSelected={props.albumIdSelected} handleListAlbumClick={handleListAlbumClick} />;
         })}
       </List>
     );
   }
 
+  let alertNoAlbum;
+  if (!props.albums || props.albums.length === 0) {
+    alertNoAlbum = <Alert severity='error'>No albums available</Alert>;
+  }
+
+  const alertNoPlaylist = <Alert severity='error'>No playlist available</Alert>;
+
   return (
     <div>
-      {listRootElem}
-      <Grow in={!props.albums || props.albums.length === 0}>
-        <Alert severity='error'>No albums available</Alert>
-      </Grow>
+      <ListItem key={'videoAlbumExpansion'} button selected={albumsDeployed}>
+        <ListItemText primary={'Albums'} />
+        {albumsDeployed ? <ExpandLess onClick={() => setAlbumsDeployed(false)} /> : <ExpandMore onClick={() => setAlbumsDeployed(true)} />}
+      </ListItem>
+      <Collapse in={albumsDeployed}>
+        {listAlbums}
+        {alertNoAlbum}
+      </Collapse>
+
+      <ListItem key={'videoPlaylistExpansion'} button selected={playlistsDeployed}>
+        <ListItemText primary={'Playlist'} />
+        {playlistsDeployed ? <ExpandLess onClick={() => setPlaylistsDeployed(false)} /> : <ExpandMore onClick={() => setPlaylistsDeployed(true)} />}
+      </ListItem>
+      <Collapse in={playlistsDeployed}>{alertNoPlaylist}</Collapse>
     </div>
   );
 };
