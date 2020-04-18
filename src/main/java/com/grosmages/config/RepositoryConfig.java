@@ -1,5 +1,6 @@
 package com.grosmages.config;
 
+import com.grosmages.entities.Playlist;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -14,5 +15,6 @@ public class RepositoryConfig implements RepositoryRestConfigurer {
 	  public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
 	    config.exposeIdsFor(Photo.class);
 	    config.exposeIdsFor(Album.class);
+	    config.exposeIdsFor(Playlist.class);
 	  }
 }
