@@ -11,6 +11,9 @@ import { Module } from '../app/types';
 import { startPhotosFetched } from '../photo/actions';
 import { startFetchAlbumsImage, startFetchAlbumsVideo } from '../album/actions';
 import { startVideosFetched } from '../video/actions';
+import { startPlaylistsFetch } from '../playlist/actions';
+import { PLAYLIST_ACTION } from '../playlist/types';
+import { INIT_VIDEOS_STATE } from '../video/types';
 
 interface Response {
   data: {
@@ -113,14 +116,15 @@ function* startFetchSaga() {
         if (state.albums.albumsVideo.length == 0) {
           yield put(startFetchAlbumsVideo());
           yield put(startVideosFetched());
+          yield put(startPlaylistsFetch());
         }
         break;
     }
   }
 }
 
-function* logoutSaga(action: AuthActionTypes) {
-  const states = [INIT_ALBUMSTATE, INIT_PHOTOS_STATE, INIT_DRAWERSTATE];
+function* logoutSaga() {
+  const states = [INIT_ALBUMSTATE, INIT_PHOTOS_STATE, INIT_DRAWERSTATE, PLAYLIST_ACTION.INIT_PLAYLIST_STATE, INIT_VIDEOS_STATE];
 
   for (let i = 0; i < states.length; i++) {
     yield put({

@@ -9,20 +9,25 @@ import { selectAlbumVideo } from '../../../store/album/actions';
 import { newAlbumSelected } from '../../../store/video/actions';
 import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
-import { Collapse } from '@material-ui/core';
+import { Collapse, ListItemIcon } from '@material-ui/core';
 import { DrawerLeaf } from './DrawerLeaf';
 import { ROUTE_VIDEOS } from '../../../utils/routesUtils';
 import { useHistory } from 'react-router-dom';
-import { ExpandMore } from '@material-ui/icons';
+import { ExpandMore, Add } from '@material-ui/icons';
 import ListItemText from '@material-ui/core/ListItemText';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ListItem from '@material-ui/core/ListItem';
+import DialogCreatePlaylist from './DialogCreatePlaylist';
+import { Playlist } from '../../../types/Playlist';
+import { selectPlaylist } from '../../../store/playlist/actions';
 
 interface DrawerAlbumsProps {
   albums: Album[];
+  playlists: Playlist[];
   selectAlbumVideo: typeof selectAlbumVideo;
   newAlbumSelected: typeof newAlbumSelected;
   drawerWidthChanged: typeof drawerWidthChanged;
+  selectPlaylist: typeof selectPlaylist;
   albumIdSelected: number;
   size: any;
 }
@@ -45,6 +50,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   const [albumListDisplayed, setAlbumListDisplayed] = useState<Album[]>([]);
   const [albumsDeployed, setAlbumsDeployed] = useState<boolean>(false);
   const [playlistsDeployed, setPlaylistsDeployed] = useState<boolean>(false);
+  const [openCreatePlaylistDialog, setOpenCreatePlaylistDialog] = useState<boolean>(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -81,7 +87,36 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
     alertNoAlbum = <Alert severity='error'>No albums available</Alert>;
   }
 
-  const alertNoPlaylist = <Alert severity='error'>No playlist available</Alert>;
+  let dialogCreatePlaylist;
+  if (openCreatePlaylistDialog) {
+    const handleCloseCreatePlaylistDialog = () => {
+      setOpenCreatePlaylistDialog(false);
+    };
+    dialogCreatePlaylist = <DialogCreatePlaylist triggerNewDialog={true} handleClose={handleCloseCreatePlaylistDialog}></DialogCreatePlaylist>;
+  }
+
+  let listPlaylist;
+  let alertNoPlaylist;
+  if (playlistsDeployed) {
+    if (props.playlists.length === 0) {
+      alertNoPlaylist = <Alert severity='error'>No playlist available</Alert>;
+    } else {
+      listPlaylist = props.playlists.map(playlist => (
+        <ListItem key={playlist.id} button selected={playlist.selected} onClick={() => props.selectPlaylist(playlist)}>
+          <ListItemText primary={playlist.name} />
+        </ListItem>
+      ));
+    }
+  }
+
+  const createPlaylist = (
+    <ListItem key={'createPlaylist'} button onClick={() => setOpenCreatePlaylistDialog(true)}>
+      <ListItemIcon>
+        <Add />
+      </ListItemIcon>
+      <ListItemText primary={'Créer une playlist'} />
+    </ListItem>
+  );
 
   return (
     <div>
@@ -98,7 +133,12 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
         <ListItemText primary={'Playlist'} />
         {playlistsDeployed ? <ExpandLess onClick={() => setPlaylistsDeployed(false)} /> : <ExpandMore onClick={() => setPlaylistsDeployed(true)} />}
       </ListItem>
-      <Collapse in={playlistsDeployed}>{alertNoPlaylist}</Collapse>
+      <Collapse in={playlistsDeployed}>
+        {alertNoPlaylist}
+        {listPlaylist}
+        {createPlaylist}
+        {dialogCreatePlaylist}
+      </Collapse>
     </div>
   );
 };
@@ -106,6 +146,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
 const mapStateToProps = (state: AppState) => ({
   albums: state.albums.albumsVideo,
   albumIdSelected: state.albums.albumVideoIdSelected,
+  playlists: state.playlists.playlists,
 });
 
-export default withSize()(connect(mapStateToProps, { selectAlbumVideo, newAlbumSelected, drawerWidthChanged })(DrawerAlbums));
+export default withSize()(connect(mapStateToProps, { selectAlbumVideo, newAlbumSelected, drawerWidthChanged, selectPlaylist })(DrawerAlbums));

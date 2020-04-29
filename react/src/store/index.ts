@@ -9,17 +9,20 @@ import { albumsReducer } from './album/reducers';
 import { drawerReducer } from './drawer/reducers';
 import { authReducer } from './auth-profile/reducers';
 import { appReducer } from './app/reducers';
+import { playlistsReducer } from './playlist/reducers';
 
 import { watchLogout, watchStartScan, watchTryLogin, watchFetchAll } from './auth-profile/sagas';
 import { watchTryFetchPhotos } from './photo/sagas';
 import { watchTryFetchAlbumsImage, watchTryFetchAlbumsVideo } from './album/sagas';
 import { watchTryFetchVideos } from './video/sagas';
 import { ActionRequest } from './types';
+import { watchTryFetchPlaylists } from './playlist/sagas';
 
 const rootReducer = combineReducers({
   photos: photosReducer,
   videos: videosReducer,
   albums: albumsReducer,
+  playlists: playlistsReducer,
   drawer: drawerReducer,
   auth: authReducer,
   app: appReducer,
@@ -57,6 +60,7 @@ export default function configureStore() {
   saga.run(watchLogout);
   saga.run(watchStartScan);
   saga.run(watchFetchAll);
+  saga.run(watchTryFetchPlaylists);
 
   return store;
 }
