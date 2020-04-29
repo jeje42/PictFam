@@ -8,8 +8,11 @@ import com.grosmages.entities.User;
 import com.grosmages.repositories.PlaylistRepository;
 import com.grosmages.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -36,12 +39,13 @@ public class RestPlaylist {
     }
 
     @PutMapping(value = "/playlist")
-    public Playlist createPlaylist(Principal principal, @RequestBody Playlist playlist) {
+    public Playlist createPlaylist(Principal principal, @RequestBody Playlist playlist, final HttpServletResponse response) throws IOException {
         createUpdatePlaylistCommon(principal, playlist);
 
         Playlist playlistExisting = playlistRepository.findByNameAndUser(playlist.getName(), playlist.getUser()).orElse(null);
         if(playlistExisting != null) {
-            throw new ConflictException();
+            response.sendError(HttpStatus.CONFLICT.value(), "Une playlist nommée " + playlist.getName() + " existe déjà.");
+            return null;
         }
 
         return playlistRepository.save(playlist);
