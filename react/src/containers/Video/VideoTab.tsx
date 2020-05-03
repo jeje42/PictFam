@@ -89,7 +89,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   let videos = props.videos;
   let dialogAddToPlaylist;
   let removeVideoFromPlaylist: { (index: number): void; (index: number): Promise<void> };
-  let listHeader;
+  let headerList;
   if (VideoModule.Playlist === videoModuleState) {
     if (playlistSelected) {
       videos = playlistSelected.videos;
@@ -150,35 +150,37 @@ const VideoTab: React.FC<VideoTabProps> = props => {
         await postPlaylist(newPlaylistObject);
       };
 
-      listHeader = (
-        <ListItem key={`PlaylistAlbum`}>
-          <ListItemText primary={`Videos dans ${playlistSelected ? playlistSelected.name : `la playlist`}`} />
-          <Tooltip title={'Activer/désactiver la sélection'}>
-            <Checkbox
-              checked={selectMode}
-              onChange={() => {
-                setSelectMode(!selectMode);
-                setSelectModeVideoIndexes([]);
-              }}
-              inputProps={{ 'aria-label': 'primary checkbox' }}
-            />
-          </Tooltip>
-          <ListItemIcon>
-            <Tooltip title={selectMode ? 'Enlever la sélection de la playlist' : `Vider la playlist`}>
-              <DeleteOutlined
-                onClick={() => {
-                  if (selectMode) {
-                    if (selectModeVideoIndexes.length > 0) {
-                      removeVideosFromPlaylist(selectModeVideoIndexes);
-                    }
-                  } else {
-                    emptyPlaylist();
-                  }
+      headerList = (
+        <List>
+          <ListItem key={`PlaylistAlbum`}>
+            <ListItemText primary={`Videos dans ${playlistSelected ? playlistSelected.name : `la playlist`}`} />
+            <Tooltip title={'Activer/désactiver la sélection'}>
+              <Checkbox
+                checked={selectMode}
+                onChange={() => {
+                  setSelectMode(!selectMode);
+                  setSelectModeVideoIndexes([]);
                 }}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
               />
             </Tooltip>
-          </ListItemIcon>
-        </ListItem>
+            <ListItemIcon>
+              <Tooltip title={selectMode ? 'Enlever la sélection de la playlist' : `Vider la playlist`}>
+                <DeleteOutlined
+                  onClick={() => {
+                    if (selectMode) {
+                      if (selectModeVideoIndexes.length > 0) {
+                        removeVideosFromPlaylist(selectModeVideoIndexes);
+                      }
+                    } else {
+                      emptyPlaylist();
+                    }
+                  }}
+                />
+              </Tooltip>
+            </ListItemIcon>
+          </ListItem>
+        </List>
       );
     }
   } else if (props.videoModule === VideoModule.Video) {
@@ -200,28 +202,30 @@ const VideoTab: React.FC<VideoTabProps> = props => {
       dialogAddToPlaylist = <DialogAddToPlaylist handleClose={handleCloseModalAddToPlaylist} videos={videoModalAddToPlaylist} />;
     }
 
-    listHeader = (
-      <ListItem key={`PlaylistAlbum`}>
-        <ListItemText primary={`Videos dans ${albumSelected ? albumSelected.name : `l'album`}`} />
-        <Tooltip title={'Activer/désactiver la sélection'}>
-          <Checkbox checked={selectMode} onChange={() => setSelectMode(!selectMode)} inputProps={{ 'aria-label': 'primary checkbox' }} />
-        </Tooltip>
-        <ListItemIcon>
-          <Tooltip title={selectMode ? 'Ajouter la sélection à la playlist' : 'Ajouter tout à la playlist'}>
-            <LibraryAdd
-              onClick={() => {
-                if (selectMode) {
-                  if (selectModeVideoIndexes.length > 0) {
-                    setVideoModalAddToPlaylist(videos.filter((video: Video, index: number) => selectModeVideoIndexes.includes(index)));
-                  }
-                } else {
-                  setVideoModalAddToPlaylist(videos);
-                }
-              }}
-            />
+    headerList = (
+      <List>
+        <ListItem key={`PlaylistAlbum`}>
+          <ListItemText primary={`Videos dans ${albumSelected ? albumSelected.name : `l'album`}`} />
+          <Tooltip title={'Activer/désactiver la sélection'}>
+            <Checkbox checked={selectMode} onChange={() => setSelectMode(!selectMode)} inputProps={{ 'aria-label': 'primary checkbox' }} />
           </Tooltip>
-        </ListItemIcon>
-      </ListItem>
+          <ListItemIcon>
+            <Tooltip title={selectMode ? 'Ajouter la sélection à la playlist' : 'Ajouter tout à la playlist'}>
+              <LibraryAdd
+                onClick={() => {
+                  if (selectMode) {
+                    if (selectModeVideoIndexes.length > 0) {
+                      setVideoModalAddToPlaylist(videos.filter((video: Video, index: number) => selectModeVideoIndexes.includes(index)));
+                    }
+                  } else {
+                    setVideoModalAddToPlaylist(videos);
+                  }
+                }}
+              />
+            </Tooltip>
+          </ListItemIcon>
+        </ListItem>
+      </List>
     );
   }
 
@@ -229,8 +233,6 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   if (videos.length > 0) {
     videosList = (
       <>
-        {listHeader}
-
         {videos.map((video: Video, index: number) => {
           let addOrDeleteButton;
           let selectionCheckbox;
@@ -333,6 +335,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
 
   return (
     <Card raised={true}>
+      {headerList}
       <List className={classes.root}>{videosList}</List>
     </Card>
   );
