@@ -9,7 +9,7 @@ import { useHistory } from 'react-router-dom';
 import { ROUTE_VIDEOS } from '../../utils/routesUtils';
 import { VideoModule } from '../../store/app/types';
 import { Playlist } from '../../types/Playlist';
-import { Add, Delete } from '@material-ui/icons';
+import { Add, Delete, LibraryAdd, DeleteOutlined } from '@material-ui/icons';
 import DialogAddToPlaylist from './DialogAddToPlaylist';
 import axios, { AxiosRequestConfig } from 'axios';
 import { ErrorAxios } from './playlistRequestHandling';
@@ -138,7 +138,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
           <ListItemText primary={`Videos dans ${playlistSelected ? playlistSelected.name : `la playlist`}`} />
           <ListItemIcon>
             <Tooltip title={`Vider la playlist`}>
-              <Delete
+              <DeleteOutlined
                 onClick={() => {
                   emptyPlaylist();
                 }}
@@ -172,7 +172,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
         <ListItemText primary={`Videos dans ${albumsObject ? albumsObject.name : `l'album`}`} />
         <ListItemIcon>
           <Tooltip title={`Ajouter tout à la playlist`}>
-            <Add
+            <LibraryAdd
               onClick={() => {
                 setVideoModalAddToPlaylist(videos);
               }}
