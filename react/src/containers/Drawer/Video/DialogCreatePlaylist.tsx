@@ -57,7 +57,10 @@ const DialogCreateAlbumFC: React.FC<DialogCreateAlbumProps> = props => {
     if (errorMessage) {
       window.alert(errorMessage);
     } else {
-      props.setPlaylist(response.data);
+      props.setPlaylist({
+        ...response.data,
+        videos: [],
+      });
       props.handleClose();
     }
   };

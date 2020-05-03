@@ -27,6 +27,9 @@ interface ImagesPageProps {
   albums: Album[];
   videos: Video[];
   playlists: Playlist[];
+  albumIdSelected: number;
+  videoReading?: Video;
+  videoModule: VideoModule;
 }
 
 const ImagesPage: React.FC<ImagesPageProps> = props => {
@@ -48,28 +51,47 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
 
   useEffect(() => {
     if (albumId) {
-      selectAlbumVideo(albumId);
+      if (props.albumIdSelected !== albumId) {
+        selectAlbumVideo(albumId);
 
-      const albumsSons: Album[] = [];
-      const album: Album | undefined = findAlbumRecurs(albums, albumId);
-      if (album) {
-        albumsSons.push(album);
-        generateAlbumListRecurs(album, albumsSons);
-        newAlbumSelected(albumsSons);
+        const albumsSons: Album[] = [];
+        const album: Album | undefined = findAlbumRecurs(albums, albumId);
+        if (album) {
+          albumsSons.push(album);
+          generateAlbumListRecurs(album, albumsSons);
+          newAlbumSelected(albumsSons);
+        }
       }
 
-      selectVideoFromVideoId(videoId);
-      selectPlaylist();
-      setVideoModule(VideoModule.Video);
+      if (!props.videoReading || videoId !== props.videoReading.id) {
+        selectVideoFromVideoId(videoId);
+      }
+
+      if (props.playlists.find(playlist => playlist.selected)) {
+        selectPlaylist();
+      }
+
+      if (props.videoModule !== VideoModule.Video) {
+        setVideoModule(VideoModule.Video);
+      }
     } else if (playlistId) {
       const playlistFound: Playlist | undefined = playlists.find(playlist => playlist.id === playlistId);
-      if (playlistFound) {
+      if (playlistFound && !playlistFound.selected) {
+        debugger;
         selectPlaylist(playlistFound);
       }
 
-      selectVideoFromVideoId(videoId);
-      setVideoModule(VideoModule.Playlist);
-      selectAlbumVideo(-1);
+      if (!props.videoReading || videoId !== props.videoReading.id) {
+        selectVideoFromVideoId(videoId);
+      }
+
+      if (props.albumIdSelected !== -1) {
+        selectAlbumVideo(-1);
+      }
+
+      if (props.videoModule !== VideoModule.Playlist) {
+        setVideoModule(VideoModule.Playlist);
+      }
     }
   }, [
     newAlbumSelected,
@@ -84,6 +106,10 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
     selectPlaylist,
     setVideoModule,
     playlists,
+    props.albumIdSelected,
+    props.videoReading,
+    props.playlists,
+    props.videoModule,
   ]);
 
   const mainElem = <MainVideo screenWidth={props.size.width} screenHeight={props.size.height} />;
@@ -95,6 +121,9 @@ const mapStateToProps = (state: AppState) => ({
   albums: state.albums.albumsVideo,
   videos: state.videos.videos,
   playlists: state.playlists.playlists,
+  albumIdSelected: state.albums.albumVideoIdSelected,
+  videoReading: state.videos.videoReading,
+  videoModule: state.app.videoModule,
 });
 
 export default withSize({ monitorHeight: true })(
