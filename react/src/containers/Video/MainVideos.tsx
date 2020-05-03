@@ -11,33 +11,22 @@ import Toolbar from '@material-ui/core/Toolbar';
 import VideoTab from './VideoTab';
 import Player from './Player';
 import { Grid } from '@material-ui/core';
+import { Playlist } from '../../types/Playlist';
 
 interface MainVideoProps {
   screenWidth: number;
   screenHeight: number;
   drawerWidth: number;
   openDrawer: boolean;
-  toggleDrawer: typeof toggleDrawer;
+  playlists: Playlist[];
   albumIdSelected: number;
+  toggleDrawer: typeof toggleDrawer;
 }
 
 interface TabPanelProps {
   children?: React.ReactNode;
   index: any;
   value: any;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return <>{value === index && <>{children}</>}</>;
-}
-
-function a11yProps(index: any) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
 }
 
 const MainVideo: React.FC<MainVideoProps> = props => {
@@ -82,7 +71,7 @@ const MainVideo: React.FC<MainVideoProps> = props => {
     toolbar: theme.mixins.toolbar,
   }))();
 
-  const [isAbumSelected, setIsAbumSelected] = useState<boolean>(props.albumIdSelected !== -1);
+  const [isAbumOrPlaylistSelected, setIsAbumOrPlaylistSelected] = useState<boolean>(props.albumIdSelected !== -1);
   const [imageFullWidth, setImageFullWidth] = useState(false);
 
   const toggleLayout = () => {
@@ -90,11 +79,20 @@ const MainVideo: React.FC<MainVideoProps> = props => {
   };
 
   useEffect(() => {
-    const newIsAlbumSelected = props.albumIdSelected !== -1;
-    if (newIsAlbumSelected !== isAbumSelected) {
-      setIsAbumSelected(newIsAlbumSelected);
+    if (props.albumIdSelected !== -1) {
+      if (!isAbumOrPlaylistSelected) {
+        setIsAbumOrPlaylistSelected(true);
+      }
+    } else {
+      if (props.playlists.map(playlist => playlist.selected)) {
+        if (!isAbumOrPlaylistSelected) {
+          setIsAbumOrPlaylistSelected(true);
+        }
+      } else if (isAbumOrPlaylistSelected) {
+        setIsAbumOrPlaylistSelected(false);
+      }
     }
-  }, [isAbumSelected, props.albumIdSelected]);
+  }, [isAbumOrPlaylistSelected, props.albumIdSelected, props.playlists]);
 
   return (
     <>
@@ -120,8 +118,8 @@ const MainVideo: React.FC<MainVideoProps> = props => {
       >
         <div className={classes.toolbar} />
         <Grid container spacing={3}>
-          {!isAbumSelected ? (
-            <div>{`Sélectionnez d'abord un album.`}</div>
+          {!isAbumOrPlaylistSelected ? (
+            <div>{`Sélectionnez d'abord un album ou une playlist.`}</div>
           ) : (
             <>
               <Grid item md={imageFullWidth ? 12 : 6} sm={12}>
@@ -140,6 +138,7 @@ const MainVideo: React.FC<MainVideoProps> = props => {
 
 const mapStateToProps = (state: AppState) => ({
   photos: state.photos.photosSelected,
+  playlists: state.playlists.playlists,
   albumIdSelected: state.albums.albumVideoIdSelected,
   openDrawer: state.drawer.open,
   drawerWidth: state.drawer.width,

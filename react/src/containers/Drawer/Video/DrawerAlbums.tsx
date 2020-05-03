@@ -11,7 +11,7 @@ import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
 import { Collapse, ListItemIcon } from '@material-ui/core';
 import { DrawerLeaf } from './DrawerLeaf';
-import { ROUTE_VIDEOS } from '../../../utils/routesUtils';
+import { ROUTE_IMAGES, ROUTE_VIDEOS } from '../../../utils/routesUtils';
 import { useHistory } from 'react-router-dom';
 import { ExpandMore, Add } from '@material-ui/icons';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -20,6 +20,7 @@ import ListItem from '@material-ui/core/ListItem';
 import DialogCreatePlaylist from './DialogCreatePlaylist';
 import { Playlist } from '../../../types/Playlist';
 import { selectPlaylist } from '../../../store/playlist/actions';
+import { Module } from '../../../store/app/types';
 
 interface DrawerAlbumsProps {
   albums: Album[];
@@ -102,7 +103,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
       alertNoPlaylist = <Alert severity='error'>No playlist available</Alert>;
     } else {
       listPlaylist = props.playlists.map(playlist => (
-        <ListItem key={playlist.id} button selected={playlist.selected} onClick={() => props.selectPlaylist(playlist)}>
+        <ListItem key={playlist.id} button selected={playlist.selected} onClick={() => history.push(`${ROUTE_VIDEOS}?playlistId=${playlist.id}`)}>
           <ListItemText primary={playlist.name} />
         </ListItem>
       ));

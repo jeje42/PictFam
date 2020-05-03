@@ -6,11 +6,13 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
+import { Playlist } from '../types/Playlist';
 
 interface MyBackdropProps {
   currentModule: Module;
   albumImageIdSelected: number;
   albumVideoIdSelected: number;
+  playlists: Playlist[];
 }
 
 const useStyles = makeStyles((theme: any) =>
@@ -29,12 +31,18 @@ const MyBackdrop: React.FC<MyBackdropProps> = props => {
   useEffect(() => {
     const albumIdSelected = props.currentModule === Module.Image ? props.albumImageIdSelected : props.albumVideoIdSelected;
 
-    if (albumIdSelected === -1) {
-      setOpenBackdrop(true);
-    } else {
+    if (albumIdSelected !== -1) {
       setOpenBackdrop(false);
+    } else {
+      const playlistSelected = props.playlists.find(playlist => playlist.selected);
+
+      if (playlistSelected) {
+        setOpenBackdrop(false);
+      } else {
+        setOpenBackdrop(true);
+      }
     }
-  }, [props.albumImageIdSelected, props.currentModule, props.albumVideoIdSelected]);
+  }, [props.albumImageIdSelected, props.currentModule, props.albumVideoIdSelected, props.playlists]);
 
   const handleCloseBackdrop = () => {
     setOpenBackdrop(false);
@@ -50,6 +58,7 @@ const MyBackdrop: React.FC<MyBackdropProps> = props => {
 const mapStateToProps = (state: AppState) => ({
   albumImageIdSelected: state.albums.albumImageIdSelected,
   albumVideoIdSelected: state.albums.albumVideoIdSelected,
+  playlists: state.playlists.playlists,
   currentModule: state.app.module,
 });
 

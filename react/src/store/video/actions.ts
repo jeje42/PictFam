@@ -5,7 +5,7 @@ import {
   VIDEOS_SELECTED,
   VIDEOS_SELECTED_NEXT,
   VIDEOS_SELECTED_PREVIOUS,
-  NEW_ALBUM_SELECTED,
+  NEW_ALBUM_VIDEO_SELECTED,
   StartVideossFetchedAction,
   SELECT_VIDEO_FOR_READING,
   SelectVideoForReading,
@@ -51,7 +51,7 @@ export function selectPreviousVideo() {
 
 export function newAlbumSelected(albums: Album[]) {
   return {
-    type: NEW_ALBUM_SELECTED,
+    type: NEW_ALBUM_VIDEO_SELECTED,
     albums: albums,
   };
 }

@@ -1,7 +1,8 @@
-import { AppActionTypes, AppState, CHANGE_MODULE, Module } from './types';
+import { AppActionTypes, AppState, CHANGE_MODULE, CHANGE_VIDEO_MODULE, Module, VideoModule } from './types';
 
 const initialState: AppState = {
   module: Module.Image,
+  videoModule: VideoModule.Video,
 };
 
 export function appReducer(state = initialState, action: AppActionTypes): AppState {
@@ -10,6 +11,11 @@ export function appReducer(state = initialState, action: AppActionTypes): AppSta
       return {
         ...state,
         module: action.module,
+      };
+    case CHANGE_VIDEO_MODULE:
+      return {
+        ...state,
+        videoModule: action.videoModule,
       };
     default:
       return state;

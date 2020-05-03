@@ -4,10 +4,10 @@ import {
   VIDEOS_SELECTED,
   VIDEOS_SELECTED_NEXT,
   VIDEOS_SELECTED_PREVIOUS,
-  NEW_ALBUM_SELECTED,
   INIT_VIDEOS_STATE,
   VideoActionTypes,
   SELECT_VIDEO_FOR_READING,
+  NEW_ALBUM_VIDEO_SELECTED,
 } from './types';
 import { Video } from '../../types/Video';
 import { Album } from '../../types/Album';
@@ -89,7 +89,7 @@ export function videosReducer(state = initialState, action: VideoActionTypes): V
       return selectedNextVideo(state);
     case VIDEOS_SELECTED_PREVIOUS:
       return selectedPreviousVideo(state);
-    case NEW_ALBUM_SELECTED:
+    case NEW_ALBUM_VIDEO_SELECTED:
       return newAlbumSelected(state, action.albums);
     case INIT_VIDEOS_STATE:
       return initialState;

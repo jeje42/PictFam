@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { changeModule } from '../../store/app/actions';
+import { changeModule, setVideoModule } from '../../store/app/actions';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
 import { useEffect } from 'react';
-import { Module } from '../../store/app/types';
+import { Module, VideoModule } from '../../store/app/types';
 import Welcome from '../Welcome';
 import { withSize } from 'react-sizeme';
 import MainVideo from './MainVideos';
@@ -13,21 +13,34 @@ import { selectAlbumVideo } from '../../store/album/actions';
 import { findAlbumRecurs, generateAlbumListRecurs } from '../../store/album/utils';
 import { newAlbumSelected, selectVideoForReading } from '../../store/video/actions';
 import { Video } from '../../types/Video';
+import { Playlist } from '../../types/Playlist';
+import { selectPlaylist } from '../../store/playlist/actions';
 
 interface ImagesPageProps {
   changeModule: typeof changeModule;
   selectAlbumVideo: typeof selectAlbumVideo;
   newAlbumSelected: typeof newAlbumSelected;
   selectVideoForReading: typeof selectVideoForReading;
+  selectPlaylist: typeof selectPlaylist;
+  setVideoModule: typeof setVideoModule;
   size: any;
   albums: Album[];
   videos: Video[];
+  playlists: Playlist[];
 }
 
 const ImagesPage: React.FC<ImagesPageProps> = props => {
-  const { albums, videos, newAlbumSelected, selectVideoForReading, selectAlbumVideo, changeModule } = props;
+  const { albums, videos, playlists, newAlbumSelected, selectVideoForReading, selectAlbumVideo, changeModule, selectPlaylist, setVideoModule } = props;
   const albumId = Number(useQuery().get('albumId'));
+  const playlistId = Number(useQuery().get('playlistId'));
   const videoId = Number(useQuery().get('videoId'));
+
+  const selectVideoFromVideoId = (videoId: number) => {
+    const videoFound: Video | undefined = videos.find(video => video.id === videoId);
+    if (videoFound) {
+      selectVideoForReading(videoFound);
+    }
+  };
 
   useEffect(() => {
     changeModule(Module.Video);
@@ -45,12 +58,33 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
         newAlbumSelected(albumsSons);
       }
 
-      const videoFound: Video | undefined = videos.find(video => video.id === videoId);
-      if (videoFound) {
-        selectVideoForReading(videoFound);
+      selectVideoFromVideoId(videoId);
+      selectPlaylist();
+      setVideoModule(VideoModule.Video);
+    } else if (playlistId) {
+      const playlistFound: Playlist | undefined = playlists.find(playlist => playlist.id === playlistId);
+      if (playlistFound) {
+        selectPlaylist(playlistFound);
       }
+
+      selectVideoFromVideoId(videoId);
+      setVideoModule(VideoModule.Playlist);
+      selectAlbumVideo(-1);
     }
-  }, [newAlbumSelected, selectVideoForReading, selectAlbumVideo, videos, albumId, videoId, albums]);
+  }, [
+    newAlbumSelected,
+    selectVideoForReading,
+    selectAlbumVideo,
+    videos,
+    albumId,
+    videoId,
+    playlistId,
+    albums,
+    selectVideoFromVideoId,
+    selectPlaylist,
+    setVideoModule,
+    playlists,
+  ]);
 
   const mainElem = <MainVideo screenWidth={props.size.width} screenHeight={props.size.height} />;
 
@@ -60,8 +94,9 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
 const mapStateToProps = (state: AppState) => ({
   albums: state.albums.albumsVideo,
   videos: state.videos.videos,
+  playlists: state.playlists.playlists,
 });
 
 export default withSize({ monitorHeight: true })(
-  connect(mapStateToProps, { changeModule, selectAlbumVideo, newAlbumSelected, selectVideoForReading })(ImagesPage),
+  connect(mapStateToProps, { changeModule, selectAlbumVideo, newAlbumSelected, selectVideoForReading, selectPlaylist, setVideoModule })(ImagesPage),
 );

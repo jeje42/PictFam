@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Video } from '../../types/Video';
 import { withSize } from 'react-sizeme'; // import css
 import ReactPlayer from 'react-player';
-import { Card } from '@material-ui/core'; //https://github.com/CookPete/react-player
+import { Card, Typography } from '@material-ui/core';
 
 interface PlayerProps {
   token: string;
@@ -65,9 +65,12 @@ const MyPlayer: React.FC<PlayerProps> = props => {
 
   const classes = useStyles();
 
-  let reactPlayer = <ReactPlayer url={videoFullAdress} playing controls width={'100%'} height={'100%'} />;
-  if (imageHeight && imageWidth) {
-    reactPlayer = <ReactPlayer url={videoFullAdress} playing controls width={`${imageWidth}px`} height={`${imageHeight}px`} />;
+  let reactPlayer = <Typography variant={'h6'}>{`Aucune vidéo sélectionnée`}</Typography>;
+  if (props.videoReading) {
+    reactPlayer = <ReactPlayer url={videoFullAdress} playing controls width={'100%'} height={'100%'} />;
+    if (imageHeight && imageWidth) {
+      reactPlayer = <ReactPlayer url={videoFullAdress} playing controls width={`${imageWidth}px`} height={`${imageHeight}px`} />;
+    }
   }
 
   return (

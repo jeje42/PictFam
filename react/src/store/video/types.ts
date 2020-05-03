@@ -7,7 +7,7 @@ export const VIDEOS_FETCHED = 'VIDEOS_FETCHED';
 export const VIDEOS_SELECTED = 'VIDEOS_SELECTED';
 export const VIDEOS_SELECTED_NEXT = 'VIDEOS_SELECTED_NEXT';
 export const VIDEOS_SELECTED_PREVIOUS = 'VIDEOS_SELECTED_PREVIOUS';
-export const NEW_ALBUM_SELECTED = 'NEW_ALBUM_SELECTED';
+export const NEW_ALBUM_VIDEO_SELECTED = 'NEW_ALBUM_VIDEO_SELECTED';
 export const INIT_VIDEOS_STATE = 'INIT_VIDEOS_STATE';
 export const SELECT_VIDEO_FOR_READING = 'SELECT_VIDEO_FOR_READING';
 
@@ -40,7 +40,7 @@ interface SelectPreviousVideoAction {
 }
 
 interface NewAlbumSelected {
-  type: typeof NEW_ALBUM_SELECTED;
+  type: typeof NEW_ALBUM_VIDEO_SELECTED;
   albums: Album[];
 }
 
