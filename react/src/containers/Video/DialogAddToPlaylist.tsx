@@ -20,7 +20,7 @@ const DialogAddToPlaylistFC: React.FC<DialogAddToPlaylistProps> = props => {
   const [playlistSelected, setPlaylistSelected] = useState<Playlist | undefined>();
 
   const postRequestOption: AxiosRequestConfig = {
-    method: 'put',
+    method: 'post',
     url: `/playlist`,
     headers: {
       'Content-Type': 'application/json',
