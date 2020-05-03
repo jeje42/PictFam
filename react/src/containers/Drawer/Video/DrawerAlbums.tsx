@@ -93,7 +93,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
     const handleCloseCreatePlaylistDialog = () => {
       setOpenCreatePlaylistDialog(false);
     };
-    dialogCreatePlaylist = <DialogCreatePlaylist triggerNewDialog={true} handleClose={handleCloseCreatePlaylistDialog}></DialogCreatePlaylist>;
+    dialogCreatePlaylist = <DialogCreatePlaylist handleClose={handleCloseCreatePlaylistDialog}></DialogCreatePlaylist>;
   }
 
   let listPlaylist;

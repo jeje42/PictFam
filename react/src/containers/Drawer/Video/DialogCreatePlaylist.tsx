@@ -11,7 +11,6 @@ import { setPlaylist } from '../../../store/playlist/actions';
 import { Playlist } from '../../../types/Playlist';
 
 interface DialogCreateAlbumProps {
-  triggerNewDialog: boolean;
   token: string;
   handleClose: () => void;
   setPlaylist: typeof setPlaylist;
@@ -66,7 +65,7 @@ const DialogCreateAlbumFC: React.FC<DialogCreateAlbumProps> = props => {
   };
 
   return (
-    <Dialog open={true} onClose={props.handleClose} aria-labelledby='form-dialog-title' disableBackdropClick>
+    <Dialog open={true} onClose={props.handleClose} disableBackdropClick>
       <DialogTitle id='form-dialog-title'>Créer une playlist</DialogTitle>
       <DialogContent>
         <Form
