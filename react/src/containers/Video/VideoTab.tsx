@@ -14,6 +14,7 @@ import DialogAddToPlaylist from './DialogAddToPlaylist';
 import axios, { AxiosRequestConfig } from 'axios';
 import { ErrorAxios } from './playlistRequestHandling';
 import { setPlaylist } from '../../store/playlist/actions';
+import { Album } from '../../types/Album';
 
 interface VideoTabProps {
   videos: Video[];
@@ -22,9 +23,30 @@ interface VideoTabProps {
   playlists: Playlist[];
   height: number;
   token: string;
+  albums: Album[];
   videoModule: VideoModule;
   setPlaylist: typeof setPlaylist;
 }
+
+const findAlbumRecurs = (album: Album, albumId: number): Album | undefined => {
+  if (album.id === albumId) {
+    return album;
+  }
+
+  const albumSonFound = album.sons.find(son => son.id === albumId);
+  if (albumSonFound) {
+    return albumSonFound;
+  }
+
+  album.sons.forEach(son => {
+    const albumFoundInSons = findAlbumRecurs(son, albumId);
+    if (albumFoundInSons) {
+      return albumFoundInSons;
+    }
+  });
+
+  return undefined;
+};
 
 const VideoTab: React.FC<VideoTabProps> = props => {
   const history = useHistory();
@@ -54,25 +76,19 @@ const VideoTab: React.FC<VideoTabProps> = props => {
     transition: 'all 2s',
   };
 
-  let albumOrPlaylistId = `albumId=${props.albumId}`;
+  let albumOrPlaylistId: string;
   let videos = props.videos;
   let dialogAddToPlaylist;
   let removeVideoFromPlaylist: { (index: number): void; (index: number): Promise<void> };
+  let listHeader;
   if (VideoModule.Playlist === videoModuleState) {
     const playlistSelected = props.playlists.find(playlist => playlist.selected);
     if (playlistSelected) {
       videos = playlistSelected.videos;
-      albumOrPlaylistId = `playlistId=${props.albumId}`;
+      albumOrPlaylistId = `playlistId=${playlistSelected.id}`;
 
-      removeVideoFromPlaylist = async (index: number) => {
+      const postPlaylist = async (playlist: Playlist) => {
         let errorMessage: string | undefined;
-
-        const newPlaylistObject: Playlist = {
-          ...playlistSelected,
-          videos: playlistSelected.videos.filter((video: Video, filterIndex: number) => filterIndex !== index),
-        };
-
-        debugger;
 
         const postRequestOption: AxiosRequestConfig = {
           method: 'post',
@@ -83,7 +99,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
           },
         };
 
-        const response: any = await axios.post(postRequestOption.url!, newPlaylistObject, postRequestOption).catch((error: ErrorAxios) => {
+        const response: any = await axios.post(postRequestOption.url!, playlist, postRequestOption).catch((error: ErrorAxios) => {
           errorMessage = error.response.data.message;
           if (!errorMessage) {
             errorMessage = 'Une erreur est survenue';
@@ -93,14 +109,48 @@ const VideoTab: React.FC<VideoTabProps> = props => {
         if (errorMessage) {
           window.alert(errorMessage);
         } else {
-          debugger;
           props.setPlaylist({
             ...response.data,
           });
         }
       };
+
+      removeVideoFromPlaylist = async (index: number) => {
+        const newPlaylistObject: Playlist = {
+          ...playlistSelected,
+          videos: playlistSelected.videos.filter((video: Video, filterIndex: number) => filterIndex !== index),
+        };
+
+        await postPlaylist(newPlaylistObject);
+      };
+
+      const emptyPlaylist = async () => {
+        const newPlaylistObject: Playlist = {
+          ...playlistSelected,
+          videos: [],
+        };
+
+        await postPlaylist(newPlaylistObject);
+      };
+
+      listHeader = (
+        <ListItem key={`PlaylistAlbum`}>
+          <ListItemText primary={`Videos dans ${playlistSelected ? playlistSelected.name : `la playlist`}`} />
+          <ListItemIcon>
+            <Tooltip title={`Vider la playlist`}>
+              <Delete
+                onClick={() => {
+                  emptyPlaylist();
+                }}
+              />
+            </Tooltip>
+          </ListItemIcon>
+        </ListItem>
+      );
     }
   } else if (props.videoModule === VideoModule.Video) {
+    albumOrPlaylistId = `albumId=${props.albumId}`;
+
     const handleCloseModalAddToPlaylist = () => {
       setVideoModalAddToPlaylist(undefined);
     };
@@ -108,12 +158,37 @@ const VideoTab: React.FC<VideoTabProps> = props => {
     if (videoModalAddToPlaylist) {
       dialogAddToPlaylist = <DialogAddToPlaylist handleClose={handleCloseModalAddToPlaylist} videos={videoModalAddToPlaylist} />;
     }
+
+    let albumsObject: Album | undefined;
+    props.albums.forEach(album => {
+      const albumFound = findAlbumRecurs(album, props.albumId);
+      if (albumFound) {
+        albumsObject = albumFound;
+      }
+    });
+
+    listHeader = (
+      <ListItem key={`PlaylistAlbum`}>
+        <ListItemText primary={`Videos dans ${albumsObject ? albumsObject.name : `l'album`}`} />
+        <ListItemIcon>
+          <Tooltip title={`Ajouter tout à la playlist`}>
+            <Add
+              onClick={() => {
+                setVideoModalAddToPlaylist(videos);
+              }}
+            />
+          </Tooltip>
+        </ListItemIcon>
+      </ListItem>
+    );
   }
 
   let videosList = <Typography variant={'h6'}>{`Pas de videos dans ${props.videoModule === VideoModule.Playlist ? 'la playlist.' : "l'album."}`}</Typography>;
   if (videos.length > 0) {
     videosList = (
       <>
+        {listHeader}
+
         {videos.map((video: Video, index: number) => {
           let addOrDeleteButton;
           if (props.videoModule === VideoModule.Video) {
@@ -179,6 +254,7 @@ const mapStateToProps = (state: AppState) => ({
   videos: state.videos.videosSelected,
   videoReading: state.videos.videoReading,
   albumId: state.albums.albumVideoIdSelected,
+  albums: state.albums.albumsVideo,
   playlists: state.playlists.playlists,
   videoModule: state.app.videoModule,
   token: state.auth.token,
