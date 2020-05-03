@@ -3,12 +3,14 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
 import { Video } from '../../types/Video';
-import { Card, List, ListItem, ListItemText, Typography } from '@material-ui/core';
+import { Card, List, ListItem, ListItemIcon, ListItemText, Tooltip, Typography } from '@material-ui/core';
 import MyImgElement from '../MyImgElement';
 import { useHistory } from 'react-router-dom';
 import { ROUTE_VIDEOS } from '../../utils/routesUtils';
 import { VideoModule } from '../../store/app/types';
 import { Playlist } from '../../types/Playlist';
+import { Add } from '@material-ui/icons';
+import DialogAddToPlaylist from './DialogAddToPlaylist';
 
 interface VideoTabProps {
   videos: Video[];
@@ -23,6 +25,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   const history = useHistory();
   const { height } = props;
   const [videoModuleState, setVideoModuleState] = useState<VideoModule>(props.videoModule);
+  const [videoModalAddToPlaylist, setVideoModalAddToPlaylist] = useState<Video[] | undefined>();
 
   const classes = makeStyles((theme: Theme) => {
     return createStyles({
@@ -56,6 +59,15 @@ const VideoTab: React.FC<VideoTabProps> = props => {
     }
   }
 
+  const handleCloseModalAddToPlaylist = () => {
+    setVideoModalAddToPlaylist(undefined);
+  };
+
+  let dialogAddToPlaylist;
+  if (videoModalAddToPlaylist) {
+    dialogAddToPlaylist = <DialogAddToPlaylist handleClose={handleCloseModalAddToPlaylist} videos={videoModalAddToPlaylist} />;
+  }
+
   let videosList = <Typography variant={'h6'}>{`Pas de videos dans ${props.videoModule === VideoModule.Playlist ? 'la playlist.' : "l'album."}`}</Typography>;
   if (videos.length > 0) {
     videosList = (
@@ -76,16 +88,27 @@ const VideoTab: React.FC<VideoTabProps> = props => {
                 }}
               />
               <ListItemText primary={video.name} secondary={video.name} />
+              <ListItemIcon>
+                <Tooltip title={`Ajouter à la playlist`}>
+                  <Add
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      setVideoModalAddToPlaylist([video]);
+                    }}
+                  />
+                </Tooltip>
+              </ListItemIcon>
             </ListItem>
           );
         })}
+        {dialogAddToPlaylist}
       </>
     );
   }
 
   return (
     <Card raised={true}>
-      <List className={classes ? classes.root : undefined}>{videosList}</List>
+      <List className={classes.root}>{videosList}</List>
     </Card>
   );
 };

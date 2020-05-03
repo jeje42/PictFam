@@ -77,7 +77,6 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
     } else if (playlistId) {
       const playlistFound: Playlist | undefined = playlists.find(playlist => playlist.id === playlistId);
       if (playlistFound && !playlistFound.selected) {
-        debugger;
         selectPlaylist(playlistFound);
       }
 
