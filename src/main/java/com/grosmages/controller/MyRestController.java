@@ -2,6 +2,7 @@ package com.grosmages.controller;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,12 +24,12 @@ import com.grosmages.security.UserPrincipal;
 
 @RestController
 public class MyRestController {
-	
+
 	Logger log = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private AlbumRepository albumRepository;
-	
+
 	@Autowired
 	private PhotoRepository photoRepository;
 
@@ -50,7 +51,7 @@ public class MyRestController {
 	 * @return
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/albumstree")	
+	@RequestMapping(value = "/albumstree")
 	public Collection<Album> getAlbumTree(@RequestParam String albumType) throws IOException {
 		Collection<Album> toReturn = "video".equals(albumType) ? albumRepository.findAllRootForVideo() : albumRepository.findAllRootForImage();
 
@@ -58,27 +59,48 @@ public class MyRestController {
 			if (!isAlbumAuthorizedForUser(album)) {
 				return false;
 			}
-			
+
 			return true;
 		}).collect(Collectors.toList());
-		
+
 		toReturn.forEach(album -> {
 			filterSons(album);
 		});
-		
+
 		return toReturn;
 	}
-	
+
 	@RequestMapping(value = "/photostree")
 	public Collection<MutlimediaAbstract> getPhotosTree(@RequestParam String dataType) throws IOException {
-		Collection<MutlimediaAbstract> photos = ("video".equals(dataType) ? videoRepository.findAllVideos() : photoRepository.findAllPhotos());
-		
+		TypeOfDataAsked typeOfDataAsked = "video".equals(dataType) ? TypeOfDataAsked.Video : TypeOfDataAsked.Photo;
+
+		Collection<MutlimediaAbstract> photosOrVideos = new ArrayList<>();
+		switch (typeOfDataAsked){
+			case Photo:
+				photosOrVideos = photoRepository.findAllPhotos();
+				break;
+			case Video:
+				photosOrVideos = videoRepository.findAllVideos();
+				break;
+		}
+
 		Set<Album> sonsEmpty = new HashSet<>();
-		
-		photos.forEach(photo -> {
-			photo.getAlbum().setSons(sonsEmpty);
+
+		photosOrVideos.forEach(photoOrVideo -> {
+			photoOrVideo.getAlbum().setSons(sonsEmpty);
+			photoOrVideo.setRights(null);
 		});
-		return photos;
+
+		if(TypeOfDataAsked.Video == typeOfDataAsked){
+			photosOrVideos.stream().forEach(photoOrVideo -> {
+				Video video = (Video) photoOrVideo;
+				video.setPlaylistVideos(null);
+			});
+		}
+
+		log.info(photosOrVideos.toString());
+
+		return photosOrVideos;
 	}
 
 	@RequestMapping(value = "/userdetails")
@@ -123,41 +145,46 @@ public class MyRestController {
 
 		return new ResponseEntity<>("JobStarted", HttpStatus.OK);
 	}
-	
+
 	private void filterSons(Album album) {
 		album.setSons(album.getSons().stream().filter(albumSon -> {
 			return isAlbumAuthorizedForUser(albumSon);
 		}).collect(Collectors.toSet()));
-		
+
 		album.getSons().forEach(albumSon -> {
 			filterSons(albumSon);
 		});
 	}
-	
+
 	private Boolean isAlbumAuthorizedForUser(Album album) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-		
+
 		if (album.getRights() == null || album.getRights().getOwner() == null) {
 			return false;
 		}
-		
+
 		if (album.getRights().getOwner().getId() == userPrincipal.getId() && album.getRights().getOwnerRead()) {
 			return true;
 		}
-		
+
 		if (album.getRights().getOthersRead()) {
 			return true;
 		}
-		
-		if (album.getRights().getSystemGroupLocal() != null 
+
+		if (album.getRights().getSystemGroupLocal() != null
 				&& album.getRights().getGroupRead()
 				&& album.getRights().getSystemGroupLocal().getUsers() != null
 				&& album.getRights().getSystemGroupLocal().getUsers().size() > 0
 				&& album.getRights().getSystemGroupLocal().getUsers().stream().filter(user -> user.getId() == userPrincipal.getId()).collect(Collectors.toList()).size()>0) {
 			return true;
 		}
-		
+
 		return false;
+	}
+
+	private enum TypeOfDataAsked {
+		Photo,
+		Video
 	}
 }

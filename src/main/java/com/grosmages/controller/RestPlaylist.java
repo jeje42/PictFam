@@ -1,32 +1,32 @@
 package com.grosmages.controller;
 
 import com.grosmages.controller.exceptions.BadRequestException;
-import com.grosmages.controller.exceptions.ConflictException;
 import com.grosmages.controller.exceptions.ForbiddenException;
 import com.grosmages.entities.*;
 import com.grosmages.repositories.PlaylistRepository;
 import com.grosmages.repositories.UserRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class RestPlaylist {
 
     @Autowired
     private ApplicationContext context;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private PlaylistRepository playlistRepository;
@@ -62,50 +62,48 @@ public class RestPlaylist {
 
     @PostMapping(value = "/playlist")
     public Playlist updatePlaylist(Principal principal, @RequestBody PlaylistPost playlistpost) {
-//        Playlist playlistToSave = new Playlist();
-//        playlistToSave.setName(playlist.getName());
-//
-//        createUpdatePlaylistCommon(principal, playlistToSave);
-//        playlistToSave.setId(playlist.getId());
-//        playlistToSave.setName(playlist.getName());
-//
-//
-//        playlist.getPlaylistVideos().forEach(playlistVideo -> {
-//
-//            playlistVideo.setPlaylist(playlist);
-////            playlistVideo.getPlaylist().setPlaylistVideos(new HashSet<>());
-////            playlistVideo.getVideo().setPlaylistVideos(new HashSet<>());
-//        });
-//
-//        Playlist playlistSaved = playlistRepository.save(playlist);
-//
-//        return playlistSaved;
+        Session session = null;
+        if (entityManager == null
+                || (session = entityManager.unwrap(Session.class)) == null) {
 
-//        createUpdatePlaylistCommon(principal, playlist);
-//
-//        Playlist savedPlaylist = playlistRepository.save(playlist);
+            throw new NullPointerException();
+        }
 
-        Playlist playlistToSave = playlistpost.getPlaylist();
 
-        playlistpost.getVideos().forEach(video -> {
-            video.setPlaylistVideos(null);
-        });
 
-        Set<PlaylistVideo> playlistVideoSet = new HashSet<>();
+        Playlist playlistToSave = context.getBean(Playlist.class);
+        playlistToSave.setId(playlistpost.getPlaylist().getId());
+
+        List<PlaylistVideo> playlistVideoList = new ArrayList<>();
         for(Integer i = 0 ; i<playlistpost.getVideos().size() ; i++){
             PlaylistVideo playlistVideo = context.getBean(PlaylistVideo.class);
-//            playlistVideo.setPlaylist(playlistToSave);
+            playlistVideo.setPlaylist(playlistToSave);
             playlistVideo.setVideo(playlistpost.getVideos().get(i));
             playlistVideo.setPosition(i);
 
-            playlistVideoSet.add(playlistVideo);
+            playlistVideoList.add(playlistVideo);
         }
 
-        playlistToSave.setPlaylistVideos(playlistVideoSet);
+        try{
+            session.beginTransaction();
 
-        Playlist savedPlaylist = playlistRepository.save(playlistToSave);
+            entityManager.createQuery("delete from PlaylistVideo where pk.playlist.id = :playlistId")
+                    .setParameter("playlistId", playlistToSave.getId())
+                    .executeUpdate();
 
-        return savedPlaylist;
+            final Session finalSession = session;
+            playlistVideoList.forEach(playlistVideo -> {
+                finalSession.save(playlistVideo);
+            });
+
+            session.getTransaction().commit();
+        } catch (Exception e){
+
+        }finally {
+            session.close();
+        }
+
+        return null;
     }
 
     @GetMapping(value = "/playlist")
@@ -116,6 +114,19 @@ public class RestPlaylist {
             throw new ForbiddenException();
         }
 
-        return playlistRepository.findAllByUser(user);
+        List<Playlist> playlists = playlistRepository.findAllByUser(user);
+
+
+        playlists.forEach(playlist -> {
+            playlist.getPlaylistVideos().forEach(playlistVideo -> {
+                playlistVideo.setPlaylist(null);
+
+                Video video = new Video();
+                video.setId(playlistVideo.getVideo().getId());
+                playlistVideo.setVideo(video);
+            });
+        });
+
+        return playlists;
     }
 }
