@@ -7,8 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -19,15 +18,16 @@ public class Playlist {
     private @Id
     @GeneratedValue
     Long id;
-
     String name;
 
     @JsonIgnore
     @ManyToOne
     User user;
 
-    @ManyToMany
-    List<Video> videos;
+//    @ManyToMany
+//    List<Video> videos;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pk.playlist")
+    private Set<PlaylistVideo> playlistVideos = new HashSet<PlaylistVideo>(0);
 
     @Override
     public boolean equals(Object obj) {
