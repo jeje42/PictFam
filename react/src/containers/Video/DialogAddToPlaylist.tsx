@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import React, { useState } from 'react';
 import { AppState } from '../../store';
-import { Button, Dialog, DialogActions, DialogContent, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, List, ListItem, ListItemText } from '@material-ui/core';
 import { Playlist } from '../../types/Playlist';
 import { Video } from '../../types/Video';
 import axios, { AxiosRequestConfig } from 'axios';

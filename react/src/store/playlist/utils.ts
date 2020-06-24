@@ -1,5 +1,4 @@
 import { Playlist } from '../../types/Playlist';
-import { PlaylistFetched } from './types';
 import { Video } from '../../types/Video';
 
 interface PlayListForPost {

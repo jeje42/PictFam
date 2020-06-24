@@ -33,25 +33,38 @@ interface ImagesPageProps {
 }
 
 const ImagesPage: React.FC<ImagesPageProps> = props => {
-  const { albums, videos, playlists, newAlbumSelected, selectVideoForReading, selectAlbumVideo, changeModule, selectPlaylist, setVideoModule } = props;
+  const {
+    albums,
+    videos,
+    playlists,
+    newAlbumSelected,
+    albumIdSelected,
+    videoReading,
+    videoModule,
+    selectVideoForReading,
+    selectAlbumVideo,
+    changeModule,
+    selectPlaylist,
+    setVideoModule,
+  } = props;
   const albumId = Number(useQuery().get('albumId'));
   const playlistId = Number(useQuery().get('playlistId'));
   const videoId = Number(useQuery().get('videoId'));
-
-  const selectVideoFromVideoId = (videoId: number) => {
-    const videoFound: Video | undefined = videos.find(video => video.id === videoId);
-    if (videoFound) {
-      selectVideoForReading(videoFound);
-    }
-  };
 
   useEffect(() => {
     changeModule(Module.Video);
   });
 
   useEffect(() => {
+    const selectVideoFromVideoId = (videoId: number) => {
+      const videoFound: Video | undefined = videos.find(video => video.id === videoId);
+      if (videoFound) {
+        selectVideoForReading(videoFound);
+      }
+    };
+
     if (albumId) {
-      if (props.albumIdSelected !== albumId) {
+      if (albumIdSelected !== albumId) {
         selectAlbumVideo(albumId);
 
         const albumsSons: Album[] = [];
@@ -63,15 +76,15 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
         }
       }
 
-      if (!props.videoReading || videoId !== props.videoReading.id) {
+      if (!videoReading || videoId !== videoReading.id) {
         selectVideoFromVideoId(videoId);
       }
 
-      if (props.playlists.find(playlist => playlist.selected)) {
+      if (playlists.find(playlist => playlist.selected)) {
         selectPlaylist();
       }
 
-      if (props.videoModule !== VideoModule.Video) {
+      if (videoModule !== VideoModule.Video) {
         setVideoModule(VideoModule.Video);
       }
     } else if (playlistId) {
@@ -80,15 +93,15 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
         selectPlaylist(playlistFound);
       }
 
-      if (!props.videoReading || videoId !== props.videoReading.id) {
+      if (!videoReading || videoId !== videoReading.id) {
         selectVideoFromVideoId(videoId);
       }
 
-      if (props.albumIdSelected !== -1) {
+      if (albumIdSelected !== -1) {
         selectAlbumVideo(-1);
       }
 
-      if (props.videoModule !== VideoModule.Playlist) {
+      if (videoModule !== VideoModule.Playlist) {
         setVideoModule(VideoModule.Playlist);
       }
     }
@@ -101,14 +114,12 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
     videoId,
     playlistId,
     albums,
-    selectVideoFromVideoId,
     selectPlaylist,
     setVideoModule,
     playlists,
-    props.albumIdSelected,
-    props.videoReading,
-    props.playlists,
-    props.videoModule,
+    albumIdSelected,
+    videoReading,
+    videoModule,
   ]);
 
   const mainElem = <MainVideo screenWidth={props.size.width} screenHeight={props.size.height} />;

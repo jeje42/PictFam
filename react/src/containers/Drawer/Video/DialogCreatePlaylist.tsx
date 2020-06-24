@@ -1,14 +1,13 @@
-import React, { useEffect } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper, TextField } from '@material-ui/core';
+import React from 'react';
+import { Button, Dialog, DialogContent, DialogTitle, Grid } from '@material-ui/core';
 import { Form, Field } from 'react-final-form';
 import { ValidationErrors } from 'final-form';
 import TextInput from '../../../components/final-forms/TextInput';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { AppState } from '../../../store';
 import { connect } from 'react-redux';
 import { ErrorAxios } from '../../Video/playlistRequestHandling';
 import { setPlaylist } from '../../../store/playlist/actions';
-import { Playlist } from '../../../types/Playlist';
 
 interface DialogCreateAlbumProps {
   token: string;
@@ -18,10 +17,6 @@ interface DialogCreateAlbumProps {
 
 interface Values {
   name?: string;
-}
-
-interface PutResponse {
-  data: Playlist;
 }
 
 type returnValidate = ValidationErrors | Promise<ValidationErrors> | undefined;
@@ -72,7 +67,7 @@ const DialogCreateAlbumFC: React.FC<DialogCreateAlbumProps> = props => {
           onSubmit={onSubmit}
           initialValues={{ name: '' }}
           validate={validate}
-          render={({ handleSubmit, submitting, pristine, values }) => (
+          render={({ handleSubmit, submitting }) => (
             <form onSubmit={handleSubmit} noValidate>
               <Grid container alignItems='flex-start' spacing={2}>
                 <Grid item xs={12}>

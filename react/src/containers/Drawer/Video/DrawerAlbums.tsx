@@ -11,7 +11,7 @@ import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
 import { Collapse, ListItemIcon } from '@material-ui/core';
 import { DrawerLeaf } from './DrawerLeaf';
-import { ROUTE_IMAGES, ROUTE_VIDEOS } from '../../../utils/routesUtils';
+import { ROUTE_VIDEOS } from '../../../utils/routesUtils';
 import { useHistory } from 'react-router-dom';
 import { ExpandMore, Add } from '@material-ui/icons';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -20,7 +20,6 @@ import ListItem from '@material-ui/core/ListItem';
 import DialogCreatePlaylist from './DialogCreatePlaylist';
 import { Playlist } from '../../../types/Playlist';
 import { selectPlaylist } from '../../../store/playlist/actions';
-import { Module } from '../../../store/app/types';
 
 interface DrawerAlbumsProps {
   albums: Album[];
@@ -38,13 +37,6 @@ const recursBuildListAlbums = (album: Album, finalList: Album[]) => {
     album.sons.forEach(son => finalList.push(son));
     album.sons.forEach(son => recursBuildListAlbums(son, finalList));
   }
-};
-
-const generateAlbumListRecurs = (album: Album, finalList: Album[]) => {
-  album.sons.forEach(album => {
-    finalList.push(album);
-    generateAlbumListRecurs(album, finalList);
-  });
 };
 
 const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
@@ -93,7 +85,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
     const handleCloseCreatePlaylistDialog = () => {
       setOpenCreatePlaylistDialog(false);
     };
-    dialogCreatePlaylist = <DialogCreatePlaylist handleClose={handleCloseCreatePlaylistDialog}></DialogCreatePlaylist>;
+    dialogCreatePlaylist = <DialogCreatePlaylist handleClose={handleCloseCreatePlaylistDialog} />;
   }
 
   let listPlaylist;

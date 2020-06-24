@@ -1,6 +1,5 @@
 import { ActionRequest } from '../types';
 import { Playlist } from '../../types/Playlist';
-import { Video } from '../../types/Video';
 
 export enum PLAYLIST_ACTION {
   START_PLAYLIST_FETCHED = 'START_PLAYLIST_FETCHED',
