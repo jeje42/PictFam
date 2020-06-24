@@ -1,0 +1,53 @@
+spring:
+   data:
+      rest:
+         base-path: /api
+   jpa:
+      properties:
+         hibernate:
+            show_sql: false
+            use_sql_comments: false
+            format_sql: false
+      hibernate:
+         ddl-auto: update
+#         ddl-auto: create
+#      database-platform: org.hibernate.dialect.MySQLDialect
+   h2:
+      console:
+         enabled: true
+   datasource:
+      url: jdbc:mysql://localhost:3306/pictfam?useLegacyDatetimeCode=false&serverTimezone=UTC
+      username: dbUsername
+      password: dbPassword
+logging:
+   level:
+      org:
+         hibernate:
+            type: info
+app:
+   jwtSecret: jwtSecretPassword
+   jwtExpirationInMs: 1800000
+pictfam:
+   foldersImages: ["/file/path/for/Images"]  #Path should be without file separator at the end
+   foldersVideos: ["/file/path/for/Videos"]
+   users:
+      -
+         name: user0
+         uid: 1000
+         password: passwordUser0
+         admin: true
+      -
+         name: user1
+         uid: 1001
+         password: passwordUser1
+         admin: false
+
+   groups:
+      -
+         name: group0
+         gid: 1002
+         users: [1000, 1001]
+      -
+         name: group1
+         gid: 1005
+         users: [1000,1001,1003]

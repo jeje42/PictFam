@@ -1,0 +1,44 @@
+spring:
+   data:
+      rest:
+         base-path: /api
+   jpa:
+      properties:
+         hibernate:
+            show_sql: false
+            use_sql_comments: false
+            format_sql: false
+   h2:
+      console:
+         enabled: true
+   datasource:
+      url: jdbc:hsqldb:mem:DatabaseName
+logging:
+   level:
+      org:
+         hibernate:
+            type: info
+app:
+   jwtSecret: jwtSecretPassword
+   jwtExpirationInMs: 1800000
+pictfam:
+   folders: [""]
+   users:
+      -
+         name: user0
+         uid: 1000
+         password: passwordUser0
+      -
+         name: user1
+         uid: 1001
+         password: passwordUser1
+
+   groups:
+      -
+         name: group0
+         gid: 1002
+         users: [1000, 1001]
+      -
+         name: group1
+         gid: 1005
+         users: [1000,1001,1003]
