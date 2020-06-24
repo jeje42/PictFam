@@ -1,5 +1,6 @@
 import { ActionRequest } from '../types';
 import { Playlist } from '../../types/Playlist';
+import { Video } from '../../types/Video';
 
 export enum PLAYLIST_ACTION {
   START_PLAYLIST_FETCHED = 'START_PLAYLIST_FETCHED',
@@ -37,3 +38,15 @@ export interface InitStateAction {
 }
 
 export type PlaylistActionTypes = StartPlaylistsFetchedAction | PlaylistsFetchedAction | SetPlaylist | SelectPlaylistAction | InitStateAction;
+
+export interface PlaylistVideosFetched {
+  videoId: number;
+  videoName: string;
+  position: number;
+}
+
+export interface PlaylistFetched {
+  id: number;
+  name: string;
+  playlistVideos: PlaylistVideosFetched[];
+}

@@ -7,6 +7,7 @@ import { Video } from '../../types/Video';
 import axios, { AxiosRequestConfig } from 'axios';
 import { ErrorAxios } from './playlistRequestHandling';
 import { setPlaylist } from '../../store/playlist/actions';
+import { transformPlaylistToPlaylistForBackend } from '../../store/playlist/utils';
 
 interface DialogAddToPlaylistProps {
   token: string;
@@ -36,12 +37,14 @@ const DialogAddToPlaylistFC: React.FC<DialogAddToPlaylistProps> = props => {
       videos: playlistSelected!.videos.concat(props.videos),
     };
 
-    const response: any = await axios.post(postRequestOption.url!, newPlaylistObject, postRequestOption).catch((error: ErrorAxios) => {
-      errorMessage = error.response.data.message;
-      if (!errorMessage) {
-        errorMessage = 'Une erreur est survenue';
-      }
-    });
+    const response: any = await axios
+      .post(postRequestOption.url!, transformPlaylistToPlaylistForBackend(newPlaylistObject), postRequestOption)
+      .catch((error: ErrorAxios) => {
+        errorMessage = error.response.data.message;
+        if (!errorMessage) {
+          errorMessage = 'Une erreur est survenue';
+        }
+      });
 
     if (errorMessage) {
       window.alert(errorMessage);

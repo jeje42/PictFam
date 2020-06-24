@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
 import { Video } from '../../types/Video';
 import { Card, Checkbox, List, ListItem, ListItemIcon, ListItemText, Tooltip, Typography } from '@material-ui/core';
-import MyImgElement from '../MyImgElement';
-import { useHistory } from 'react-router-dom';
-import { ROUTE_VIDEOS } from '../../utils/routesUtils';
+import { DndProvider } from 'react-dnd';
+import Backend from 'react-dnd-html5-backend';
+import update from 'immutability-helper';
 import { VideoModule } from '../../store/app/types';
 import { Playlist } from '../../types/Playlist';
-import { Add, Delete, LibraryAdd, DeleteOutlined } from '@material-ui/icons';
+import { LibraryAdd, DeleteOutlined } from '@material-ui/icons';
 import DialogAddToPlaylist from './DialogAddToPlaylist';
 import axios, { AxiosRequestConfig } from 'axios';
 import { ErrorAxios } from './playlistRequestHandling';
 import { setPlaylist } from '../../store/playlist/actions';
 import { Album } from '../../types/Album';
+import VideoListItem from './VideoListItem';
+import { transformPlaylistToPlaylistForBackend } from '../../store/playlist/utils';
 
 interface VideoTabProps {
   videos: Video[];
@@ -49,12 +51,13 @@ const findAlbumRecurs = (album: Album, albumId: number): Album | undefined => {
 };
 
 const VideoTab: React.FC<VideoTabProps> = props => {
-  const history = useHistory();
   const { height } = props;
   const [videoModuleState, setVideoModuleState] = useState<VideoModule>(props.videoModule);
   const [videoModalAddToPlaylist, setVideoModalAddToPlaylist] = useState<Video[] | undefined>();
   const [selectMode, setSelectMode] = useState<boolean>(false);
   const [selectModeVideoIndexes, setSelectModeVideoIndexes] = useState<number[]>([]);
+
+  const [videosDisplayed, setVideosDisplayed] = useState<Video[]>([]);
 
   const classes = makeStyles((theme: Theme) => {
     return createStyles({
@@ -69,30 +72,27 @@ const VideoTab: React.FC<VideoTabProps> = props => {
 
   useEffect(() => {
     setVideoModuleState(props.videoModule);
-  }, [props.videoModule]);
+
+    if (VideoModule.Video === props.videoModule) {
+      setVideosDisplayed(props.videos);
+    } else if (VideoModule.Playlist === props.videoModule && playlistSelected) {
+      setVideosDisplayed(playlistSelected.videos);
+    }
+  }, [props.videoModule, playlistSelected, props.videos]);
 
   useEffect(() => {
     setSelectMode(false);
     setSelectModeVideoIndexes([]);
   }, [props.videoModule, props.albumId, playlistSelected]);
 
-  const imageWidth = 10;
-  const imgStyle = {
-    margin: '10px',
-    borderRadius: '5px',
-    width: `${imageWidth}em`,
-    height: `${(imageWidth * 9) / 16}em`,
-    transition: 'all 2s',
-  };
-
   let albumOrPlaylistId: string;
-  let videos = props.videos;
   let dialogAddToPlaylist;
   let removeVideoFromPlaylist: { (index: number): void; (index: number): Promise<void> };
   let headerList;
+  let moveVideoHovered: (dragIndex: number, hoverIndex: number) => void;
+  let saveAfterDrop: () => void;
   if (VideoModule.Playlist === videoModuleState) {
     if (playlistSelected) {
-      videos = playlistSelected.videos;
       albumOrPlaylistId = `playlistId=${playlistSelected.id}`;
 
       const postPlaylist = async (playlist: Playlist) => {
@@ -107,12 +107,14 @@ const VideoTab: React.FC<VideoTabProps> = props => {
           },
         };
 
-        const response: any = await axios.post(postRequestOption.url!, playlist, postRequestOption).catch((error: ErrorAxios) => {
-          errorMessage = error.response.data.message;
-          if (!errorMessage) {
-            errorMessage = 'Une erreur est survenue';
-          }
-        });
+        const response: any = await axios
+          .post(postRequestOption.url!, transformPlaylistToPlaylistForBackend(playlist), postRequestOption)
+          .catch((error: ErrorAxios) => {
+            errorMessage = error.response.data.message;
+            if (!errorMessage) {
+              errorMessage = 'Une erreur est survenue';
+            }
+          });
 
         if (errorMessage) {
           window.alert(errorMessage);
@@ -148,6 +150,27 @@ const VideoTab: React.FC<VideoTabProps> = props => {
         };
 
         await postPlaylist(newPlaylistObject);
+      };
+
+      moveVideoHovered = (dragIndex: number, hoverIndex: number) => {
+        const dragVideo = videosDisplayed[dragIndex];
+
+        setVideosDisplayed(
+          update(videosDisplayed, {
+            $splice: [
+              [dragIndex, 1],
+              [hoverIndex, 0, dragVideo],
+            ],
+          }),
+        );
+      };
+
+      saveAfterDrop = async () => {
+        await postPlaylist({
+          ...playlistSelected,
+          videos: [...videosDisplayed],
+        });
+        console.log('Would like to save !');
       };
 
       headerList = (
@@ -215,10 +238,10 @@ const VideoTab: React.FC<VideoTabProps> = props => {
                 onClick={() => {
                   if (selectMode) {
                     if (selectModeVideoIndexes.length > 0) {
-                      setVideoModalAddToPlaylist(videos.filter((video: Video, index: number) => selectModeVideoIndexes.includes(index)));
+                      setVideoModalAddToPlaylist(videosDisplayed.filter((video: Video, index: number) => selectModeVideoIndexes.includes(index)));
                     }
                   } else {
-                    setVideoModalAddToPlaylist(videos);
+                    setVideoModalAddToPlaylist(videosDisplayed);
                   }
                 }}
               />
@@ -230,102 +253,26 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   }
 
   let videosList = <Typography variant={'h6'}>{`Pas de videos dans ${props.videoModule === VideoModule.Playlist ? 'la playlist.' : "l'album."}`}</Typography>;
-  if (videos.length > 0) {
+  if (videosDisplayed.length > 0) {
     videosList = (
       <>
-        {videos.map((video: Video, index: number) => {
-          let addOrDeleteButton;
-          let selectionCheckbox;
-          if (props.videoModule === VideoModule.Video) {
-            addOrDeleteButton = (
-              <ListItemIcon>
-                <Tooltip title={`Ajouter à la playlist`}>
-                  <Add
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      setVideoModalAddToPlaylist([video]);
-                    }}
-                  />
-                </Tooltip>
-              </ListItemIcon>
-            );
-
-            const selectedVideoIndex = selectModeVideoIndexes.indexOf(index);
-            if (selectMode) {
-              selectionCheckbox = (
-                <Tooltip title={`${selectedVideoIndex === -1 ? 'Sélectionner la video' : 'Déselectionner la video'}`}>
-                  <Checkbox
-                    checked={selectedVideoIndex !== -1}
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                    }}
-                    onChange={(e: any) => {
-                      if (selectedVideoIndex === -1) {
-                        setSelectModeVideoIndexes(selectModeVideoIndexes.concat(index));
-                      } else {
-                        setSelectModeVideoIndexes(selectModeVideoIndexes.filter((index: number) => index !== selectedVideoIndex));
-                      }
-                    }}
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                  />
-                </Tooltip>
-              );
-            }
-          } else {
-            addOrDeleteButton = (
-              <ListItemIcon>
-                <Tooltip title={`Retirer de la playlist`}>
-                  <Delete
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      removeVideoFromPlaylist(index);
-                    }}
-                  />
-                </Tooltip>
-              </ListItemIcon>
-            );
-
-            const selectedVideoIndex = selectModeVideoIndexes.indexOf(index);
-            if (selectMode) {
-              selectionCheckbox = (
-                <Tooltip title={`${selectedVideoIndex === -1 ? 'Sélectionner la video' : 'Déselectionner la video'}`}>
-                  <Checkbox
-                    checked={selectedVideoIndex !== -1}
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                    }}
-                    onChange={(e: any) => {
-                      if (selectedVideoIndex === -1) {
-                        setSelectModeVideoIndexes(selectModeVideoIndexes.concat(index));
-                      } else {
-                        setSelectModeVideoIndexes(selectModeVideoIndexes.filter((index: number) => index !== selectedVideoIndex));
-                      }
-                    }}
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                  />
-                </Tooltip>
-              );
-            }
-          }
-
+        {videosDisplayed.map((video: Video, index: number) => {
           return (
-            <ListItem
-              key={video.id}
-              button={true}
-              onClick={() => history.push(`${ROUTE_VIDEOS}?${albumOrPlaylistId}&videoId=${video.id}`)}
-              selected={props.videoReading && props.videoReading === video}
-            >
-              <MyImgElement
-                key={video.id}
-                imgUrl={`thumnailVideo/${video.id}`}
-                styleRaw={{
-                  ...imgStyle,
-                }}
-              />
-              <ListItemText primary={video.name} secondary={video.name} />
-              {selectionCheckbox}
-              {addOrDeleteButton}
-            </ListItem>
+            <VideoListItem
+              key={`${video.id}`}
+              index={index}
+              video={video}
+              albumOrPlaylistId={albumOrPlaylistId}
+              selectMode={selectMode}
+              removeVideoFromPlaylist={removeVideoFromPlaylist}
+              selectModeVideoIndexes={selectModeVideoIndexes}
+              setSelectModeVideoIndexes={setSelectModeVideoIndexes}
+              setVideoModalAddToPlaylist={setVideoModalAddToPlaylist}
+              videoModule={props.videoModule}
+              videoReading={props.videoReading}
+              moveVideoHovered={moveVideoHovered}
+              saveAfterDrop={saveAfterDrop}
+            />
           );
         })}
         {dialogAddToPlaylist}
@@ -334,10 +281,12 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   }
 
   return (
-    <Card raised={true}>
-      {headerList}
-      <List className={classes.root}>{videosList}</List>
-    </Card>
+    <DndProvider backend={Backend}>
+      <Card raised={true}>
+        {headerList}
+        <List className={classes.root}>{videosList}</List>
+      </Card>
+    </DndProvider>
   );
 };
 

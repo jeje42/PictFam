@@ -1,11 +1,12 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { AxiosRequestConfig } from 'axios';
 import { getRequest } from '../../utils/axiosUtils';
-import { PLAYLIST_ACTION, PlaylistActionTypes } from './types';
+import { PLAYLIST_ACTION, PlaylistActionTypes, PlaylistFetched, PlaylistVideosFetched } from './types';
 import { Playlist } from '../../types/Playlist';
+import { Album } from '../../types/Album';
 
 interface Response {
-  data: Playlist[];
+  data: PlaylistFetched[];
 }
 
 function* tryToFetchPlaylists(action: PlaylistActionTypes) {
@@ -19,12 +20,19 @@ function* tryToFetchPlaylists(action: PlaylistActionTypes) {
 
   const response: Response = yield call(getRequest, options);
 
-  const playlists: Playlist[] = response.data.map((value: Playlist) => {
+  const playlists: Playlist[] = response.data.map((value: PlaylistFetched) => {
+    const sortedPlaylistVideos = value.playlistVideos.sort((a: PlaylistVideosFetched, b: PlaylistVideosFetched) => a.position - b.position);
+
     return {
       id: value.id,
       name: value.name,
       selected: false,
-      videos: value.videos,
+      videos: sortedPlaylistVideos.map(playlistVideo => ({
+        id: playlistVideo.videoId,
+        name: playlistVideo.videoName,
+        selected: false,
+        album: {} as Album,
+      })),
     };
   });
 
