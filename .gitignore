@@ -72,3 +72,7 @@ packages/react-devtools-extensions/firefox/*.pem
 packages/react-devtools-extensions/shared/build
 packages/react-devtools-inline/dist
 packages/react-devtools-shell/dist
+
+react/package-lock.json
+react/yarn.lock
+src/main/resources/application*
