@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
 import { Video } from '../../types/Video';
 import { Card, Checkbox, List, ListItem, ListItemIcon, ListItemText, Tooltip, Typography } from '@material-ui/core';
 import { DndProvider } from 'react-dnd';
-import Backend from 'react-dnd-html5-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import update from 'immutability-helper';
 import { VideoModule } from '../../store/app/types';
 import { Playlist } from '../../types/Playlist';
@@ -59,7 +59,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
 
   const [videosDisplayed, setVideosDisplayed] = useState<Video[]>([]);
 
-  const classes = makeStyles((theme: Theme) => {
+  const classes = makeStyles(() => {
     return createStyles({
       root: {
         overflow: 'auto',
@@ -281,7 +281,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   }
 
   return (
-    <DndProvider backend={Backend}>
+    <DndProvider backend={HTML5Backend}>
       <Card raised={true}>
         {headerList}
         <List className={classes.root}>{videosList}</List>
