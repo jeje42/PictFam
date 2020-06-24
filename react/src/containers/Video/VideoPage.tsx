@@ -65,11 +65,11 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
 
     if (albumId) {
       if (albumIdSelected !== albumId) {
-        selectAlbumVideo(albumId);
-
         const albumsSons: Album[] = [];
         const album: Album | undefined = findAlbumRecurs(albums, albumId);
         if (album) {
+          selectAlbumVideo(albumId);
+
           albumsSons.push(album);
           generateAlbumListRecurs(album, albumsSons);
           newAlbumSelected(albumsSons);
