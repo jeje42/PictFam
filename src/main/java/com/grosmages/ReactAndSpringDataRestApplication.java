@@ -94,7 +94,7 @@ public class ReactAndSpringDataRestApplication implements CommandLineRunner {
 			if(oldUser == null) {
 				User newUser = context.getBean(User.class);
 				newUser.setName(user.getName());
-				newUser.setPassword(user.getPassword());
+				newUser.setPassword(passwordEncoder.encode(user.getPassword()));
 				newUser.setUid(user.getUid());
 
 				Set<Role> roles = new HashSet();
