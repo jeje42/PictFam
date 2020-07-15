@@ -43,7 +43,6 @@ import com.grosmages.repositories.SystemGroupLocalRepository;
 import com.grosmages.repositories.UserRepository;
 
 @SpringBootApplication
-@Import({RepositoryConfig.class})
 @EnableScheduling
 @Transactional
 @EnableAspectJAutoProxy
