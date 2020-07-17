@@ -11,7 +11,7 @@ import { Module } from '../app/types';
 import { startPhotosFetched } from '../photo/actions';
 import { startFetchAlbumsImage, startFetchAlbumsVideo } from '../album/actions';
 import { startVideosFetched } from '../video/actions';
-import { startPlaylistsFetch } from '../playlist/actions';
+import { startFetchAllPlaylists } from '../playlist/actions';
 import { PLAYLIST_ACTION } from '../playlist/types';
 import { INIT_VIDEOS_STATE } from '../video/types';
 
@@ -116,7 +116,7 @@ function* startFetchSaga() {
         if (state.albums.albumsVideo.length === 0) {
           yield put(startFetchAlbumsVideo());
           yield put(startVideosFetched());
-          yield put(startPlaylistsFetch());
+          yield put(startFetchAllPlaylists());
         }
         break;
     }
@@ -133,18 +133,18 @@ function* logoutSaga() {
   }
 }
 
-export function* watchTryLogin() {
+export function* watchTryLogin(): Generator {
   yield takeLatest(START_LOGIN, tryToLoginSaga);
 }
 
-export function* watchStartScan() {
+export function* watchStartScan(): Generator {
   yield takeEvery(START_SCAN, startScanSaga);
 }
 
-export function* watchLogout() {
+export function* watchLogout(): Generator {
   yield takeEvery(LOGOUT, logoutSaga);
 }
 
-export function* watchFetchAll() {
+export function* watchFetchAll(): Generator {
   yield takeEvery(FETCH_ACTION, startFetchSaga);
 }

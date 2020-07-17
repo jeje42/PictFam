@@ -1,5 +1,6 @@
 package com.grosmages.event;
 
+import com.grosmages.config.WebSocketConfig;
 import com.grosmages.entities.Playlist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,14 +11,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 
-import static com.grosmages.WebSocketConfiguration.MESSAGE_PREFIX;
-
 public class PlaylistListener {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    SimpMessagingTemplate websocket; // <2>
+    SimpMessagingTemplate websocket;
 
     @Autowired
     EntityLinks entityLinks;
@@ -27,7 +26,7 @@ public class PlaylistListener {
     {
         logger.info("PostPersist");
         this.websocket.convertAndSend(
-                MESSAGE_PREFIX + "/newEmployee", getPath(playlist));
+                WebSocketConfig.MESSAGE_PREFIX + "/newPlaylist", getPath(playlist));
     }
 
     @PostUpdate
@@ -35,7 +34,7 @@ public class PlaylistListener {
     {
         logger.info("PostUpdate");
         this.websocket.convertAndSend(
-                MESSAGE_PREFIX + "/newEmployee", getPath(playlist));
+                WebSocketConfig.MESSAGE_PREFIX + "/updatePlaylist", getPath(playlist));
     }
 
     private String getPath(Playlist playlist) {

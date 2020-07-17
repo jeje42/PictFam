@@ -2,7 +2,8 @@ import { ActionRequest } from '../types';
 import { Playlist } from '../../types/Playlist';
 
 export enum PLAYLIST_ACTION {
-  START_PLAYLIST_FETCHED = 'START_PLAYLIST_FETCHED',
+  START_FETCH_ALL_PLAYLIST = 'START_FETCH_ALL_PLAYLIST',
+  START_FETCH_ONE_PLAYLIST = 'START_FETCH_ONE_PLAYLIST',
   SET_PLAYLIST = 'SET_PLAYLIST',
   PLAYLIST_FETCHED = 'PLAYLIST_FETCHED',
   PLAYLIST_SELECTED = 'PLAYLIST_SELECTED',
@@ -13,8 +14,12 @@ export interface PlaylistsState {
   playlists: Playlist[];
 }
 
-export interface StartPlaylistsFetchedAction extends ActionRequest {
-  type: typeof PLAYLIST_ACTION.START_PLAYLIST_FETCHED;
+export interface StartFetchAllPlaylistsAction extends ActionRequest {
+  type: typeof PLAYLIST_ACTION.START_FETCH_ALL_PLAYLIST;
+}
+
+export interface StartFetchOnePlaylistsAction extends ActionRequest {
+  type: typeof PLAYLIST_ACTION.START_FETCH_ONE_PLAYLIST;
 }
 
 export interface PlaylistsFetchedAction {
@@ -36,7 +41,13 @@ export interface InitStateAction {
   type: typeof PLAYLIST_ACTION.INIT_PLAYLIST_STATE;
 }
 
-export type PlaylistActionTypes = StartPlaylistsFetchedAction | PlaylistsFetchedAction | SetPlaylist | SelectPlaylistAction | InitStateAction;
+export type PlaylistActionTypes =
+  | StartFetchAllPlaylistsAction
+  | StartFetchOnePlaylistsAction
+  | PlaylistsFetchedAction
+  | SetPlaylist
+  | SelectPlaylistAction
+  | InitStateAction;
 
 export interface PlaylistVideosFetched {
   videoId: number;

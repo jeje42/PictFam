@@ -16,7 +16,7 @@ import { watchTryFetchPhotos } from './photo/sagas';
 import { watchTryFetchAlbumsImage, watchTryFetchAlbumsVideo } from './album/sagas';
 import { watchTryFetchVideos } from './video/sagas';
 import { ActionRequest } from './types';
-import { watchTryFetchPlaylists } from './playlist/sagas';
+import { watchTryFetchAllPlaylists, watchTryFetchOnePlaylists } from './playlist/sagas';
 
 const rootReducer = combineReducers({
   photos: photosReducer,
@@ -60,7 +60,8 @@ export default function configureStore() {
   saga.run(watchLogout);
   saga.run(watchStartScan);
   saga.run(watchFetchAll);
-  saga.run(watchTryFetchPlaylists);
+  saga.run(watchTryFetchAllPlaylists);
+  saga.run(watchTryFetchOnePlaylists);
 
   return store;
 }

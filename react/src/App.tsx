@@ -10,6 +10,7 @@ import VideoPage from './containers/Video/VideoPage';
 import { Module } from './store/app/types';
 import { Album } from './types/Album';
 import { fetchAllAction } from './store/auth-profile/actions';
+import { SocketHoc } from './WebSockets';
 
 interface AppProps {
   isAuthenticated: boolean;
@@ -19,19 +20,18 @@ interface AppProps {
   fetchAllAction: typeof fetchAllAction;
 }
 
-const App: React.FC<AppProps> = props => {
-  const { currentModule, albumsImage, albumsVideo, isAuthenticated, fetchAllAction } = props;
+const App: React.FC<AppProps> = ({ currentModule, albumsImage, albumsVideo, fetchAllAction, isAuthenticated }) => {
   useEffect(() => {
     fetchAllAction();
   }, [albumsImage.length, albumsVideo.length, currentModule, isAuthenticated, fetchAllAction]);
 
-  // @ts-ignore
-  function PrivateRoute({ children, ...rest }) {
+  function PrivateRoute({ children, path, ...rest }: { children: React.ReactNode; path: string }) {
     return (
       <Route
+        path={path}
         {...rest}
         render={({ location }) =>
-          props.isAuthenticated ? (
+          isAuthenticated ? (
             children
           ) : (
             <Redirect
@@ -47,26 +47,29 @@ const App: React.FC<AppProps> = props => {
   }
 
   return (
-    <Router>
-      <Switch>
-        <Route path='/login'>
-          <Login />
-        </Route>
-        <PrivateRoute path={ROUTE_IMAGES}>
-          <ImagesPage />
-        </PrivateRoute>
-        <PrivateRoute path={ROUTE_VIDEOS}>
-          <VideoPage />
-        </PrivateRoute>
-        <PrivateRoute path='/'>
-          <Redirect
-            to={{
-              pathname: ROUTE_IMAGES,
-            }}
-          />
-        </PrivateRoute>
-      </Switch>
-    </Router>
+    <>
+      <SocketHoc />
+      <Router>
+        <Switch>
+          <Route path='/login'>
+            <Login />
+          </Route>
+          <PrivateRoute path={ROUTE_IMAGES}>
+            <ImagesPage />
+          </PrivateRoute>
+          <PrivateRoute path={ROUTE_VIDEOS}>
+            <VideoPage />
+          </PrivateRoute>
+          <PrivateRoute path='/'>
+            <Redirect
+              to={{
+                pathname: ROUTE_IMAGES,
+              }}
+            />
+          </PrivateRoute>
+        </Switch>
+      </Router>
+    </>
   );
 };
 
@@ -75,6 +78,7 @@ const mapStateToProps = (state: AppState) => ({
   currentModule: state.app.module,
   albumsImage: state.albums.albumsImage,
   albumsVideo: state.albums.albumsVideo,
+  token: state.auth.token,
 });
 
 export default connect(mapStateToProps, { fetchAllAction })(App);

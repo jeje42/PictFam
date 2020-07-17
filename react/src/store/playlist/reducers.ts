@@ -43,13 +43,24 @@ const setPlaylist = (state: PlaylistsState, playlist: Playlist): PlaylistsState 
   };
 };
 
+const playListsFetched = (state: PlaylistsState, playlists: Playlist[]) => {
+  const newPlaylists = playlists.filter(pl => !state.playlists.find(playlistInReducer => playlistInReducer.id === pl.id));
+
+  const playlistsFromReducerUpdated = state.playlists.map(playlistInReducer => {
+    const foundNewPlaylist = playlists.find(pl => pl.id === playlistInReducer.id);
+    return foundNewPlaylist ? foundNewPlaylist : playlistInReducer;
+  });
+
+  return {
+    ...state,
+    playlists: [...playlistsFromReducerUpdated, ...newPlaylists],
+  };
+};
+
 export function playlistsReducer(state = initialState, action: PlaylistActionTypes): PlaylistsState {
   switch (action.type) {
     case PLAYLIST_ACTION.PLAYLIST_FETCHED:
-      return {
-        ...state,
-        playlists: action.playlists,
-      };
+      return playListsFetched(state, action.playlists);
     case PLAYLIST_ACTION.PLAYLIST_SELECTED:
       return playlistSelected(state, action.playlist);
     case PLAYLIST_ACTION.SET_PLAYLIST:
