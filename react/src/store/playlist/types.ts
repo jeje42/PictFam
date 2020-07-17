@@ -5,6 +5,7 @@ export enum PLAYLIST_ACTION {
   START_FETCH_ALL_PLAYLIST = 'START_FETCH_ALL_PLAYLIST',
   START_FETCH_ONE_PLAYLIST = 'START_FETCH_ONE_PLAYLIST',
   SET_PLAYLIST = 'SET_PLAYLIST',
+  REMOVE_PLAYLIST = 'REMOVE_PLAYLIST',
   PLAYLIST_FETCHED = 'PLAYLIST_FETCHED',
   PLAYLIST_SELECTED = 'PLAYLIST_SELECTED',
   INIT_PLAYLIST_STATE = 'INIT_PLAYLIST_STATE',
@@ -32,6 +33,11 @@ export interface SetPlaylist {
   playlist: Playlist;
 }
 
+export interface RemovePlaylist {
+  type: PLAYLIST_ACTION.REMOVE_PLAYLIST;
+  playlistId: string;
+}
+
 export interface SelectPlaylistAction {
   type: typeof PLAYLIST_ACTION.PLAYLIST_SELECTED;
   playlist?: Playlist;
@@ -47,6 +53,7 @@ export type PlaylistActionTypes =
   | PlaylistsFetchedAction
   | SetPlaylist
   | SelectPlaylistAction
+  | RemovePlaylist
   | InitStateAction;
 
 export interface PlaylistVideosFetched {

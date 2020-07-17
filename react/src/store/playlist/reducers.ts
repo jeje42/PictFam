@@ -43,7 +43,7 @@ const setPlaylist = (state: PlaylistsState, playlist: Playlist): PlaylistsState 
   };
 };
 
-const playListsFetched = (state: PlaylistsState, playlists: Playlist[]) => {
+const playListsFetched = (state: PlaylistsState, playlists: Playlist[]): PlaylistsState => {
   const newPlaylists = playlists.filter(pl => !state.playlists.find(playlistInReducer => playlistInReducer.id === pl.id));
 
   const playlistsFromReducerUpdated = state.playlists.map(playlistInReducer => {
@@ -57,6 +57,11 @@ const playListsFetched = (state: PlaylistsState, playlists: Playlist[]) => {
   };
 };
 
+const removePlaylist = (state: PlaylistsState, playlistId: string): PlaylistsState => ({
+  ...state,
+  playlists: state.playlists.filter(pl => pl.id !== Number(playlistId)),
+});
+
 export function playlistsReducer(state = initialState, action: PlaylistActionTypes): PlaylistsState {
   switch (action.type) {
     case PLAYLIST_ACTION.PLAYLIST_FETCHED:
@@ -65,6 +70,8 @@ export function playlistsReducer(state = initialState, action: PlaylistActionTyp
       return playlistSelected(state, action.playlist);
     case PLAYLIST_ACTION.SET_PLAYLIST:
       return setPlaylist(state, action.playlist);
+    case PLAYLIST_ACTION.REMOVE_PLAYLIST:
+      return removePlaylist(state, action.playlistId);
     case PLAYLIST_ACTION.INIT_PLAYLIST_STATE:
       return initialState;
     default:

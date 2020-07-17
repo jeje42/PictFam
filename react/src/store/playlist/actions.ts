@@ -2,6 +2,7 @@ import {
   InitStateAction,
   PLAYLIST_ACTION,
   PlaylistsFetchedAction,
+  RemovePlaylist,
   SelectPlaylistAction,
   SetPlaylist,
   StartFetchAllPlaylistsAction,
@@ -40,6 +41,13 @@ export function setPlaylist(playlist: Playlist): SetPlaylist {
   return {
     type: PLAYLIST_ACTION.SET_PLAYLIST,
     playlist,
+  };
+}
+
+export function removePlaylist(playlistId: string): RemovePlaylist {
+  return {
+    type: PLAYLIST_ACTION.REMOVE_PLAYLIST,
+    playlistId,
   };
 }
 

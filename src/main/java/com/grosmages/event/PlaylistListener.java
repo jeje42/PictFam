@@ -9,6 +9,7 @@ import org.springframework.hateoas.EntityLinks;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
 
 public class PlaylistListener {
@@ -24,7 +25,6 @@ public class PlaylistListener {
     @PostPersist
     public void postCreated(Playlist playlist)
     {
-        logger.info("PostPersist");
         this.websocket.convertAndSend(
                 WebSocketConfig.MESSAGE_PREFIX + "/newPlaylist", getPath(playlist));
     }
@@ -32,9 +32,15 @@ public class PlaylistListener {
     @PostUpdate
     public void postUpdated(Playlist playlist)
     {
-        logger.info("PostUpdate");
         this.websocket.convertAndSend(
                 WebSocketConfig.MESSAGE_PREFIX + "/updatePlaylist", getPath(playlist));
+    }
+
+    @PostRemove
+    public void postRemove(Playlist playlist)
+    {
+        this.websocket.convertAndSend(
+                WebSocketConfig.MESSAGE_PREFIX + "/removePlaylist", getPath(playlist));
     }
 
     private String getPath(Playlist playlist) {
