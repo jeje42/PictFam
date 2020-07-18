@@ -1,7 +1,14 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { AxiosRequestConfig } from 'axios';
 import { Album } from '../../types/Album';
-import { ALBUM_IMAGE_FETCHED, ALBUM_VIDEO_FETCHED, AlbumActionTypes, START_ALBUM_IMAGE_FETCHED, START_ALBUM_VIDEO_FETCHED } from './types';
+import {
+  ALBUM_IMAGE_FETCHED,
+  ALBUM_VIDEO_FETCHED,
+  AlbumActionTypes,
+  START_ALBUM_IMAGE_FETCHED,
+  START_ALBUM_VIDEO_FETCHED,
+  START_FETCH_ONE_ALBUM,
+} from './types';
 import { getRequest } from '../../utils/axiosUtils';
 
 interface Response {
@@ -48,10 +55,32 @@ function* tryToFetchAlbumsVideo(action: AlbumActionTypes) {
   });
 }
 
+function* tryToFetchOneAlbum(action: AlbumActionTypes) {
+  if (action.type !== START_FETCH_ONE_ALBUM) {
+    return;
+  }
+
+  const options: AxiosRequestConfig = {
+    ...action.request,
+  };
+
+  const response: Response = yield call(getRequest, options);
+
+  debugger;
+  // yield put({
+  //   type: ALBUM_VIDEO_FETCHED,
+  //   albums: response.data,
+  // });
+}
+
 export function* watchTryFetchAlbumsImage() {
   yield takeLatest(START_ALBUM_IMAGE_FETCHED, tryToFetchAlbumsImage);
 }
 
 export function* watchTryFetchAlbumsVideo() {
   yield takeLatest(START_ALBUM_VIDEO_FETCHED, tryToFetchAlbumsVideo);
+}
+
+export function* watchTryFetchOneAlbum() {
+  yield takeLatest(START_FETCH_ONE_ALBUM, tryToFetchOneAlbum);
 }

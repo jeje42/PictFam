@@ -9,7 +9,7 @@ import { select } from 'redux-saga/effects';
 import { AppState } from '../index';
 import { Module } from '../app/types';
 import { startPhotosFetched } from '../photo/actions';
-import { startFetchAlbumsImage, startFetchAlbumsVideo } from '../album/actions';
+import { startFetchAllAlbumsImage, startFetchAllAlbumsVideo } from '../album/actions';
 import { startVideosFetched } from '../video/actions';
 import { startFetchAllPlaylists } from '../playlist/actions';
 import { PLAYLIST_ACTION } from '../playlist/types';
@@ -109,12 +109,12 @@ function* startFetchSaga() {
       case Module.Image:
         if (state.albums.albumsImage.length === 0) {
           yield put(startPhotosFetched());
-          yield put(startFetchAlbumsImage());
+          yield put(startFetchAllAlbumsImage());
         }
         break;
       case Module.Video:
         if (state.albums.albumsVideo.length === 0) {
-          yield put(startFetchAlbumsVideo());
+          yield put(startFetchAllAlbumsVideo());
           yield put(startVideosFetched());
           yield put(startFetchAllPlaylists());
         }

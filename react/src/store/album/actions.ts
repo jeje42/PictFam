@@ -9,12 +9,22 @@ import {
   SelectAlbumVideoAction,
   START_ALBUM_IMAGE_FETCHED,
   START_ALBUM_VIDEO_FETCHED,
-  StartFetchAlbumsImageAction,
-  StartFetchAlbumsVideoAction,
+  StartFetchAllAlbumsImageAction,
+  StartFetchAllAlbumsVideoAction,
 } from './types';
 import { Album } from '../../types/Album';
 
-export function startFetchAlbumsImage(): StartFetchAlbumsImageAction {
+export function startFetchAllAlbumsImage(): StartFetchAllAlbumsImageAction {
+  return {
+    type: START_ALBUM_IMAGE_FETCHED,
+    request: {
+      method: 'get',
+      url: '/albumstree',
+    },
+  };
+}
+
+export function startFetchOneAlbum(): StartFetchAllAlbumsImageAction {
   return {
     type: START_ALBUM_IMAGE_FETCHED,
     request: {
@@ -38,7 +48,7 @@ export function selectAlbumImage(albumId: number): SelectAlbumImageAction {
   };
 }
 
-export function startFetchAlbumsVideo(): StartFetchAlbumsVideoAction {
+export function startFetchAllAlbumsVideo(): StartFetchAllAlbumsVideoAction {
   return {
     type: START_ALBUM_VIDEO_FETCHED,
     request: {

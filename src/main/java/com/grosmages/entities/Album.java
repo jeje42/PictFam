@@ -3,14 +3,9 @@ package com.grosmages.entities;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
+import com.grosmages.event.AlbumListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Component
 @Entity
 @Scope("prototype")
+@EntityListeners(AlbumListener.class)
 public class Album {
 	private @Id @GeneratedValue Long id;
 	private String name;
