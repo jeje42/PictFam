@@ -5,7 +5,7 @@ import com.grosmages.entities.Playlist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.persistence.PostPersist;
@@ -44,6 +44,6 @@ public class PlaylistListener {
     }
 
     private String getPath(Playlist playlist) {
-        return this.entityLinks.linkForSingleResource(playlist.getClass(), playlist.getId()).toUri().getPath();
+        return this.entityLinks.linkForItemResource(playlist.getClass(), playlist.getId()).toUri().getPath();
     }
 }

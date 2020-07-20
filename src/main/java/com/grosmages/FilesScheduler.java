@@ -12,10 +12,7 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.UserPrincipal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -23,7 +20,6 @@ import javax.imageio.ImageIO;
 
 import com.grosmages.entities.*;
 import com.grosmages.repositories.*;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -209,7 +205,7 @@ public class FilesScheduler {
 						album.setForVideo(scantype == SCAN_TYPE.VIDEO);
 
 						if (parentAlbum != null) {
-							album.setIsRoot(false);
+							album.setRoot(false);
 							album = albumRepository.save(album);
 
 							Set<Album> sons = parentAlbum.getSons();
@@ -220,7 +216,7 @@ public class FilesScheduler {
 
 							parentAlbum = albumRepository.save(parentAlbum);
 						} else {
-							album.setIsRoot(true);
+							album.setRoot(true);
 							album = albumRepository.save(album);
 						}
 					}

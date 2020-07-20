@@ -12,11 +12,11 @@ public interface AlbumRepository extends PagingAndSortingRepository<Album, Long>
 	public Album findByPath(String path);
 
 	@PreAuthorize("isAuthenticated()")
-	@Query("SELECT distinct a FROM Album a WHERE a.isRoot = true and a.isForPhoto = TRUE")
+	@Query("SELECT distinct a FROM Album a WHERE a.root = true and a.forPhoto = TRUE")
 	Collection<Album> findAllRootForImage();
 
 	@PreAuthorize("isAuthenticated()")
-	@Query("SELECT distinct a FROM Album a WHERE a.isRoot = true and a.isForVideo = TRUE")
+	@Query("SELECT distinct a FROM Album a WHERE a.root = true and a.forVideo = TRUE")
 	Collection<Album> findAllRootForVideo();
 
 	@PreAuthorize("isAuthenticated()")

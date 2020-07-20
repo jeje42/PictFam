@@ -1,11 +1,11 @@
 package com.grosmages.event;
 
 import com.grosmages.config.WebSocketConfig;
-import com.grosmages.entities.Playlist;
+import com.grosmages.entities.Album;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.persistence.PostPersist;
@@ -23,27 +23,27 @@ public class AlbumListener {
     EntityLinks entityLinks;
 
     @PostPersist
-    public void postCreated(Playlist playlist)
+    public void postCreated(Album album)
     {
         this.websocket.convertAndSend(
-                WebSocketConfig.MESSAGE_PREFIX + "/newAlbum", getPath(playlist));
+                WebSocketConfig.MESSAGE_PREFIX + "/newAlbum", getPath(album));
     }
 
     @PostUpdate
-    public void postUpdated(Playlist playlist)
+    public void postUpdated(Album album)
     {
         this.websocket.convertAndSend(
-                WebSocketConfig.MESSAGE_PREFIX + "/updateAlbum", getPath(playlist));
+                WebSocketConfig.MESSAGE_PREFIX + "/updateAlbum", getPath(album));
     }
 
     @PostRemove
-    public void postRemove(Playlist playlist)
+    public void postRemove(Album album)
     {
         this.websocket.convertAndSend(
-                WebSocketConfig.MESSAGE_PREFIX + "/removeAlbum", getPath(playlist));
+                WebSocketConfig.MESSAGE_PREFIX + "/removeAlbum", getPath(album));
     }
 
-    private String getPath(Playlist playlist) {
-        return this.entityLinks.linkForSingleResource(playlist.getClass(), playlist.getId()).toUri().getPath();
+    private String getPath(Album album) {
+        return this.entityLinks.linkForItemResource(album.getClass(), album.getId()).toUri().getPath();
     }
 }

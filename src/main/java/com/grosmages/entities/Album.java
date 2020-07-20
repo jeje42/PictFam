@@ -6,13 +6,11 @@ import java.util.Set;
 import javax.persistence.*;
 
 import com.grosmages.event.AlbumListener;
+import lombok.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -22,22 +20,22 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AlbumListener.class)
 public class Album {
 	private @Id @GeneratedValue Long id;
-	private String name;
+	String name;
 	
 	@JsonIgnore
-	private String path;
+	String path;
 	
-	private Boolean isRoot;
+	Boolean root;
 	
 	@JsonIgnore
 	@OneToOne(cascade = CascadeType.ALL)
-	private Rights rights;
+	Rights rights;
 	
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Album> sons;
 
-	private boolean isForPhoto;
-    private boolean isForVideo;
+	Boolean forPhoto;
+    Boolean forVideo;
 	
 	@Override
     public boolean equals(Object obj) {
@@ -54,11 +52,11 @@ public class Album {
             return false;
         }
 
-        if (this.isForPhoto != other.isForPhoto) {
+        if (this.forPhoto != other.forPhoto) {
             return false;
         }
 
-        if (this.isForVideo != other.isForVideo) {
+        if (this.forVideo != other.forVideo) {
             return false;
         }
 
