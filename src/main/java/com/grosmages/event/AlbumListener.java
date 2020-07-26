@@ -44,6 +44,8 @@ public class AlbumListener {
     }
 
     private String getPath(Album album) {
-        return this.entityLinks.linkForItemResource(album.getClass(), album.getId()).toUri().getPath();
+        logger.info("Creating path for album " + album.getId());
+//        return this.entityLinks.linkForItemResource(album.getClass(), album.getId()).toUri().getPath();
+        return album.getId().toString();
     }
 }

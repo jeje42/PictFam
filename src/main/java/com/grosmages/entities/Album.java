@@ -25,14 +25,15 @@ public class Album {
 	@JsonIgnore
 	String path;
 	
-	Boolean root;
-	
 	@JsonIgnore
 	@OneToOne(cascade = CascadeType.ALL)
 	Rights rights;
+
+	@ManyToOne
+    Album father;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<Album> sons;
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "father")
+	Set<Album> sons;
 
 	Boolean forPhoto;
     Boolean forVideo;

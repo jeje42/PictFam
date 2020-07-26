@@ -19,7 +19,7 @@ export function startFetchAllAlbumsImage(): StartFetchAllAlbumsImageAction {
     type: START_ALBUM_IMAGE_FETCHED,
     request: {
       method: 'get',
-      url: '/albumstree',
+      url: '/albums',
     },
   };
 }
@@ -29,7 +29,7 @@ export function startFetchOneAlbum(): StartFetchAllAlbumsImageAction {
     type: START_ALBUM_IMAGE_FETCHED,
     request: {
       method: 'get',
-      url: '/albumstree',
+      url: '/albums',
     },
   };
 }
@@ -53,7 +53,7 @@ export function startFetchAllAlbumsVideo(): StartFetchAllAlbumsVideoAction {
     type: START_ALBUM_VIDEO_FETCHED,
     request: {
       method: 'get',
-      url: '/albumstree',
+      url: '/albums',
     },
   };
 }

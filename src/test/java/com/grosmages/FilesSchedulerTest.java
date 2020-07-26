@@ -113,6 +113,11 @@ public class FilesSchedulerTest {
 		assertThat(lAlbumsDatabase.size()).isEqualTo(3);
 		assertThat(lAlbumsDatabase.get(1).getPath()).isEqualTo(dir1);
 		assertThat(lAlbumsDatabase.get(2).getPath()).isEqualTo(subDir1);
+
+		assertThat(lAlbumsDatabase.get(1).getSons().size()).isEqualTo(1);
+
+		assertThat(lAlbumsDatabase.get(2).getFather()).isNotNull();
+		assertThat(lAlbumsDatabase.get(2).getFather().getPath()).isEqualTo(dir1);
 	}
 	
 	@Test

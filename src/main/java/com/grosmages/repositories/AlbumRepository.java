@@ -9,14 +9,18 @@ import com.grosmages.entities.Album;
 
 @Repository
 public interface AlbumRepository extends PagingAndSortingRepository<Album, Long> {
-	public Album findByPath(String path);
+	Album findByPath(String path);
+
+	Collection<Album> findAllByForPhotoTrueAndFatherIsNull();
+
+	Collection<Album> findAllByForVideoTrueAndFatherIsNull();
 
 	@PreAuthorize("isAuthenticated()")
-	@Query("SELECT distinct a FROM Album a WHERE a.root = true and a.forPhoto = TRUE")
+	@Query("SELECT distinct a FROM Album a WHERE a.father is null and a.forPhoto = TRUE")
 	Collection<Album> findAllRootForImage();
 
 	@PreAuthorize("isAuthenticated()")
-	@Query("SELECT distinct a FROM Album a WHERE a.root = true and a.forVideo = TRUE")
+	@Query("SELECT distinct a FROM Album a WHERE a.father is null and a.forVideo = TRUE")
 	Collection<Album> findAllRootForVideo();
 
 	@PreAuthorize("isAuthenticated()")

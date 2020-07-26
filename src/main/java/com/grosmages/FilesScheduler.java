@@ -205,18 +205,17 @@ public class FilesScheduler {
 						album.setForVideo(scantype == SCAN_TYPE.VIDEO);
 
 						if (parentAlbum != null) {
-							album.setRoot(false);
+							album.setFather(parentAlbum);
 							album = albumRepository.save(album);
 
-							Set<Album> sons = parentAlbum.getSons();
-							if (sons == null)	sons = new HashSet<>();
-
-							sons.add(album);
-							parentAlbum.setSons(sons);
+//							Set<Album> sons = parentAlbum.getSons();
+//							if (sons == null)	sons = new HashSet<>();
+//
+//							sons.add(album);
+//							parentAlbum.setSons(sons);
 
 							parentAlbum = albumRepository.save(parentAlbum);
 						} else {
-							album.setRoot(true);
 							album = albumRepository.save(album);
 						}
 					}
