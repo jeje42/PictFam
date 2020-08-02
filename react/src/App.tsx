@@ -16,14 +16,14 @@ interface AppProps {
   isAuthenticated: boolean;
   currentModule: Module;
   albumsImage: Album[];
-  albumsVideo: Album[];
+  videoAlbums: Album[];
   fetchAllAction: typeof fetchAllAction;
 }
 
-const App: React.FC<AppProps> = ({ currentModule, albumsImage, albumsVideo, fetchAllAction, isAuthenticated }) => {
+const App: React.FC<AppProps> = ({ currentModule, albumsImage, videoAlbums, fetchAllAction, isAuthenticated }) => {
   useEffect(() => {
     fetchAllAction();
-  }, [albumsImage.length, albumsVideo.length, currentModule, isAuthenticated, fetchAllAction]);
+  }, [albumsImage.length, videoAlbums.length, currentModule, isAuthenticated, fetchAllAction]);
 
   function PrivateRoute({ children, path, ...rest }: { children: React.ReactNode; path: string }) {
     return (
@@ -76,8 +76,8 @@ const App: React.FC<AppProps> = ({ currentModule, albumsImage, albumsVideo, fetc
 const mapStateToProps = (state: AppState) => ({
   isAuthenticated: state.auth.isAuthenticated,
   currentModule: state.app.module,
-  albumsImage: state.albums.albumsImage,
-  albumsVideo: state.albums.albumsVideo,
+  albumsImage: state.albums.imageAlbumsTree,
+  videoAlbums: state.albums.videoAlbumsTree,
   token: state.auth.token,
 });
 

@@ -294,7 +294,7 @@ const mapStateToProps = (state: AppState) => ({
   videos: state.videos.videosSelected,
   videoReading: state.videos.videoReading,
   albumId: state.albums.albumVideoIdSelected,
-  albums: state.albums.albumsVideo,
+  albums: state.albums.videoAlbumsTree,
   playlists: state.playlists.playlists,
   videoModule: state.app.videoModule,
   token: state.auth.token,

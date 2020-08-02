@@ -1,86 +1,59 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
-import { AxiosRequestConfig } from 'axios';
-import { Album } from '../../types/Album';
-import {
-  ALBUM_IMAGE_FETCHED,
-  ALBUM_VIDEO_FETCHED,
-  AlbumActionTypes,
-  START_ALBUM_IMAGE_FETCHED,
-  START_ALBUM_VIDEO_FETCHED,
-  START_FETCH_ONE_ALBUM,
-} from './types';
-import { getRequest } from '../../utils/axiosUtils';
+import { all, put, select, takeLatest } from 'redux-saga/effects';
+import axios, { AxiosRequestConfig } from 'axios';
+import { AlbumFetched } from '../../types/Album';
+import { AlbumAction, AlbumActionTypes, AlbumMediaType } from './types';
+import { Endpoints } from '../../config/endpoints';
+import { addAlbumToReducer } from './actions';
+import { albumFetchedToAlbum } from './utils';
 
-interface Response {
-  data: Album[];
+function* addAlbumsAndCallFetchSons(albumMediaType: AlbumMediaType, albums?: AlbumFetched[], parentId?: number): Generator {
+  if (albums) {
+    yield all(albums.map(album => put(addAlbumToReducer(albumFetchedToAlbum(album), albumMediaType, parentId))));
+
+    yield all(albums.map(album => fetchSonAlbum(album._links.sons.href, albumMediaType, album.id)));
+  }
 }
 
-function* tryToFetchAlbumsImage(action: AlbumActionTypes) {
-  if (action.type !== START_ALBUM_IMAGE_FETCHED) {
-    return;
-  }
+function* fetchSonAlbum(url: string, albumMediaType: AlbumMediaType, parentId: number): Generator {
+  const token = yield select(state => state.auth.token);
 
-  const options: AxiosRequestConfig = {
-    ...action.request,
-    params: {
-      albumType: 'image',
+  const requestConfig: AxiosRequestConfig = {
+    method: 'GET',
+    url: url.substring(url.indexOf('/api')),
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   };
 
-  const response: Response = yield call(getRequest, options);
+  const r = yield axios(requestConfig);
+  const response = r as { data: { _embedded: { albums: AlbumFetched[] } } };
 
-  yield put({
-    type: ALBUM_IMAGE_FETCHED,
-    albums: response.data,
-  });
+  yield addAlbumsAndCallFetchSons(albumMediaType, response?.data?._embedded?.albums, parentId);
 }
 
-function* tryToFetchAlbumsVideo(action: AlbumActionTypes) {
-  if (action.type !== START_ALBUM_VIDEO_FETCHED) {
+function* fetchAlbumsFromRoot(action: AlbumActionTypes): Generator {
+  if (action.type !== AlbumAction.FETCH_ALBUMS_FROM_ROOT_SAGA) {
     return;
   }
 
-  const options: AxiosRequestConfig = {
-    ...action.request,
-    params: {
-      albumType: 'video',
+  const { albumMediaType } = action;
+
+  const token = yield select(state => state.auth.token);
+
+  const requestConfig: AxiosRequestConfig = {
+    method: 'GET',
+    url: `${Endpoints.Albums}/search/${albumMediaType === AlbumMediaType.Image ? 'findAllRootForImage' : 'findAllRootForVideo'}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   };
 
-  const response: Response = yield call(getRequest, options);
+  const r = yield axios(requestConfig);
+  const response = r as { data: { _embedded: { albums: AlbumFetched[] } } };
 
-  yield put({
-    type: ALBUM_VIDEO_FETCHED,
-    albums: response.data,
-  });
+  yield addAlbumsAndCallFetchSons(albumMediaType, response?.data?._embedded?.albums);
 }
 
-function* tryToFetchOneAlbum(action: AlbumActionTypes) {
-  if (action.type !== START_FETCH_ONE_ALBUM) {
-    return;
-  }
-
-  const options: AxiosRequestConfig = {
-    ...action.request,
-  };
-
-  const response: Response = yield call(getRequest, options);
-
-  debugger;
-  // yield put({
-  //   type: ALBUM_VIDEO_FETCHED,
-  //   albums: response.data,
-  // });
-}
-
-export function* watchTryFetchAlbumsImage() {
-  yield takeLatest(START_ALBUM_IMAGE_FETCHED, tryToFetchAlbumsImage);
-}
-
-export function* watchTryFetchAlbumsVideo() {
-  yield takeLatest(START_ALBUM_VIDEO_FETCHED, tryToFetchAlbumsVideo);
-}
-
-export function* watchTryFetchOneAlbum() {
-  yield takeLatest(START_FETCH_ONE_ALBUM, tryToFetchOneAlbum);
+export function* watchFetchAlbumsFromRoot(): Generator {
+  yield takeLatest(AlbumAction.FETCH_ALBUMS_FROM_ROOT_SAGA, fetchAlbumsFromRoot);
 }

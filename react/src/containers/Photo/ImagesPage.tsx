@@ -1,23 +1,24 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { changeModule } from '../../store/app/actions';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
-import { useEffect } from 'react';
 import { Module } from '../../store/app/types';
 import Welcome from '../Welcome';
 import { withSize } from 'react-sizeme';
 import MainPhoto from './MainPhoto';
 import ThumnailsGalery from '../ThumnailsGalery';
 import { useQuery } from '../../utils/routesUtils';
-import { selectAlbumImage } from '../../store/album/actions';
+import { selectAlbum } from '../../store/album';
 import { Album } from '../../types/Album';
 import { findAlbumRecurs, generateAlbumListRecurs } from '../../store/album/utils';
 import { newAlbumSelected, selectPhoto } from '../../store/photo/actions';
 import { Photo } from '../../types/Photo';
+import { AlbumMediaType } from '../../store/album/types';
 
 interface ImagesPageProps {
   changeModule: typeof changeModule;
-  selectAlbumImage: typeof selectAlbumImage;
+  selectAlbum: typeof selectAlbum;
   newAlbumSelected: typeof newAlbumSelected;
   selectPhoto: typeof selectPhoto;
   size: any;
@@ -25,18 +26,17 @@ interface ImagesPageProps {
   photos: Photo[];
 }
 
-const ImagesPage: React.FC<ImagesPageProps> = props => {
-  const { albums, photos, selectAlbumImage, newAlbumSelected, selectPhoto } = props;
+const ImagesPage: React.FC<ImagesPageProps> = ({ albums, photos, size, selectAlbum, newAlbumSelected, selectPhoto, changeModule }) => {
   const albumId = Number(useQuery().get('albumId'));
   const photoId = Number(useQuery().get('photoId'));
 
   useEffect(() => {
-    props.changeModule(Module.Image);
+    changeModule(Module.Image);
   });
 
   useEffect(() => {
     if (albumId) {
-      selectAlbumImage(albumId);
+      selectAlbum(albumId, AlbumMediaType.Image);
       const albumsSons: Album[] = [];
       const album: Album | undefined = findAlbumRecurs(albums, albumId);
       if (album) {
@@ -45,24 +45,24 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
         newAlbumSelected(albumsSons);
       }
     } else {
-      selectAlbumImage(-1);
+      selectAlbum(-1, AlbumMediaType.Image);
       newAlbumSelected([]);
     }
 
     const photoFound: Photo | undefined = photos.find(photo => photo.id === photoId);
     selectPhoto(photoFound);
-  }, [albums, selectAlbumImage, albumId, newAlbumSelected, photos, photoId, selectPhoto]);
+  }, [albums, selectAlbum, albumId, newAlbumSelected, photos, photoId, selectPhoto]);
 
-  const mainElem = <MainPhoto screenWidth={props.size.width} screenHeight={props.size.height} />;
+  const mainElem = <MainPhoto screenWidth={size.width} screenHeight={size.height} />;
 
-  const toolbarElem = <ThumnailsGalery screenWidth={props.size.width} />;
+  const toolbarElem = <ThumnailsGalery screenWidth={size.width} />;
 
   return <Welcome mainElem={mainElem} toolbarElem={toolbarElem} />;
 };
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.albumsImage,
+  albums: state.albums.imageAlbumsTree,
   photos: state.photos.photos,
 });
 
-export default withSize({ monitorHeight: true })(connect(mapStateToProps, { changeModule, selectAlbumImage, newAlbumSelected, selectPhoto })(ImagesPage));
+export default withSize({ monitorHeight: true })(connect(mapStateToProps, { changeModule, selectAlbum, newAlbumSelected, selectPhoto })(ImagesPage));

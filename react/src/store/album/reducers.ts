@@ -1,42 +1,52 @@
-import { ALBUM_IMAGE_FETCHED, ALBUM_IMAGE_SELECTED, ALBUM_VIDEO_FETCHED, ALBUM_VIDEO_SELECTED, AlbumActionTypes, AlbumState, INIT_ALBUMSTATE } from './types';
+import { AddAlbumToReducer, AlbumAction, AlbumActionTypes, AlbumMediaType, AlbumState, SelectAlbumAction } from './types';
 
 const initialState: AlbumState = {
-  albumsImage: [],
+  imageAlbumsTree: [],
+  imageAlbumsRecord: {},
   albumImageIdSelected: -1,
-  albumsVideo: [],
+  videoAlbumsTree: [],
+  videoAlbumsRecord: {},
   albumVideoIdSelected: -1,
 };
 
-const albumImageSelected = (state: AlbumState, albumId: number) => {
+const albumSelected = (state: AlbumState, action: SelectAlbumAction) => {
+  const selectedAttributeName = action.albumMediaType === AlbumMediaType.Image ? 'albumImageIdSelected' : 'albumVideoIdSelected';
   return {
     ...state,
-    albumImageIdSelected: albumId,
+    [selectedAttributeName]: action.albumId,
   };
 };
 
-const albumVideoSelected = (state: AlbumState, albumId: number) => {
-  return {
+const addAlbumToReducer = (state: AlbumState, action: AddAlbumToReducer): AlbumState => {
+  const recordAttributeName = action.albumMediaType === AlbumMediaType.Image ? 'imageAlbumsRecord' : 'videoAlbumsRecord';
+  const treeAttributeName = action.albumMediaType === AlbumMediaType.Image ? 'imageAlbumsTree' : 'videoAlbumsTree';
+
+  const parentExists = action.parentId ? state[recordAttributeName][action.parentId] : undefined;
+
+  const toReturn = {
     ...state,
-    albumVideoIdSelected: albumId,
+    [recordAttributeName]: {
+      ...state[recordAttributeName],
+      [action.album.id]: action.album,
+    },
   };
+
+  if (parentExists) {
+    parentExists.sons = [...parentExists.sons, action.album];
+  } else {
+    toReturn[treeAttributeName] = [...toReturn[treeAttributeName], action.album];
+  }
+
+  return toReturn;
 };
+
 export function albumsReducer(state = initialState, action: AlbumActionTypes): AlbumState {
   switch (action.type) {
-    case ALBUM_IMAGE_FETCHED:
-      return {
-        ...state,
-        albumsImage: action.albums,
-      };
-    case ALBUM_VIDEO_FETCHED:
-      return {
-        ...state,
-        albumsVideo: action.albums,
-      };
-    case ALBUM_IMAGE_SELECTED:
-      return albumImageSelected(state, action.albumId);
-    case ALBUM_VIDEO_SELECTED:
-      return albumVideoSelected(state, action.albumId);
-    case INIT_ALBUMSTATE:
+    case AlbumAction.SELECT_ALBUM:
+      return albumSelected(state, action);
+    case AlbumAction.ADD_ALBUM_TO_REDUCER:
+      return addAlbumToReducer(state, action);
+    case AlbumAction.INIT_ALBUMSTATE:
       return initialState;
     default:
       return state;

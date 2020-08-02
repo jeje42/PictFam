@@ -1,24 +1,25 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { changeModule, setVideoModule } from '../../store/app/actions';
 import { AppState } from '../../store';
 import { connect } from 'react-redux';
-import { useEffect } from 'react';
 import { Module, VideoModule } from '../../store/app/types';
 import Welcome from '../Welcome';
 import { withSize } from 'react-sizeme';
 import MainVideo from './MainVideos';
 import { useQuery } from '../../utils/routesUtils';
 import { Album } from '../../types/Album';
-import { selectAlbumVideo } from '../../store/album/actions';
+import { selectAlbum } from '../../store/album';
 import { findAlbumRecurs, generateAlbumListRecurs } from '../../store/album/utils';
 import { newAlbumSelected, selectVideoForReading } from '../../store/video/actions';
 import { Video } from '../../types/Video';
 import { Playlist } from '../../types/Playlist';
 import { selectPlaylist } from '../../store/playlist/actions';
+import { AlbumMediaType } from '../../store/album/types';
 
 interface ImagesPageProps {
   changeModule: typeof changeModule;
-  selectAlbumVideo: typeof selectAlbumVideo;
+  selectAlbum: typeof selectAlbum;
   newAlbumSelected: typeof newAlbumSelected;
   selectVideoForReading: typeof selectVideoForReading;
   selectPlaylist: typeof selectPlaylist;
@@ -42,7 +43,7 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
     videoReading,
     videoModule,
     selectVideoForReading,
-    selectAlbumVideo,
+    selectAlbum,
     changeModule,
     selectPlaylist,
     setVideoModule,
@@ -65,7 +66,7 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
 
     if (albumId) {
       if (albumIdSelected !== albumId) {
-        selectAlbumVideo(albumId);
+        selectAlbum(albumId, AlbumMediaType.Video);
 
         const albumsSons: Album[] = [];
         const album: Album | undefined = findAlbumRecurs(albums, albumId);
@@ -98,7 +99,7 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
       }
 
       if (albumIdSelected !== -1) {
-        selectAlbumVideo(-1);
+        selectAlbum(-1, AlbumMediaType.Video);
       }
 
       if (videoModule !== VideoModule.Playlist) {
@@ -108,7 +109,7 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
   }, [
     newAlbumSelected,
     selectVideoForReading,
-    selectAlbumVideo,
+    selectAlbum,
     videos,
     albumId,
     videoId,
@@ -128,7 +129,7 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
 };
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.albumsVideo,
+  albums: state.albums.videoAlbumsTree,
   videos: state.videos.videos,
   playlists: state.playlists.playlists,
   albumIdSelected: state.albums.albumVideoIdSelected,
@@ -137,5 +138,5 @@ const mapStateToProps = (state: AppState) => ({
 });
 
 export default withSize({ monitorHeight: true })(
-  connect(mapStateToProps, { changeModule, selectAlbumVideo, newAlbumSelected, selectVideoForReading, selectPlaylist, setVideoModule })(ImagesPage),
+  connect(mapStateToProps, { changeModule, selectAlbum, newAlbumSelected, selectVideoForReading, selectPlaylist, setVideoModule })(ImagesPage),
 );

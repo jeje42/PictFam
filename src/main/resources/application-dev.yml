@@ -9,7 +9,7 @@ spring:
             use_sql_comments: false
             format_sql: false
       hibernate:
-         ddl-auto: update
+         ddl-auto: create
 #         ddl-auto: create
 #      database-platform: org.hibernate.dialect.MySQLDialect
    h2:
@@ -17,8 +17,8 @@ spring:
          enabled: true
    datasource:
       url: jdbc:mysql://localhost:3306/pictfam?useLegacyDatetimeCode=false&serverTimezone=UTC
-      username: dbUsername
-      password: dbPassword
+      username: pictfam
+      password: pictfam
 logging:
    level:
       org:
@@ -28,23 +28,23 @@ app:
    jwtSecret: jwtSecretPassword
    jwtExpirationInMs: 1800000
 pictfam:
-   foldersImages: ["/file/path/for/Images"]  #Path should be without file separator at the end
-   foldersVideos: ["/file/path/for/Videos"]
+   foldersImages: ["/home/jeje/Pictures/"]  #Path should be without file separator at the end
+   foldersVideos: ["/home/jeje/Videos/"]
    users:
       -
-         name: user0
+         name: jeje
          uid: 1000
-         password: passwordUser0
+         password: jeje
          admin: true
       -
-         name: user1
+         name: nana
          uid: 1001
-         password: passwordUser1
+         password: nana
          admin: false
 
    groups:
       -
-         name: group0
+         name: jeje
          gid: 1002
          users: [1000, 1001]
       -

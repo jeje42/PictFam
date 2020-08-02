@@ -1,4 +1,4 @@
-import { Album } from '../../types/Album';
+import { Album, AlbumFetched } from '../../types/Album';
 
 export const generateAlbumListRecurs = (album: Album, finalList: Album[]) => {
   album.sons.forEach(album => {
@@ -40,3 +40,8 @@ export const isSonSelectedRecurs = (albums: Album[], albumId: number): boolean =
   });
   return toReturn;
 };
+
+export const albumFetchedToAlbum = (albumFetched: AlbumFetched): Album => ({
+  ...albumFetched,
+  sons: [],
+});
