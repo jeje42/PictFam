@@ -3,6 +3,7 @@ import { register as socketRegister } from '../utils/socketUtils';
 import { connect } from 'react-redux';
 import { AppState } from '../store';
 import { removePlaylist, startFetchOnePlaylist } from '../store/playlist/actions';
+import { newAlbumFromSocketSagaAction } from '../store/album';
 
 const TOPIC = '/topic';
 
@@ -22,15 +23,18 @@ interface SocketHocProps {
   token: string;
   startFetchOnePlaylist: typeof startFetchOnePlaylist;
   removePlaylist: typeof removePlaylist;
+  newAlbumFromSocketSagaAction: typeof newAlbumFromSocketSagaAction;
 }
 
-const SocketHocFC: React.FC<SocketHocProps> = ({ token, startFetchOnePlaylist, removePlaylist }) => {
+const SocketHocFC: React.FC<SocketHocProps> = ({ token, startFetchOnePlaylist, removePlaylist, newAlbumFromSocketSagaAction }) => {
   useEffect(() => {
     if (token && token !== '') {
       const newOrUpdatePlaylistCB = (entityLink: string) => startFetchOnePlaylist(entityLink);
+
       const removePlaylistCB = (entityLink: string) => removePlaylist(entityLink.split('/').pop()!);
 
-      const newOrUpdateAlbumCB = (entityLink: string) => startFetchOnePlaylist(entityLink);
+      const newOrUpdateAlbumCB = (entityLink: string) => newAlbumFromSocketSagaAction(entityLink);
+
       // const removeAlbumCB = (entityLink: string) => removePlaylist(entityLink.split('/').pop()!);
 
       socketRegister(
@@ -55,4 +59,4 @@ const mapStateToProps = (state: AppState) => ({
   token: state.auth.token,
 });
 
-export default connect(mapStateToProps, { startFetchOnePlaylist, removePlaylist })(SocketHocFC);
+export default connect(mapStateToProps, { startFetchOnePlaylist, removePlaylist, newAlbumFromSocketSagaAction })(SocketHocFC);

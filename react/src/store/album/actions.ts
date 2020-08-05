@@ -1,4 +1,4 @@
-import { AddAlbumToReducer, AlbumAction, AlbumMediaType, FetchAlbumsFromRootSagaAction, SelectAlbumAction } from './types';
+import { AddAlbumToReducer, AlbumAction, AlbumMediaType, FetchAlbumsFromRootSagaAction, NewAlbumFromSocketSagaAction, SelectAlbumAction } from './types';
 import { Album } from '../../types/Album';
 
 export const selectAlbum = (albumId: number, albumMediaType: AlbumMediaType): SelectAlbumAction => ({
@@ -17,4 +17,9 @@ export const addAlbumToReducer = (album: Album, albumMediaType: AlbumMediaType, 
   album,
   parentId,
   albumMediaType,
+});
+
+export const newAlbumFromSocketSagaAction = (albumId: string): NewAlbumFromSocketSagaAction => ({
+  type: AlbumAction.NEW_ALBUM_FROM_SOCKET_SAGA,
+  albumId,
 });

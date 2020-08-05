@@ -5,7 +5,7 @@ import createSagaMiddleware from 'redux-saga';
 
 import { photosReducer } from './photo/reducers';
 import { videosReducer } from './video/reducers';
-import { albumsReducer, watchFetchAlbumsFromRoot } from './album';
+import { albumsReducer, watchFetchAlbumsFromRoot, watchNewAlbumFromSocketSagaAction } from './album';
 import { drawerReducer } from './drawer/reducers';
 import { authReducer } from './auth-profile/reducers';
 import { appReducer } from './app/reducers';
@@ -55,6 +55,7 @@ export default function configureStore() {
   saga.run(watchTryFetchPhotos);
   saga.run(watchTryFetchVideos);
   saga.run(watchFetchAlbumsFromRoot);
+  saga.run(watchNewAlbumFromSocketSagaAction);
   saga.run(watchLogout);
   saga.run(watchStartScan);
   saga.run(watchFetchAll);

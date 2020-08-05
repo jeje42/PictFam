@@ -4,6 +4,8 @@ export interface AlbumFetched {
   id: number;
   name: string;
   isRoot: boolean;
+  forPhoto: boolean;
+  forVideo: boolean;
   _links: {
     father: Href;
     sons: Href;

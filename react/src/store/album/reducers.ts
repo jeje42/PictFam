@@ -1,4 +1,4 @@
-import { AddAlbumToReducer, AlbumAction, AlbumActionTypes, AlbumMediaType, AlbumState, SelectAlbumAction } from './types';
+import { AddAlbumToReducer, AlbumAction, AlbumActionTypes, AlbumMediaType, AlbumState, SelectAlbumAction, UpdateAlbumToReducer } from './types';
 
 const initialState: AlbumState = {
   imageAlbumsTree: [],
@@ -17,8 +17,26 @@ const albumSelected = (state: AlbumState, action: SelectAlbumAction) => {
   };
 };
 
+const updateAlbumInReducer = (state: AlbumState, action: UpdateAlbumToReducer): AlbumState => {
+  const recordAttributeName = action.albumMediaType === AlbumMediaType.Image ? 'imageAlbumsRecord' : 'videoAlbumsRecord';
+  const treeAttributeName = action.albumMediaType === AlbumMediaType.Image ? 'imageAlbumsTree' : 'videoAlbumsTree';
+
+  return {
+    ...state,
+    [recordAttributeName]: {
+      ...state[recordAttributeName],
+      [action.album.id]: action.album,
+    },
+    [treeAttributeName]: state[treeAttributeName].map(a => (a.id === action.album.id ? action.album : a)),
+  };
+};
+
 const addAlbumToReducer = (state: AlbumState, action: AddAlbumToReducer): AlbumState => {
   const recordAttributeName = action.albumMediaType === AlbumMediaType.Image ? 'imageAlbumsRecord' : 'videoAlbumsRecord';
+  if (state[recordAttributeName][action.album.id]) {
+    return updateAlbumInReducer(state, { type: AlbumAction.UPDATE_ALBUM_TO_REDUCER, albumMediaType: action.albumMediaType, album: action.album });
+  }
+
   const treeAttributeName = action.albumMediaType === AlbumMediaType.Image ? 'imageAlbumsTree' : 'videoAlbumsTree';
 
   const parentExists = action.parentId ? state[recordAttributeName][action.parentId] : undefined;
