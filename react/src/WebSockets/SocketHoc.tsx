@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../store';
 import { removePlaylist, startFetchOnePlaylist } from '../store/playlist/actions';
 import { newAlbumFromSocketSagaAction } from '../store/album';
+import { newOrUpdatePhotoFromSocketSagaAction } from '../store/photo/actions';
 
 const TOPIC = '/topic';
 
@@ -19,14 +20,27 @@ enum WsAlbum {
   Remove = 'removeAlbum',
 }
 
+enum WsPhoto {
+  New = 'newPhoto',
+  Update = 'updatePhoto',
+  Remove = 'removePhoto',
+}
+
 interface SocketHocProps {
   token: string;
   startFetchOnePlaylist: typeof startFetchOnePlaylist;
   removePlaylist: typeof removePlaylist;
   newAlbumFromSocketSagaAction: typeof newAlbumFromSocketSagaAction;
+  newOrUpdatePhotoFromSocketSagaAction: typeof newOrUpdatePhotoFromSocketSagaAction;
 }
 
-const SocketHocFC: React.FC<SocketHocProps> = ({ token, startFetchOnePlaylist, removePlaylist, newAlbumFromSocketSagaAction }) => {
+const SocketHocFC: React.FC<SocketHocProps> = ({
+  token,
+  startFetchOnePlaylist,
+  removePlaylist,
+  newAlbumFromSocketSagaAction,
+  newOrUpdatePhotoFromSocketSagaAction,
+}) => {
   useEffect(() => {
     if (token && token !== '') {
       const newOrUpdatePlaylistCB = (entityLink: string) => startFetchOnePlaylist(entityLink);
@@ -34,6 +48,8 @@ const SocketHocFC: React.FC<SocketHocProps> = ({ token, startFetchOnePlaylist, r
       const removePlaylistCB = (entityLink: string) => removePlaylist(entityLink.split('/').pop()!);
 
       const newOrUpdateAlbumCB = (entityLink: string) => newAlbumFromSocketSagaAction(entityLink);
+
+      const newOrUpdatePhotoCB = (entityLink: string) => newOrUpdatePhotoFromSocketSagaAction(entityLink);
 
       // const removeAlbumCB = (entityLink: string) => removePlaylist(entityLink.split('/').pop()!);
 
@@ -45,6 +61,10 @@ const SocketHocFC: React.FC<SocketHocProps> = ({ token, startFetchOnePlaylist, r
 
           { route: `${TOPIC}/${WsAlbum.New}`, callback: (message: { body: string }) => newOrUpdateAlbumCB(message.body) },
           { route: `${TOPIC}/${WsAlbum.Update}`, callback: (message: { body: string }) => newOrUpdateAlbumCB(message.body) },
+          // { route: `${TOPIC}/${WsAlbum.Remove}`, callback: (message: { body: string }) => removePlaylistCB(message.body) },
+
+          { route: `${TOPIC}/${WsPhoto.New}`, callback: (message: { body: string }) => newOrUpdatePhotoCB(message.body) },
+          { route: `${TOPIC}/${WsPhoto.Update}`, callback: (message: { body: string }) => newOrUpdatePhotoCB(message.body) },
           // { route: `${TOPIC}/${WsAlbum.Remove}`, callback: (message: { body: string }) => removePlaylistCB(message.body) },
         ],
         token,
@@ -59,4 +79,6 @@ const mapStateToProps = (state: AppState) => ({
   token: state.auth.token,
 });
 
-export default connect(mapStateToProps, { startFetchOnePlaylist, removePlaylist, newAlbumFromSocketSagaAction })(SocketHocFC);
+export default connect(mapStateToProps, { startFetchOnePlaylist, removePlaylist, newAlbumFromSocketSagaAction, newOrUpdatePhotoFromSocketSagaAction })(
+  SocketHocFC,
+);

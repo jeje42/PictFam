@@ -1,7 +1,6 @@
 import { call, put, select, takeEvery, takeLatest } from 'redux-saga/effects';
 import { AuthActionTypes, DONE_LOGIN, FETCH_ACTION, LOGOUT, SET_LOGIN_HAS_FAILED, SET_USER_DETAILS, START_LOGIN, START_SCAN } from './types';
 import { AxiosRequestConfig } from 'axios';
-import { INIT_PHOTOS_STATE } from '../photo/types';
 import { INIT_DRAWERSTATE } from '../drawer/types';
 import { getRequest, postRequest } from '../../utils/axiosUtils';
 import { AppState } from '../index';
@@ -13,6 +12,7 @@ import { startFetchAllPlaylists } from '../playlist/actions';
 import { PLAYLIST_ACTION } from '../playlist/types';
 import { INIT_VIDEOS_STATE } from '../video/types';
 import { AlbumAction, AlbumMediaType } from '../album/types';
+import { PhotoAction } from '../photo/types';
 
 interface Response {
   data: {
@@ -123,7 +123,7 @@ function* startFetchSaga() {
 }
 
 function* logoutSaga() {
-  const states = [AlbumAction.INIT_ALBUMSTATE, INIT_PHOTOS_STATE, INIT_DRAWERSTATE, PLAYLIST_ACTION.INIT_PLAYLIST_STATE, INIT_VIDEOS_STATE];
+  const states = [AlbumAction.INIT_ALBUMSTATE, PhotoAction.INIT_PHOTOS_STATE, INIT_DRAWERSTATE, PLAYLIST_ACTION.INIT_PLAYLIST_STATE, INIT_VIDEOS_STATE];
 
   for (let i = 0; i < states.length; i++) {
     yield put({

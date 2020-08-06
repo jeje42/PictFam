@@ -12,7 +12,7 @@ import { appReducer } from './app/reducers';
 import { playlistsReducer } from './playlist/reducers';
 
 import { watchLogout, watchStartScan, watchTryLogin, watchFetchAll } from './auth-profile/sagas';
-import { watchTryFetchPhotos } from './photo/sagas';
+import { watchNewOrUpdatePhoto, watchTryFetchPhotos } from './photo/sagas';
 import { watchTryFetchVideos } from './video/sagas';
 import { ActionRequest } from './types';
 import { watchTryFetchAllPlaylists, watchTryFetchOnePlaylists } from './playlist/sagas';
@@ -61,6 +61,7 @@ export default function configureStore() {
   saga.run(watchFetchAll);
   saga.run(watchTryFetchAllPlaylists);
   saga.run(watchTryFetchOnePlaylists);
+  saga.run(watchNewOrUpdatePhoto);
 
   return store;
 }

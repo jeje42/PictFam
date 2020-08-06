@@ -1,4 +1,4 @@
-import { all, put, select, takeEvery, takeLatest } from 'redux-saga/effects';
+import { all, put, select, takeEvery } from 'redux-saga/effects';
 import axios, { AxiosRequestConfig } from 'axios';
 import { AlbumFetched } from '../../types/Album';
 import { AlbumAction, AlbumActionTypes, AlbumMediaType, NewAlbumFromSocketSagaAction } from './types';
