@@ -46,7 +46,7 @@ export function newAlbumSelected(albums: Album[]) {
 }
 
 export const newOrUpdatePhotoFromSocketSagaAction = (photoId: string): NewOrUpdatePhotoFromSocketSagaAction => ({
-  type: PhotoAction.NEW_OR_UPDATE_ALBUM_FROM_SOCKET_SAGA,
+  type: PhotoAction.NEW_OR_UPDATE_PHOTO_FROM_SOCKET_SAGA,
   photoId,
 });
 

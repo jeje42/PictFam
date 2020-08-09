@@ -1,6 +1,7 @@
 package com.grosmages.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.grosmages.event.VideoListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Component
 @Entity(name = "Video")
 @Scope("prototype")
+@EntityListeners(VideoListener.class)
 public class Video extends MutlimediaAbstract {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pk.video", cascade=CascadeType.ALL)

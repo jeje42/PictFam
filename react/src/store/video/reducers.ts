@@ -1,14 +1,4 @@
-import {
-  VideosState,
-  VIDEOS_FETCHED,
-  VIDEOS_SELECTED,
-  VIDEOS_SELECTED_NEXT,
-  VIDEOS_SELECTED_PREVIOUS,
-  INIT_VIDEOS_STATE,
-  VideoActionTypes,
-  SELECT_VIDEO_FOR_READING,
-  NEW_ALBUM_VIDEO_SELECTED,
-} from './types';
+import { VideosState, VideoActionTypes, VideoAction } from './types';
 import { Video } from '../../types/Video';
 import { Album } from '../../types/Album';
 
@@ -76,25 +66,50 @@ const selectVideoForReading = (state: VideosState, video: Video): VideosState =>
   };
 };
 
+const addVideoToReducer = (state: VideosState, video: Video): VideosState => {
+  let updated = false;
+  const newState: VideosState = {
+    ...state,
+    videos: state.videos.map(p => {
+      if (p.id === video.id) {
+        updated = true;
+        return video;
+      }
+      return p;
+    }),
+  };
+
+  if (updated) {
+    return newState;
+  }
+
+  return {
+    ...state,
+    videos: [...state.videos, ...[video]],
+  };
+};
+
 export function videosReducer(state = initialState, action: VideoActionTypes): VideosState {
   switch (action.type) {
-    case VIDEOS_FETCHED:
+    case VideoAction.VIDEOS_FETCHED:
       return {
         ...state,
         ...action.videos,
       };
-    case VIDEOS_SELECTED:
+    case VideoAction.VIDEOS_SELECTED:
       return videoSelected(state, action.video);
-    case VIDEOS_SELECTED_NEXT:
+    case VideoAction.VIDEOS_SELECTED_NEXT:
       return selectedNextVideo(state);
-    case VIDEOS_SELECTED_PREVIOUS:
+    case VideoAction.VIDEOS_SELECTED_PREVIOUS:
       return selectedPreviousVideo(state);
-    case NEW_ALBUM_VIDEO_SELECTED:
+    case VideoAction.NEW_ALBUM_VIDEO_SELECTED:
       return newAlbumSelected(state, action.albums);
-    case INIT_VIDEOS_STATE:
+    case VideoAction.INIT_VIDEOS_STATE:
       return initialState;
-    case SELECT_VIDEO_FOR_READING:
+    case VideoAction.SELECT_VIDEO_FOR_READING:
       return selectVideoForReading(state, action.video);
+    case VideoAction.ADD_VIDEO_TO_REDUCER:
+      return addVideoToReducer(state, action.video);
     default:
       return state;
   }

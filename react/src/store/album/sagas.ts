@@ -97,7 +97,7 @@ function* newAlbumFromSocketLogic(album: AlbumFetched, socketHandling: SocketHan
     });
 
     if (albumRecord[response.data.id]) {
-      addAlbumToReducer(albumFetchedToAlbum(response.data), album.id);
+      addAlbumToReducer(albumFetchedToAlbum(response.data), albumMediaType, album.id);
     } else {
       //Parent is again not part of the reducer
       yield newAlbumFromSocketLogic(response.data, SocketHandling.FindRootFirst);

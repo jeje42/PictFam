@@ -54,9 +54,25 @@ const newAlbumSelected = (state: PhotosState, albums: Album[]) => {
 };
 
 const addPhotoToReducer = (state: PhotosState, photo: Photo): PhotosState => {
+  let updated = false;
+  const newState: PhotosState = {
+    ...state,
+    photos: state.photos.map(p => {
+      if (p.id === photo.id) {
+        updated = true;
+        return photo;
+      }
+      return p;
+    }),
+  };
+
+  if (updated) {
+    return newState;
+  }
+
   return {
     ...state,
-    photos: [...state.photos, photo],
+    photos: [...state.photos, ...[photo]],
   };
 };
 

@@ -84,5 +84,5 @@ function* newOrUpdatePhoto(action: NewOrUpdatePhotoFromSocketSagaAction) {
 }
 
 export function* watchNewOrUpdatePhoto() {
-  yield takeEvery(PhotoAction.NEW_OR_UPDATE_ALBUM_FROM_SOCKET_SAGA, newOrUpdatePhoto);
+  yield takeEvery(PhotoAction.NEW_OR_UPDATE_PHOTO_FROM_SOCKET_SAGA, newOrUpdatePhoto);
 }

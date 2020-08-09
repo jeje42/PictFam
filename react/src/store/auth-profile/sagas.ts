@@ -10,9 +10,9 @@ import { fetchAlbumsFromRootSagaAction } from '../album';
 import { startVideosFetched } from '../video/actions';
 import { startFetchAllPlaylists } from '../playlist/actions';
 import { PLAYLIST_ACTION } from '../playlist/types';
-import { INIT_VIDEOS_STATE } from '../video/types';
 import { AlbumAction, AlbumMediaType } from '../album/types';
 import { PhotoAction } from '../photo/types';
+import { VideoAction } from '../video/types';
 
 interface Response {
   data: {
@@ -123,7 +123,13 @@ function* startFetchSaga() {
 }
 
 function* logoutSaga() {
-  const states = [AlbumAction.INIT_ALBUMSTATE, PhotoAction.INIT_PHOTOS_STATE, INIT_DRAWERSTATE, PLAYLIST_ACTION.INIT_PLAYLIST_STATE, INIT_VIDEOS_STATE];
+  const states = [
+    AlbumAction.INIT_ALBUMSTATE,
+    PhotoAction.INIT_PHOTOS_STATE,
+    INIT_DRAWERSTATE,
+    PLAYLIST_ACTION.INIT_PLAYLIST_STATE,
+    VideoAction.INIT_VIDEOS_STATE,
+  ];
 
   for (let i = 0; i < states.length; i++) {
     yield put({

@@ -1,15 +1,21 @@
 import { Video } from '../../types/Video';
 import { Album } from '../../types/Album';
 import { ActionRequest } from '../types';
+import { PhotoAction } from '../photo/types';
 
-export const START_VIDEOS_FETCHED = 'START_VIDEOS_FETCHED';
-export const VIDEOS_FETCHED = 'VIDEOS_FETCHED';
-export const VIDEOS_SELECTED = 'VIDEOS_SELECTED';
-export const VIDEOS_SELECTED_NEXT = 'VIDEOS_SELECTED_NEXT';
-export const VIDEOS_SELECTED_PREVIOUS = 'VIDEOS_SELECTED_PREVIOUS';
-export const NEW_ALBUM_VIDEO_SELECTED = 'NEW_ALBUM_VIDEO_SELECTED';
-export const INIT_VIDEOS_STATE = 'INIT_VIDEOS_STATE';
-export const SELECT_VIDEO_FOR_READING = 'SELECT_VIDEO_FOR_READING';
+export enum VideoAction {
+  START_VIDEOS_FETCHED = 'START_VIDEOS_FETCHED',
+  VIDEOS_FETCHED = 'VIDEOS_FETCHED',
+  VIDEOS_SELECTED = 'VIDEOS_SELECTED',
+  VIDEOS_SELECTED_NEXT = 'VIDEOS_SELECTED_NEXT',
+  VIDEOS_SELECTED_PREVIOUS = 'VIDEOS_SELECTED_PREVIOUS',
+  NEW_ALBUM_VIDEO_SELECTED = 'NEW_ALBUM_VIDEO_SELECTED',
+  INIT_VIDEOS_STATE = 'INIT_VIDEOS_STATE',
+  SELECT_VIDEO_FOR_READING = 'SELECT_VIDEO_FOR_READING',
+
+  NEW_OR_UPDATE_VIDEO_FROM_SOCKET_SAGA = 'NEW_OR_UPDATE_VIDEO_FROM_SOCKET_SAGA',
+  ADD_VIDEO_TO_REDUCER = 'ADD_VIDEO_TO_REDUCER',
+}
 
 export interface VideosState {
   videos: Video[];
@@ -18,38 +24,48 @@ export interface VideosState {
 }
 
 export interface StartVideossFetchedAction extends ActionRequest {
-  type: typeof START_VIDEOS_FETCHED;
+  type: typeof VideoAction.START_VIDEOS_FETCHED;
 }
 
-interface VideosFetchedAction {
-  type: typeof VIDEOS_FETCHED;
+export interface VideosFetchedAction {
+  type: typeof VideoAction.VIDEOS_FETCHED;
   videos: VideosState;
 }
 
-interface SelectVideoAction {
-  type: typeof VIDEOS_SELECTED;
+export interface SelectVideoAction {
+  type: typeof VideoAction.VIDEOS_SELECTED;
   video: Video;
 }
 
-interface SelectNextVideoAction {
-  type: typeof VIDEOS_SELECTED_NEXT;
+export interface SelectNextVideoAction {
+  type: typeof VideoAction.VIDEOS_SELECTED_NEXT;
 }
 
-interface SelectPreviousVideoAction {
-  type: typeof VIDEOS_SELECTED_PREVIOUS;
+export interface SelectPreviousVideoAction {
+  type: typeof VideoAction.VIDEOS_SELECTED_PREVIOUS;
 }
 
-interface NewAlbumSelected {
-  type: typeof NEW_ALBUM_VIDEO_SELECTED;
+export interface NewAlbumSelected {
+  type: typeof VideoAction.NEW_ALBUM_VIDEO_SELECTED;
   albums: Album[];
 }
 
-interface InitStateAction {
-  type: typeof INIT_VIDEOS_STATE;
+export interface InitStateAction {
+  type: typeof VideoAction.INIT_VIDEOS_STATE;
 }
 
 export interface SelectVideoForReading {
-  type: typeof SELECT_VIDEO_FOR_READING;
+  type: typeof VideoAction.SELECT_VIDEO_FOR_READING;
+  video: Video;
+}
+
+export interface NewOrUpdateVideoFromSocketSagaAction {
+  type: typeof VideoAction.NEW_OR_UPDATE_VIDEO_FROM_SOCKET_SAGA;
+  videoId: string;
+}
+
+export interface AddVideoToReducerAction {
+  type: typeof VideoAction.ADD_VIDEO_TO_REDUCER;
   video: Video;
 }
 
@@ -61,4 +77,6 @@ export type VideoActionTypes =
   | SelectPreviousVideoAction
   | NewAlbumSelected
   | InitStateAction
-  | SelectVideoForReading;
+  | SelectVideoForReading
+  | NewOrUpdateVideoFromSocketSagaAction
+  | AddVideoToReducerAction;
