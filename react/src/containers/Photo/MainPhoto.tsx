@@ -26,10 +26,6 @@ interface MainPhotoProps {
 const MainPhoto: React.FC<MainPhotoProps> = props => {
   const history = useHistory();
 
-  if (props.photos.length === 0) {
-    return <></>;
-  }
-
   const selectPhotoHandler: (photo: Photo) => void = (photo: Photo) => {
     history.push(`${ROUTE_IMAGES}?albumId=${props.albumIdSelected}&photoId=${photo.id}`);
   };
@@ -61,6 +57,10 @@ const MainPhoto: React.FC<MainPhotoProps> = props => {
       },
     }),
   )();
+
+  if (props.photos.length === 0) {
+    return <></>;
+  }
 
   const imageWidth = 250;
   const imgStyle = {

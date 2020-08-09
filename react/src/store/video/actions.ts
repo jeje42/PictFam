@@ -1,21 +1,22 @@
 import {
-  VideosState,
-  START_VIDEOS_FETCHED,
-  VIDEOS_FETCHED,
-  VIDEOS_SELECTED,
-  VIDEOS_SELECTED_NEXT,
-  VIDEOS_SELECTED_PREVIOUS,
-  NEW_ALBUM_VIDEO_SELECTED,
-  StartVideossFetchedAction,
-  SELECT_VIDEO_FOR_READING,
+  AddVideoToReducerAction,
+  NewAlbumSelected,
+  NewOrUpdateVideoFromSocketSagaAction,
+  SelectNextVideoAction,
+  SelectPreviousVideoAction,
+  SelectVideoAction,
   SelectVideoForReading,
+  StartVideossFetchedAction,
+  VideoAction,
+  VideosFetchedAction,
+  VideosState,
 } from './types';
 import { Video } from '../../types/Video';
 import { Album } from '../../types/Album';
 
 export function startVideosFetched(): StartVideossFetchedAction {
   return {
-    type: START_VIDEOS_FETCHED,
+    type: VideoAction.START_VIDEOS_FETCHED,
     request: {
       method: 'get',
       url: '/photostree',
@@ -23,42 +24,52 @@ export function startVideosFetched(): StartVideossFetchedAction {
   };
 }
 
-export function videosFetched(newVideos: VideosState) {
+export const videosFetched = (newVideos: VideosState): VideosFetchedAction => {
   return {
-    type: VIDEOS_FETCHED,
+    type: VideoAction.VIDEOS_FETCHED,
     videos: newVideos,
   };
-}
+};
 
-export function selectVideo(video: Video) {
+export const selectVideo = (video: Video): SelectVideoAction => {
   return {
-    type: VIDEOS_SELECTED,
+    type: VideoAction.VIDEOS_SELECTED,
     video,
   };
-}
+};
 
-export function selectNextVideo() {
+export const selectNextVideo = (): SelectNextVideoAction => {
   return {
-    type: VIDEOS_SELECTED_NEXT,
+    type: VideoAction.VIDEOS_SELECTED_NEXT,
   };
-}
+};
 
-export function selectPreviousVideo() {
+export const selectPreviousVideo = (): SelectPreviousVideoAction => {
   return {
-    type: VIDEOS_SELECTED_PREVIOUS,
+    type: VideoAction.VIDEOS_SELECTED_PREVIOUS,
   };
-}
+};
 
-export function newAlbumSelected(albums: Album[]) {
+export const newAlbumSelected = (albums: Album[]): NewAlbumSelected => {
   return {
-    type: NEW_ALBUM_VIDEO_SELECTED,
+    type: VideoAction.NEW_ALBUM_VIDEO_SELECTED,
     albums: albums,
   };
-}
+};
 
-export function selectVideoForReading(video: Video): SelectVideoForReading {
+export const selectVideoForReading = (video: Video): SelectVideoForReading => {
   return {
-    type: SELECT_VIDEO_FOR_READING,
+    type: VideoAction.SELECT_VIDEO_FOR_READING,
     video: video,
   };
-}
+};
+
+export const newOrUpdateVideoFromSocketSagaAction = (videoId: string): NewOrUpdateVideoFromSocketSagaAction => ({
+  type: VideoAction.NEW_OR_UPDATE_VIDEO_FROM_SOCKET_SAGA,
+  videoId,
+});
+
+export const addVideoToReducerAction = (video: Video): AddVideoToReducerAction => ({
+  type: VideoAction.ADD_VIDEO_TO_REDUCER,
+  video,
+});

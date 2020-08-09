@@ -1,9 +1,18 @@
-import { InitStateAction, PLAYLIST_ACTION, PlaylistsFetchedAction, SelectPlaylistAction, SetPlaylist, StartPlaylistsFetchedAction } from './types';
+import {
+  InitStateAction,
+  PLAYLIST_ACTION,
+  PlaylistsFetchedAction,
+  RemovePlaylist,
+  SelectPlaylistAction,
+  SetPlaylist,
+  StartFetchAllPlaylistsAction,
+  StartFetchOnePlaylistsAction,
+} from './types';
 import { Playlist } from '../../types/Playlist';
 
-export function startPlaylistsFetch(): StartPlaylistsFetchedAction {
+export function startFetchAllPlaylists(): StartFetchAllPlaylistsAction {
   return {
-    type: PLAYLIST_ACTION.START_PLAYLIST_FETCHED,
+    type: PLAYLIST_ACTION.START_FETCH_ALL_PLAYLIST,
     request: {
       method: 'get',
       url: '/playlist',
@@ -11,7 +20,17 @@ export function startPlaylistsFetch(): StartPlaylistsFetchedAction {
   };
 }
 
-export function playlistsFetched(playlists: Playlist[]): PlaylistsFetchedAction {
+export function startFetchOnePlaylist(url: string): StartFetchOnePlaylistsAction {
+  return {
+    type: PLAYLIST_ACTION.START_FETCH_ONE_PLAYLIST,
+    request: {
+      method: 'get',
+      url,
+    },
+  };
+}
+
+export function playlistsFetch(playlists: Playlist[]): PlaylistsFetchedAction {
   return {
     type: PLAYLIST_ACTION.PLAYLIST_FETCHED,
     playlists,
@@ -22,6 +41,13 @@ export function setPlaylist(playlist: Playlist): SetPlaylist {
   return {
     type: PLAYLIST_ACTION.SET_PLAYLIST,
     playlist,
+  };
+}
+
+export function removePlaylist(playlistId: string): RemovePlaylist {
+  return {
+    type: PLAYLIST_ACTION.REMOVE_PLAYLIST,
+    playlistId,
   };
 }
 

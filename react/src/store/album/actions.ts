@@ -1,63 +1,25 @@
-import {
-  ALBUM_IMAGE_FETCHED,
-  ALBUM_IMAGE_SELECTED,
-  ALBUM_VIDEO_FETCHED,
-  ALBUM_VIDEO_SELECTED,
-  AlbumImageFetchedAction,
-  AlbumVideoFetchedAction,
-  SelectAlbumImageAction,
-  SelectAlbumVideoAction,
-  START_ALBUM_IMAGE_FETCHED,
-  START_ALBUM_VIDEO_FETCHED,
-  StartFetchAlbumsImageAction,
-  StartFetchAlbumsVideoAction,
-} from './types';
+import { AddAlbumToReducer, AlbumAction, AlbumMediaType, FetchAlbumsFromRootSagaAction, NewAlbumFromSocketSagaAction, SelectAlbumAction } from './types';
 import { Album } from '../../types/Album';
 
-export function startFetchAlbumsImage(): StartFetchAlbumsImageAction {
-  return {
-    type: START_ALBUM_IMAGE_FETCHED,
-    request: {
-      method: 'get',
-      url: '/albumstree',
-    },
-  };
-}
+export const selectAlbum = (albumId: number, albumMediaType: AlbumMediaType): SelectAlbumAction => ({
+  type: AlbumAction.SELECT_ALBUM,
+  albumId,
+  albumMediaType,
+});
 
-export function albumsImageFetch(newAlbums: Album[]): AlbumImageFetchedAction {
-  return {
-    type: ALBUM_IMAGE_FETCHED,
-    albums: newAlbums,
-  };
-}
+export const fetchAlbumsFromRootSagaAction = (albumMediaType: AlbumMediaType): FetchAlbumsFromRootSagaAction => ({
+  type: AlbumAction.FETCH_ALBUMS_FROM_ROOT_SAGA,
+  albumMediaType,
+});
 
-export function selectAlbumImage(albumId: number): SelectAlbumImageAction {
-  return {
-    type: ALBUM_IMAGE_SELECTED,
-    albumId,
-  };
-}
+export const addAlbumToReducer = (album: Album, albumMediaType: AlbumMediaType, parentId?: number): AddAlbumToReducer => ({
+  type: AlbumAction.ADD_ALBUM_TO_REDUCER,
+  album,
+  parentId,
+  albumMediaType,
+});
 
-export function startFetchAlbumsVideo(): StartFetchAlbumsVideoAction {
-  return {
-    type: START_ALBUM_VIDEO_FETCHED,
-    request: {
-      method: 'get',
-      url: '/albumstree',
-    },
-  };
-}
-
-export function albumsVideoFetch(newAlbums: Album[]): AlbumVideoFetchedAction {
-  return {
-    type: ALBUM_VIDEO_FETCHED,
-    albums: newAlbums,
-  };
-}
-
-export function selectAlbumVideo(albumId: number): SelectAlbumVideoAction {
-  return {
-    type: ALBUM_VIDEO_SELECTED,
-    albumId,
-  };
-}
+export const newAlbumFromSocketSagaAction = (albumId: string): NewAlbumFromSocketSagaAction => ({
+  type: AlbumAction.NEW_ALBUM_FROM_SOCKET_SAGA,
+  albumId,
+});

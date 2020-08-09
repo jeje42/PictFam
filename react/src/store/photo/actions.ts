@@ -1,19 +1,10 @@
-import {
-  PhotosState,
-  START_PHOTOS_FETCHED,
-  PHOTOS_FETCHED,
-  PHOTOS_SELECTED,
-  PHOTOS_SELECTED_NEXT,
-  PHOTOS_SELECTED_PREVIOUS,
-  NEW_ALBUM_SELECTED,
-  StartPhotosFetchedAction,
-} from './types';
+import { AddPhotoToReducerAction, NewOrUpdatePhotoFromSocketSagaAction, PhotoAction, PhotosState, StartPhotosFetchedAction } from './types';
 import { Photo } from '../../types/Photo';
 import { Album } from '../../types/Album';
 
 export function startPhotosFetched(): StartPhotosFetchedAction {
   return {
-    type: START_PHOTOS_FETCHED,
+    type: PhotoAction.START_PHOTOS_FETCHED,
     request: {
       method: 'get',
       url: '/photostree',
@@ -23,33 +14,43 @@ export function startPhotosFetched(): StartPhotosFetchedAction {
 
 export function photosFetched(newPhotos: PhotosState) {
   return {
-    type: PHOTOS_FETCHED,
+    type: PhotoAction.PHOTOS_FETCHED,
     photos: newPhotos,
   };
 }
 
 export function selectPhoto(photo?: Photo) {
   return {
-    type: PHOTOS_SELECTED,
+    type: PhotoAction.PHOTOS_SELECTED,
     photo,
   };
 }
 
 export function selectNextPhoto() {
   return {
-    type: PHOTOS_SELECTED_NEXT,
+    type: PhotoAction.PHOTOS_SELECTED_NEXT,
   };
 }
 
 export function selectPreviousPhoto() {
   return {
-    type: PHOTOS_SELECTED_PREVIOUS,
+    type: PhotoAction.PHOTOS_SELECTED_PREVIOUS,
   };
 }
 
 export function newAlbumSelected(albums: Album[]) {
   return {
-    type: NEW_ALBUM_SELECTED,
+    type: PhotoAction.NEW_ALBUM_SELECTED,
     albums: albums,
   };
 }
+
+export const newOrUpdatePhotoFromSocketSagaAction = (photoId: string): NewOrUpdatePhotoFromSocketSagaAction => ({
+  type: PhotoAction.NEW_OR_UPDATE_PHOTO_FROM_SOCKET_SAGA,
+  photoId,
+});
+
+export const addPhotoToReducerAction = (photo: Photo): AddPhotoToReducerAction => ({
+  type: PhotoAction.ADD_PHOTO_TO_REDUCER,
+  photo,
+});

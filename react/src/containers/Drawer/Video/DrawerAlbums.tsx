@@ -5,7 +5,6 @@ import List from '@material-ui/core/List';
 import { withSize } from 'react-sizeme';
 import { AppState } from '../../../store';
 import { Album } from '../../../types/Album';
-import { selectAlbumVideo } from '../../../store/album/actions';
 import { newAlbumSelected } from '../../../store/video/actions';
 import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
@@ -24,7 +23,6 @@ import { selectPlaylist } from '../../../store/playlist/actions';
 interface DrawerAlbumsProps {
   albums: Album[];
   playlists: Playlist[];
-  selectAlbumVideo: typeof selectAlbumVideo;
   newAlbumSelected: typeof newAlbumSelected;
   drawerWidthChanged: typeof drawerWidthChanged;
   selectPlaylist: typeof selectPlaylist;
@@ -39,7 +37,7 @@ const recursBuildListAlbums = (album: Album, finalList: Album[]) => {
   }
 };
 
-const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
+const DrawerAlbums: React.FC<DrawerAlbumsProps> = ({ albums, playlists, albumIdSelected, size, drawerWidthChanged }) => {
   const [albumListDisplayed, setAlbumListDisplayed] = useState<Album[]>([]);
   const [albumsDeployed, setAlbumsDeployed] = useState<boolean>(false);
   const [playlistsDeployed, setPlaylistsDeployed] = useState<boolean>(false);
@@ -47,36 +45,36 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   const history = useHistory();
 
   useEffect(() => {
-    props.drawerWidthChanged(Math.trunc(props.size.width));
-  }, [props, props.size.width]);
+    drawerWidthChanged(Math.trunc(size.width));
+  }, [size.width, drawerWidthChanged]);
 
   useEffect(() => {
-    if (props.albums) {
+    if (albums) {
       const listAlbumsNew: Album[] = [];
 
-      props.albums.forEach(alb => listAlbumsNew.push(alb));
-      props.albums.forEach(alb => recursBuildListAlbums(alb, listAlbumsNew));
+      albums.forEach(alb => listAlbumsNew.push(alb));
+      albums.forEach(alb => recursBuildListAlbums(alb, listAlbumsNew));
       setAlbumListDisplayed(listAlbumsNew);
     }
-  }, [props.albums]);
+  }, [albums]);
 
   const handleListAlbumClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, album: Album) => {
     history.push(`${ROUTE_VIDEOS}?albumId=${album.id}`);
   };
 
   let listAlbums;
-  if (props.albums.length > 0) {
+  if (albums.length > 0) {
     listAlbums = (
       <List>
         {albumListDisplayed.map(album => {
-          return <DrawerLeaf key={album.id} album={album} nested={true} albumIdSelected={props.albumIdSelected} handleListAlbumClick={handleListAlbumClick} />;
+          return <DrawerLeaf key={album.id} album={album} nested={true} albumIdSelected={albumIdSelected} handleListAlbumClick={handleListAlbumClick} />;
         })}
       </List>
     );
   }
 
   let alertNoAlbum;
-  if (!props.albums || props.albums.length === 0) {
+  if (!albums || albums.length === 0) {
     alertNoAlbum = <Alert severity='error'>No albums available</Alert>;
   }
 
@@ -91,10 +89,10 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   let listPlaylist;
   let alertNoPlaylist;
   if (playlistsDeployed) {
-    if (props.playlists.length === 0) {
+    if (playlists.length === 0) {
       alertNoPlaylist = <Alert severity='error'>No playlist available</Alert>;
     } else {
-      listPlaylist = props.playlists.map(playlist => (
+      listPlaylist = playlists.map(playlist => (
         <ListItem key={playlist.id} button selected={playlist.selected} onClick={() => history.push(`${ROUTE_VIDEOS}?playlistId=${playlist.id}`)}>
           <ListItemText primary={playlist.name} />
         </ListItem>
@@ -137,9 +135,9 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
 };
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.albumsVideo,
+  albums: state.albums.videoAlbumsTree,
   albumIdSelected: state.albums.albumVideoIdSelected,
   playlists: state.playlists.playlists,
 });
 
-export default withSize()(connect(mapStateToProps, { selectAlbumVideo, newAlbumSelected, drawerWidthChanged, selectPlaylist })(DrawerAlbums));
+export default withSize()(connect(mapStateToProps, { newAlbumSelected, drawerWidthChanged, selectPlaylist })(DrawerAlbums));

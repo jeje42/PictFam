@@ -7,7 +7,6 @@ import { useHistory } from 'react-router-dom';
 
 import { AppState } from '../../../store';
 import { Album } from '../../../types/Album';
-import { selectAlbumImage } from '../../../store/album/actions';
 import { newAlbumSelected } from '../../../store/photo/actions';
 import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
@@ -19,7 +18,6 @@ import { isSonSelectedRecurs } from '../../../store/album/utils';
 
 interface DrawerAlbumsProps {
   albums: Album[];
-  selectAlbumImage: typeof selectAlbumImage;
   newAlbumSelected: typeof newAlbumSelected;
   drawerWidthChanged: typeof drawerWidthChanged;
   albumIdSelected: number;
@@ -27,8 +25,7 @@ interface DrawerAlbumsProps {
 }
 
 const recursAlbumOpen = (album: Album, finalObject: AlbumsHash, albumIdSelected: number) => {
-  const isOneOfSonsSelected = isSonSelectedRecurs(album.sons, albumIdSelected);
-  finalObject[album.id] = isOneOfSonsSelected;
+  finalObject[album.id] = isSonSelectedRecurs(album.sons, albumIdSelected);
   album.sons.forEach(son => {
     recursAlbumOpen(son, finalObject, albumIdSelected);
   });
@@ -98,8 +95,8 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
 };
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.albumsImage,
+  albums: state.albums.imageAlbumsTree,
   albumIdSelected: state.albums.albumImageIdSelected,
 });
 
-export default withSize()(connect(mapStateToProps, { selectAlbumImage, newAlbumSelected, drawerWidthChanged })(DrawerAlbums));
+export default withSize()(connect(mapStateToProps, { newAlbumSelected, drawerWidthChanged })(DrawerAlbums));

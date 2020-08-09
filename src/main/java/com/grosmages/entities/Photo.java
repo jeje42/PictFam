@@ -2,6 +2,7 @@ package com.grosmages.entities;
 
 import javax.persistence.*;
 
+import com.grosmages.event.PhotoListener;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
@@ -18,5 +19,6 @@ import lombok.NoArgsConstructor;
 @Component
 @Entity(name = "Photo")
 @Scope("prototype")
+@EntityListeners(PhotoListener.class)
 public class Photo extends MutlimediaAbstract {
 }

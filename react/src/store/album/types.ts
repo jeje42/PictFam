@@ -1,58 +1,66 @@
 import { Album } from '../../types/Album';
-import { ActionRequest } from '../types';
 
-export const START_ALBUM_IMAGE_FETCHED = 'START_ALBUM_IMAGE_FETCHED';
-export const ALBUM_IMAGE_FETCHED = 'ALBUM_IMAGE_FETCHED';
-export const ALBUM_IMAGE_SELECTED = 'ALBUM_IMAGE_SELECTED';
-export const START_ALBUM_VIDEO_FETCHED = 'START_ALBUM_VIDEO_FETCHED';
-export const ALBUM_VIDEO_FETCHED = 'ALBUM_VIDEO_FETCHED';
-export const ALBUM_VIDEO_SELECTED = 'ALBUM_VIDEO_SELECTED';
-export const INIT_ALBUMSTATE = 'INIT_ALBUMSTATE';
+export enum AlbumAction {
+  INIT_ALBUMSTATE = 'INIT_ALBUMSTATE',
+  ADD_ALBUM_TO_REDUCER = 'ADD_ALBUM_TO_REDUCER',
+  UPDATE_ALBUM_TO_REDUCER = 'UPDATE_ALBUM_TO_REDUCER',
+  SELECT_ALBUM = 'SELECT_ALBUM',
+
+  FETCH_ALBUMS_FROM_ROOT_SAGA = 'FETCH_ALBUMS_FROM_ROOT_SAGA',
+  NEW_ALBUM_FROM_SOCKET_SAGA = 'NEW_ALBUM_FROM_SOCKET_SAGA',
+}
+
+export enum AlbumMediaType {
+  Image,
+  Video,
+}
 
 export interface AlbumState {
-  albumsImage: Album[];
+  imageAlbumsTree: Album[];
+  imageAlbumsRecord: Record<number, Album>;
   albumImageIdSelected: number;
-  albumsVideo: Album[];
+  videoAlbumsTree: Album[];
+  videoAlbumsRecord: Record<number, Album>;
   albumVideoIdSelected: number;
 }
 
-export interface StartFetchAlbumsImageAction extends ActionRequest {
-  type: typeof START_ALBUM_IMAGE_FETCHED;
+export interface FetchAlbumsFromRootSagaAction {
+  type: typeof AlbumAction.FETCH_ALBUMS_FROM_ROOT_SAGA;
+  albumMediaType: AlbumMediaType;
 }
 
-export interface AlbumImageFetchedAction {
-  type: typeof ALBUM_IMAGE_FETCHED;
-  albums: Album[];
+export interface NewAlbumFromSocketSagaAction {
+  type: typeof AlbumAction.NEW_ALBUM_FROM_SOCKET_SAGA;
+  albumId: string;
 }
 
-export interface SelectAlbumImageAction {
-  type: typeof ALBUM_IMAGE_SELECTED;
+export interface SelectAlbumAction {
+  type: typeof AlbumAction.SELECT_ALBUM;
   albumId: number;
+  albumMediaType: AlbumMediaType;
 }
 
-export interface StartFetchAlbumsVideoAction extends ActionRequest {
-  type: typeof START_ALBUM_VIDEO_FETCHED;
+export interface AddAlbumToReducer {
+  type: typeof AlbumAction.ADD_ALBUM_TO_REDUCER;
+  albumMediaType: AlbumMediaType;
+  album: Album;
+  parentId?: number;
 }
 
-export interface AlbumVideoFetchedAction {
-  type: typeof ALBUM_VIDEO_FETCHED;
-  albums: Album[];
-}
-
-export interface SelectAlbumVideoAction {
-  type: typeof ALBUM_VIDEO_SELECTED;
-  albumId: number;
+export interface UpdateAlbumToReducer {
+  type: typeof AlbumAction.UPDATE_ALBUM_TO_REDUCER;
+  albumMediaType: AlbumMediaType;
+  album: Album;
 }
 
 export interface InitAlbumStateAction {
-  type: typeof INIT_ALBUMSTATE;
+  type: typeof AlbumAction.INIT_ALBUMSTATE;
 }
 
 export type AlbumActionTypes =
-  | StartFetchAlbumsImageAction
-  | AlbumImageFetchedAction
-  | SelectAlbumImageAction
+  | FetchAlbumsFromRootSagaAction
+  | SelectAlbumAction
   | InitAlbumStateAction
-  | StartFetchAlbumsVideoAction
-  | AlbumVideoFetchedAction
-  | SelectAlbumVideoAction;
+  | AddAlbumToReducer
+  | NewAlbumFromSocketSagaAction
+  | UpdateAlbumToReducer;

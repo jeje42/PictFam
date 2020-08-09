@@ -1,13 +1,4 @@
-import {
-  PhotosState,
-  PhotoActionTypes,
-  PHOTOS_FETCHED,
-  PHOTOS_SELECTED,
-  PHOTOS_SELECTED_NEXT,
-  PHOTOS_SELECTED_PREVIOUS,
-  NEW_ALBUM_SELECTED,
-  INIT_PHOTOS_STATE,
-} from './types';
+import { PhotoAction, PhotoActionTypes, PhotosState } from './types';
 import { Photo } from '../../types/Photo';
 import { Album } from '../../types/Album';
 
@@ -62,22 +53,47 @@ const newAlbumSelected = (state: PhotosState, albums: Album[]) => {
   };
 };
 
+const addPhotoToReducer = (state: PhotosState, photo: Photo): PhotosState => {
+  let updated = false;
+  const newState: PhotosState = {
+    ...state,
+    photos: state.photos.map(p => {
+      if (p.id === photo.id) {
+        updated = true;
+        return photo;
+      }
+      return p;
+    }),
+  };
+
+  if (updated) {
+    return newState;
+  }
+
+  return {
+    ...state,
+    photos: [...state.photos, ...[photo]],
+  };
+};
+
 export function photosReducer(state = initialState, action: PhotoActionTypes): PhotosState {
   switch (action.type) {
-    case PHOTOS_FETCHED:
+    case PhotoAction.PHOTOS_FETCHED:
       return {
         ...state,
         ...action.photos,
       };
-    case PHOTOS_SELECTED:
+    case PhotoAction.PHOTOS_SELECTED:
       return photoSelected(state, action.photo);
-    case PHOTOS_SELECTED_NEXT:
+    case PhotoAction.PHOTOS_SELECTED_NEXT:
       return selectedNextPhoto(state);
-    case PHOTOS_SELECTED_PREVIOUS:
+    case PhotoAction.PHOTOS_SELECTED_PREVIOUS:
       return selectedPreviousPhoto(state);
-    case NEW_ALBUM_SELECTED:
+    case PhotoAction.NEW_ALBUM_SELECTED:
       return newAlbumSelected(state, action.albums);
-    case INIT_PHOTOS_STATE:
+    case PhotoAction.ADD_PHOTO_TO_REDUCER:
+      return addPhotoToReducer(state, action.photo);
+    case PhotoAction.INIT_PHOTOS_STATE:
       return initialState;
     default:
       return state;

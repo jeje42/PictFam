@@ -3,45 +3,40 @@ package com.grosmages.entities;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
+import com.grosmages.event.AlbumListener;
+import lombok.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @Component
 @Entity
 @Scope("prototype")
+@EntityListeners(AlbumListener.class)
 public class Album {
 	private @Id @GeneratedValue Long id;
-	private String name;
+	String name;
 	
 	@JsonIgnore
-	private String path;
-	
-	private Boolean isRoot;
+	String path;
 	
 	@JsonIgnore
 	@OneToOne(cascade = CascadeType.ALL)
-	private Rights rights;
-	
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<Album> sons;
+	Rights rights;
 
-	private boolean isForPhoto;
-    private boolean isForVideo;
+	@ManyToOne
+    Album father;
+	
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "father")
+	Set<Album> sons;
+
+	Boolean forPhoto;
+    Boolean forVideo;
 	
 	@Override
     public boolean equals(Object obj) {
@@ -58,11 +53,11 @@ public class Album {
             return false;
         }
 
-        if (this.isForPhoto != other.isForPhoto) {
+        if (this.forPhoto != other.forPhoto) {
             return false;
         }
 
-        if (this.isForVideo != other.isForVideo) {
+        if (this.forVideo != other.forVideo) {
             return false;
         }
 

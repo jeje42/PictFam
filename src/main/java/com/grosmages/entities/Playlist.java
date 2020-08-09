@@ -1,6 +1,7 @@
 package com.grosmages.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.grosmages.event.PlaylistListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -14,6 +15,7 @@ import java.util.*;
 @Component
 @Entity
 @Scope("prototype")
+@EntityListeners(PlaylistListener.class)
 public class Playlist {
     private @Id
     @GeneratedValue

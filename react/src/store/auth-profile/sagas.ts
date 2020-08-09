@@ -1,19 +1,18 @@
-import { call, put, takeEvery, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeEvery, takeLatest } from 'redux-saga/effects';
 import { AuthActionTypes, DONE_LOGIN, FETCH_ACTION, LOGOUT, SET_LOGIN_HAS_FAILED, SET_USER_DETAILS, START_LOGIN, START_SCAN } from './types';
 import { AxiosRequestConfig } from 'axios';
-import { INIT_ALBUMSTATE } from '../album/types';
-import { INIT_PHOTOS_STATE } from '../photo/types';
 import { INIT_DRAWERSTATE } from '../drawer/types';
 import { getRequest, postRequest } from '../../utils/axiosUtils';
-import { select } from 'redux-saga/effects';
 import { AppState } from '../index';
 import { Module } from '../app/types';
 import { startPhotosFetched } from '../photo/actions';
-import { startFetchAlbumsImage, startFetchAlbumsVideo } from '../album/actions';
+import { fetchAlbumsFromRootSagaAction } from '../album';
 import { startVideosFetched } from '../video/actions';
-import { startPlaylistsFetch } from '../playlist/actions';
+import { startFetchAllPlaylists } from '../playlist/actions';
 import { PLAYLIST_ACTION } from '../playlist/types';
-import { INIT_VIDEOS_STATE } from '../video/types';
+import { AlbumAction, AlbumMediaType } from '../album/types';
+import { PhotoAction } from '../photo/types';
+import { VideoAction } from '../video/types';
 
 interface Response {
   data: {
@@ -107,16 +106,16 @@ function* startFetchSaga() {
   if (state.auth.isAuthenticated) {
     switch (state.app.module) {
       case Module.Image:
-        if (state.albums.albumsImage.length === 0) {
+        if (state.albums.imageAlbumsTree.length === 0) {
           yield put(startPhotosFetched());
-          yield put(startFetchAlbumsImage());
+          yield put(fetchAlbumsFromRootSagaAction(AlbumMediaType.Image));
         }
         break;
       case Module.Video:
-        if (state.albums.albumsVideo.length === 0) {
-          yield put(startFetchAlbumsVideo());
+        if (state.albums.videoAlbumsTree.length === 0) {
+          yield put(fetchAlbumsFromRootSagaAction(AlbumMediaType.Video));
           yield put(startVideosFetched());
-          yield put(startPlaylistsFetch());
+          yield put(startFetchAllPlaylists());
         }
         break;
     }
@@ -124,7 +123,13 @@ function* startFetchSaga() {
 }
 
 function* logoutSaga() {
-  const states = [INIT_ALBUMSTATE, INIT_PHOTOS_STATE, INIT_DRAWERSTATE, PLAYLIST_ACTION.INIT_PLAYLIST_STATE, INIT_VIDEOS_STATE];
+  const states = [
+    AlbumAction.INIT_ALBUMSTATE,
+    PhotoAction.INIT_PHOTOS_STATE,
+    INIT_DRAWERSTATE,
+    PLAYLIST_ACTION.INIT_PLAYLIST_STATE,
+    VideoAction.INIT_VIDEOS_STATE,
+  ];
 
   for (let i = 0; i < states.length; i++) {
     yield put({
@@ -133,18 +138,18 @@ function* logoutSaga() {
   }
 }
 
-export function* watchTryLogin() {
+export function* watchTryLogin(): Generator {
   yield takeLatest(START_LOGIN, tryToLoginSaga);
 }
 
-export function* watchStartScan() {
+export function* watchStartScan(): Generator {
   yield takeEvery(START_SCAN, startScanSaga);
 }
 
-export function* watchLogout() {
+export function* watchLogout(): Generator {
   yield takeEvery(LOGOUT, logoutSaga);
 }
 
-export function* watchFetchAll() {
+export function* watchFetchAll(): Generator {
   yield takeEvery(FETCH_ACTION, startFetchSaga);
 }

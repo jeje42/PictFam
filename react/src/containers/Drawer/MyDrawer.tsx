@@ -18,7 +18,6 @@ import { withSize } from 'react-sizeme';
 import { connect } from 'react-redux';
 import { selectPhoto, startPhotosFetched } from '../../store/photo/actions';
 import { startVideosFetched } from '../../store/video/actions';
-import { startFetchAlbumsImage } from '../../store/album/actions';
 import { toggleDrawer } from '../../store/drawer/actions';
 import { logoutAction, startScanAction } from '../../store/auth-profile/actions';
 import { changeModule } from '../../store/app/actions';
@@ -214,7 +213,6 @@ export default withSize({ monitorHeight: true })(
     startPhotosFetched,
     startVideosFetched,
     selectPhoto,
-    startFetchAlbumsImage,
     toggleDrawer,
     startScanAction,
     logoutAction,

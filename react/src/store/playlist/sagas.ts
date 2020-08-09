@@ -4,13 +4,14 @@ import { getRequest } from '../../utils/axiosUtils';
 import { PLAYLIST_ACTION, PlaylistActionTypes, PlaylistFetched, PlaylistVideosFetched } from './types';
 import { Playlist } from '../../types/Playlist';
 import { Album } from '../../types/Album';
+import { playlistsFetch } from './actions';
 
 interface Response {
-  data: PlaylistFetched[];
+  data: PlaylistFetched[] | PlaylistFetched;
 }
 
-function* tryToFetchPlaylists(action: PlaylistActionTypes) {
-  if (action.type !== PLAYLIST_ACTION.START_PLAYLIST_FETCHED) {
+function* tryToFetchPlaylist(action: PlaylistActionTypes) {
+  if (action.type !== PLAYLIST_ACTION.START_FETCH_ALL_PLAYLIST && action.type !== PLAYLIST_ACTION.START_FETCH_ONE_PLAYLIST) {
     return;
   }
 
@@ -20,7 +21,10 @@ function* tryToFetchPlaylists(action: PlaylistActionTypes) {
 
   const response: Response = yield call(getRequest, options);
 
-  const playlists: Playlist[] = response.data.map((value: PlaylistFetched) => {
+  const playListDataToList: PlaylistFetched[] =
+    action.type === PLAYLIST_ACTION.START_FETCH_ALL_PLAYLIST ? (response.data as PlaylistFetched[]) : [response.data as PlaylistFetched];
+
+  const playlists: Playlist[] = playListDataToList.map((value: PlaylistFetched) => {
     const sortedPlaylistVideos = value.playlistVideos.sort((a: PlaylistVideosFetched, b: PlaylistVideosFetched) => a.position - b.position);
 
     return {
@@ -36,12 +40,13 @@ function* tryToFetchPlaylists(action: PlaylistActionTypes) {
     };
   });
 
-  yield put({
-    type: PLAYLIST_ACTION.PLAYLIST_FETCHED,
-    playlists,
-  });
+  yield put(playlistsFetch(playlists));
 }
 
-export function* watchTryFetchPlaylists() {
-  yield takeLatest(PLAYLIST_ACTION.START_PLAYLIST_FETCHED, tryToFetchPlaylists);
+export function* watchTryFetchAllPlaylists(): Generator {
+  yield takeLatest(PLAYLIST_ACTION.START_FETCH_ALL_PLAYLIST, tryToFetchPlaylist);
+}
+
+export function* watchTryFetchOnePlaylists(): Generator {
+  yield takeLatest(PLAYLIST_ACTION.START_FETCH_ONE_PLAYLIST, tryToFetchPlaylist);
 }

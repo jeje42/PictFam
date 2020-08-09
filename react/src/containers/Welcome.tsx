@@ -6,15 +6,12 @@ import { withSize } from 'react-sizeme';
 import { AppState } from '../store';
 import { startPhotosFetched } from '../store/photo/actions';
 import { startVideosFetched } from '../store/video/actions';
-import { startFetchAlbumsImage, startFetchAlbumsVideo } from '../store/album/actions';
 import CheckTokenValidComponent from './CheckTokenValidComponent';
 import MyBackdrop from './MyBackdrop';
 import MyDrawer from './Drawer/MyDrawer';
 
 interface WelcomeProps {
   startVideosFetched: typeof startVideosFetched;
-
-  startFetchAlbumsVideo: typeof startFetchAlbumsVideo;
   mainElem: React.ReactNode;
   toolbarElem: React.ReactNode;
 }
@@ -65,6 +62,4 @@ const mapStateToProps = (state: AppState) => ({
   token: state.auth.token,
 });
 
-export default withSize({ monitorHeight: true })(
-  connect(mapStateToProps, { startPhotosFetched, startVideosFetched, startFetchAlbumsImage, startFetchAlbumsVideo })(Welcome),
-);
+export default withSize({ monitorHeight: true })(connect(mapStateToProps, { startPhotosFetched, startVideosFetched })(Welcome));
