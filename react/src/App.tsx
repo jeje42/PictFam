@@ -11,6 +11,7 @@ import { Module } from './store/app/types';
 import { Album } from './types/Album';
 import { fetchAllAction } from './store/auth-profile/actions';
 import { SocketHoc } from './WebSockets';
+import { MyConnectedSnackbar } from './containers/Feedback';
 
 interface AppProps {
   isAuthenticated: boolean;
@@ -49,6 +50,7 @@ const App: React.FC<AppProps> = ({ currentModule, albumsImage, videoAlbums, fetc
   return (
     <>
       <SocketHoc />
+      <MyConnectedSnackbar />
       <Router>
         <Switch>
           <Route path='/login'>

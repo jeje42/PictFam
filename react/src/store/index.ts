@@ -16,6 +16,7 @@ import { watchNewOrUpdatePhoto, watchTryFetchPhotos } from './photo/sagas';
 import { watchNewOrUpdateVideo, watchTryFetchVideos } from './video/sagas';
 import { ActionRequest } from './types';
 import { watchTryFetchAllPlaylists, watchTryFetchOnePlaylists } from './playlist/sagas';
+import { feedbackReducer } from './feedback';
 
 const rootReducer = combineReducers({
   photos: photosReducer,
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   drawer: drawerReducer,
   auth: authReducer,
   app: appReducer,
+  feedback: feedbackReducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;

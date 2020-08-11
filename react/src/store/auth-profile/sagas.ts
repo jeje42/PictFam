@@ -13,6 +13,7 @@ import { PLAYLIST_ACTION } from '../playlist/types';
 import { AlbumAction, AlbumMediaType } from '../album/types';
 import { PhotoAction } from '../photo/types';
 import { VideoAction } from '../video/types';
+import { pushMessageAction } from '../feedback';
 
 interface Response {
   data: {
@@ -94,9 +95,9 @@ function* startScanSaga(action: AuthActionTypes) {
   });
 
   if (response.status === 200) {
-    alert('Scan has begun!');
+    yield put(pushMessageAction({ message: 'Scan has begun!', severity: 'success' }));
   } else {
-    alert('Problem! Scan not started!');
+    yield put(pushMessageAction({ message: 'Problem! Scan not started!', severity: 'error' }));
   }
 }
 
