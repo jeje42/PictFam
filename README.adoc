@@ -11,8 +11,3 @@ CREATE DATABASE pictfam;
 CREATE USER 'pictfam' IDENTIFIED BY 'pictfam';
 GRANT ALL ON pictfam.* TO pictfam;
 FLUSH PRIVILEGES;
-
-
-MysqlPictfam
-pour root user: MysqlPictFam42Prod
-pour pictfam user: MysqlPictFam42User
