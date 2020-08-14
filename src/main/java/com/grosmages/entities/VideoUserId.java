@@ -10,10 +10,10 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @Embeddable
-public class PlaylistVideoId implements java.io.Serializable {
+public class VideoUserId implements java.io.Serializable {
 
     @ManyToOne
-    private Playlist playlist;
+    private User user;
 
     @ManyToOne
     private Video video;
@@ -22,9 +22,9 @@ public class PlaylistVideoId implements java.io.Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PlaylistVideoId that = (PlaylistVideoId) o;
+        VideoUserId that = (VideoUserId) o;
 
-        if (!Objects.equals(playlist, that.playlist)) return false;
+        if (!Objects.equals(user, that.user)) return false;
         if (!Objects.equals(video, that.video))
             return false;
 
@@ -33,7 +33,7 @@ public class PlaylistVideoId implements java.io.Serializable {
 
     public int hashCode() {
         int result;
-        result = (playlist != null ? playlist.hashCode() : 0);
+        result = (user != null ? user.hashCode() : 0);
         result = 31 * result + (video != null ? video.hashCode() : 0);
         return result;
     }
