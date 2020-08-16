@@ -77,7 +77,7 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
     if (albumId) {
       selectVideosLogic();
     }
-  }, [albumId, videoAlbumsRecord, videoParentAlbumsRecord, selectAlbum, newVideoAlbumSelected]);
+  }, [albumId, videoAlbumsRecord, videoParentAlbumsRecord, videos, selectAlbum, newVideoAlbumSelected]); //keep videos in the array, it is necessary to update the album reducer if videos change
 
   useEffect(() => {
     const videoModuleLogic = () => {

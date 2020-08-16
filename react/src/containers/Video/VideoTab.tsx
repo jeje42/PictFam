@@ -31,8 +31,8 @@ interface VideoTabProps {
 }
 
 const VideoTab: React.FC<VideoTabProps> = props => {
-  const { height, videoAlbumsRecord, playlists } = props;
-  const [videoModuleState, setVideoModuleState] = useState<VideoModule>(props.videoModule);
+  const { albumId, height, videoAlbumsRecord, playlists, videos, videoModule, token, videoReading } = props;
+  const [videoModuleState, setVideoModuleState] = useState<VideoModule>(videoModule);
   const [videoModalAddToPlaylist, setVideoModalAddToPlaylist] = useState<Video[] | undefined>();
   const [selectMode, setSelectMode] = useState<boolean>(false);
   const [selectModeVideoIndexes, setSelectModeVideoIndexes] = useState<number[]>([]);
@@ -51,19 +51,19 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   const playlistSelected = playlists.find(playlist => playlist.selected);
 
   useEffect(() => {
-    setVideoModuleState(props.videoModule);
+    setVideoModuleState(videoModule);
 
-    if (VideoModule.Video === props.videoModule) {
-      setVideosDisplayed(props.videos);
-    } else if (VideoModule.Playlist === props.videoModule && playlistSelected) {
+    if (VideoModule.Video === videoModule) {
+      setVideosDisplayed(videos);
+    } else if (VideoModule.Playlist === videoModule && playlistSelected) {
       setVideosDisplayed(playlistSelected.videos);
     }
-  }, [props.videoModule, playlistSelected, props.videos]);
+  }, [videoModule, playlistSelected, videos]);
 
   useEffect(() => {
     setSelectMode(false);
     setSelectModeVideoIndexes([]);
-  }, [props.videoModule, props.albumId, playlistSelected]);
+  }, [videoModule, albumId, playlistSelected]);
 
   let albumOrPlaylistId: string;
   let dialogAddToPlaylist;
@@ -83,7 +83,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
           url: `/playlist`,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${props.token}`,
+            Authorization: `Bearer ${token}`,
           },
         };
 
@@ -186,10 +186,10 @@ const VideoTab: React.FC<VideoTabProps> = props => {
         </List>
       );
     }
-  } else if (props.videoModule === VideoModule.Video) {
-    albumOrPlaylistId = `albumId=${props.albumId}`;
+  } else if (videoModule === VideoModule.Video) {
+    albumOrPlaylistId = `albumId=${albumId}`;
 
-    const albumSelected = videoAlbumsRecord[props.albumId];
+    const albumSelected = videoAlbumsRecord[albumId];
 
     const handleCloseModalAddToPlaylist = () => {
       setVideoModalAddToPlaylist(undefined);
@@ -230,7 +230,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
     );
   }
 
-  let videosList = <Typography variant={'h6'}>{`Pas de videos dans ${props.videoModule === VideoModule.Playlist ? 'la playlist.' : "l'album."}`}</Typography>;
+  let videosList = <Typography variant={'h6'}>{`Pas de videos dans ${videoModule === VideoModule.Playlist ? 'la playlist.' : "l'album."}`}</Typography>;
   if (videosDisplayed.length > 0) {
     videosList = (
       <>
@@ -246,8 +246,8 @@ const VideoTab: React.FC<VideoTabProps> = props => {
               selectModeVideoIndexes={selectModeVideoIndexes}
               setSelectModeVideoIndexes={setSelectModeVideoIndexes}
               setVideoModalAddToPlaylist={setVideoModalAddToPlaylist}
-              videoModule={props.videoModule}
-              videoReading={props.videoReading}
+              videoModule={videoModule}
+              videoReading={videoReading}
               moveVideoHovered={moveVideoHovered}
               saveAfterDrop={saveAfterDrop}
               displayAddToPlaylist={playlists.length > 0}

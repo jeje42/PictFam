@@ -48,7 +48,7 @@ const selectedPreviousVideo = (state: VideosState) => {
 };
 
 const newAlbumSelected = (state: VideosState, albums: Album[]) => {
-  const newVideosSelected = state.videos.filter(video => albums.filter(album => album.id === video.album.id).length > 0);
+  const newVideosSelected = state.videos.filter(video => albums.filter(album => album && album.id === video.album.id).length > 0);
 
   return videoSelected(
     {
