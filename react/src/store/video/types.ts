@@ -1,7 +1,6 @@
 import { Video } from '../../types/Video';
 import { Album } from '../../types/Album';
 import { ActionRequest } from '../types';
-import { PhotoAction } from '../photo/types';
 
 export enum VideoAction {
   START_VIDEOS_FETCHED = 'START_VIDEOS_FETCHED',
@@ -9,7 +8,7 @@ export enum VideoAction {
   VIDEOS_SELECTED = 'VIDEOS_SELECTED',
   VIDEOS_SELECTED_NEXT = 'VIDEOS_SELECTED_NEXT',
   VIDEOS_SELECTED_PREVIOUS = 'VIDEOS_SELECTED_PREVIOUS',
-  NEW_ALBUM_VIDEO_SELECTED = 'NEW_ALBUM_VIDEO_SELECTED',
+  NEW_VIDEO_ALBUM_SELECTED = 'NEW_VIDEO_ALBUM_SELECTED',
   INIT_VIDEOS_STATE = 'INIT_VIDEOS_STATE',
   SELECT_VIDEO_FOR_READING = 'SELECT_VIDEO_FOR_READING',
 
@@ -45,8 +44,8 @@ export interface SelectPreviousVideoAction {
   type: typeof VideoAction.VIDEOS_SELECTED_PREVIOUS;
 }
 
-export interface NewAlbumSelected {
-  type: typeof VideoAction.NEW_ALBUM_VIDEO_SELECTED;
+export interface NewVideoAlbumSelected {
+  type: typeof VideoAction.NEW_VIDEO_ALBUM_SELECTED;
   albums: Album[];
 }
 
@@ -75,7 +74,7 @@ export type VideoActionTypes =
   | SelectVideoAction
   | SelectNextVideoAction
   | SelectPreviousVideoAction
-  | NewAlbumSelected
+  | NewVideoAlbumSelected
   | InitStateAction
   | SelectVideoForReading
   | NewOrUpdateVideoFromSocketSagaAction

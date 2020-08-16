@@ -10,8 +10,7 @@ import MainVideo from './MainVideos';
 import { useQuery } from '../../utils/routesUtils';
 import { Album } from '../../types/Album';
 import { selectAlbum } from '../../store/album';
-import { findAlbumRecurs, generateAlbumListRecurs } from '../../store/album/utils';
-import { newAlbumSelected, selectVideoForReading } from '../../store/video/actions';
+import { newVideoAlbumSelected, selectVideoForReading } from '../../store/video/actions';
 import { Video } from '../../types/Video';
 import { Playlist } from '../../types/Playlist';
 import { selectPlaylist } from '../../store/playlist/actions';
@@ -20,12 +19,13 @@ import { AlbumMediaType } from '../../store/album/types';
 interface ImagesPageProps {
   changeModule: typeof changeModule;
   selectAlbum: typeof selectAlbum;
-  newAlbumSelected: typeof newAlbumSelected;
+  newVideoAlbumSelected: typeof newVideoAlbumSelected;
   selectVideoForReading: typeof selectVideoForReading;
   selectPlaylist: typeof selectPlaylist;
   setVideoModule: typeof setVideoModule;
   size: any;
-  albums: Album[];
+  videoAlbumsRecord: Record<number, Album>;
+  videoParentAlbumsRecord: Record<number, Album[]>;
   videos: Video[];
   playlists: Playlist[];
   albumIdSelected: number;
@@ -35,10 +35,11 @@ interface ImagesPageProps {
 
 const ImagesPage: React.FC<ImagesPageProps> = props => {
   const {
-    albums,
+    videoAlbumsRecord,
+    videoParentAlbumsRecord,
     videos,
     playlists,
-    newAlbumSelected,
+    newVideoAlbumSelected,
     albumIdSelected,
     videoReading,
     videoModule,
@@ -57,6 +58,69 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
   });
 
   useEffect(() => {
+    const selectVideosLogic = () => {
+      selectAlbum(albumId, AlbumMediaType.Video);
+
+      const albumsSons: Album[] = [];
+
+      const addSonsRecurs = (parentId: number) => {
+        albumsSons.push(videoAlbumsRecord[parentId]);
+        if (videoParentAlbumsRecord[parentId]) {
+          videoParentAlbumsRecord[parentId].forEach(a => addSonsRecurs(a.id));
+        }
+      };
+
+      addSonsRecurs(albumId);
+      newVideoAlbumSelected(albumsSons);
+    };
+
+    if (albumId) {
+      selectVideosLogic();
+    }
+  }, [albumId, videoAlbumsRecord, videoParentAlbumsRecord, selectAlbum, newVideoAlbumSelected]);
+
+  useEffect(() => {
+    const videoModuleLogic = () => {
+      if (albumId) {
+        if (videoModule !== VideoModule.Video) {
+          setVideoModule(VideoModule.Video);
+        }
+      } else if (playlistId) {
+        if (videoModule !== VideoModule.Playlist) {
+          setVideoModule(VideoModule.Playlist);
+        }
+      }
+    };
+
+    videoModuleLogic();
+  }, [albumId, videoModule, playlistId, setVideoModule]);
+
+  useEffect(() => {
+    if (!albumId && playlistId) {
+      if (albumIdSelected !== -1) {
+        selectAlbum(-1, AlbumMediaType.Video);
+      }
+    }
+  }, [albumId, playlistId, albumIdSelected, selectAlbum]);
+
+  useEffect(() => {
+    const playlistSelectionLogic = () => {
+      if (albumId) {
+        if (playlists.find(playlist => playlist.selected)) {
+          selectPlaylist();
+        }
+      } else if (playlistId) {
+        const playlistFound: Playlist | undefined = playlists.find(playlist => playlist.id === playlistId);
+        if (playlistFound && !playlistFound.selected) {
+          selectPlaylist(playlistFound);
+        }
+      }
+    };
+
+    playlistSelectionLogic();
+  }, [albumId, playlistId, playlists, selectPlaylist]);
+
+  useEffect(() => {
     const selectVideoFromVideoId = (videoId: number) => {
       const videoFound: Video | undefined = videos.find(video => video.id === videoId);
       if (videoFound) {
@@ -65,63 +129,15 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
     };
 
     if (albumId) {
-      if (albumIdSelected !== albumId) {
-        selectAlbum(albumId, AlbumMediaType.Video);
-
-        const albumsSons: Album[] = [];
-        const album: Album | undefined = findAlbumRecurs(albums, albumId);
-        if (album) {
-          albumsSons.push(album);
-          generateAlbumListRecurs(album, albumsSons);
-          newAlbumSelected(albumsSons);
-        }
-      }
-
       if (!videoReading || videoId !== videoReading.id) {
         selectVideoFromVideoId(videoId);
-      }
-
-      if (playlists.find(playlist => playlist.selected)) {
-        selectPlaylist();
-      }
-
-      if (videoModule !== VideoModule.Video) {
-        setVideoModule(VideoModule.Video);
       }
     } else if (playlistId) {
-      const playlistFound: Playlist | undefined = playlists.find(playlist => playlist.id === playlistId);
-      if (playlistFound && !playlistFound.selected) {
-        selectPlaylist(playlistFound);
-      }
-
       if (!videoReading || videoId !== videoReading.id) {
         selectVideoFromVideoId(videoId);
       }
-
-      if (albumIdSelected !== -1) {
-        selectAlbum(-1, AlbumMediaType.Video);
-      }
-
-      if (videoModule !== VideoModule.Playlist) {
-        setVideoModule(VideoModule.Playlist);
-      }
     }
-  }, [
-    newAlbumSelected,
-    selectVideoForReading,
-    selectAlbum,
-    videos,
-    albumId,
-    videoId,
-    playlistId,
-    albums,
-    selectPlaylist,
-    setVideoModule,
-    playlists,
-    albumIdSelected,
-    videoReading,
-    videoModule,
-  ]);
+  }, [selectVideoForReading, videos, albumId, videoId, playlistId, videoReading]);
 
   const mainElem = <MainVideo screenWidth={props.size.width} screenHeight={props.size.height} />;
 
@@ -129,7 +145,8 @@ const ImagesPage: React.FC<ImagesPageProps> = props => {
 };
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.videoAlbumsTree,
+  videoAlbumsRecord: state.albums.videoAlbumsRecord,
+  videoParentAlbumsRecord: state.albums.videoParentAlbumsRecord,
   videos: state.videos.videos,
   playlists: state.playlists.playlists,
   albumIdSelected: state.albums.albumVideoIdSelected,
@@ -138,5 +155,5 @@ const mapStateToProps = (state: AppState) => ({
 });
 
 export default withSize({ monitorHeight: true })(
-  connect(mapStateToProps, { changeModule, selectAlbum, newAlbumSelected, selectVideoForReading, selectPlaylist, setVideoModule })(ImagesPage),
+  connect(mapStateToProps, { changeModule, selectAlbum, newVideoAlbumSelected, selectVideoForReading, selectPlaylist, setVideoModule })(ImagesPage),
 );

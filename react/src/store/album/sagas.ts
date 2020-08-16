@@ -6,12 +6,10 @@ import { Endpoints } from '../../config/endpoints';
 import { addAlbumToReducer } from './actions';
 import { albumFetchedToAlbum } from './utils';
 
-function* addAlbumsAndCallFetchSons(albumMediaType: AlbumMediaType, albums?: AlbumFetched[], parentId?: number): Generator {
-  if (albums) {
-    yield all(albums.map(album => put(addAlbumToReducer(albumFetchedToAlbum(album), albumMediaType, parentId))));
+function* addAlbumsAndCallFetchSons(albumMediaType: AlbumMediaType, albums: AlbumFetched[], parentId: number): Generator {
+  yield all(albums.map(album => put(addAlbumToReducer(albumFetchedToAlbum(album, parentId), albumMediaType))));
 
-    yield all(albums.map(album => fetchSonAlbum(album._links.sons.href, albumMediaType, album.id)));
-  }
+  yield all(albums.map(album => fetchSonAlbum(album._links.sons.href, albumMediaType, album.id)));
 }
 
 function* fetchSonAlbum(url: string, albumMediaType: AlbumMediaType, parentId: number): Generator {
@@ -51,15 +49,10 @@ function* fetchAlbumsFromRoot(action: AlbumActionTypes): Generator {
   const r = yield axios(requestConfig);
   const response = r as { data: { _embedded: { albums: AlbumFetched[] } } };
 
-  yield addAlbumsAndCallFetchSons(albumMediaType, response?.data?._embedded?.albums);
+  yield addAlbumsAndCallFetchSons(albumMediaType, response?.data?._embedded?.albums, -1);
 }
 
-enum SocketHandling {
-  FindRootFirst,
-  JustFindFirstParent,
-}
-
-function* newAlbumFromSocketLogic(album: AlbumFetched, socketHandling: SocketHandling): Generator {
+function* newAlbumFromSocketLogic(album: AlbumFetched): Generator {
   const parentUrl = album._links.father.href;
   const token = yield select(state => state.auth.token);
 
@@ -79,30 +72,13 @@ function* newAlbumFromSocketLogic(album: AlbumFetched, socketHandling: SocketHan
   } catch (e) {
     //404 not found for parent goes here
     //That means the album is a new root
-    if (socketHandling === SocketHandling.FindRootFirst) {
-      yield addAlbumsAndCallFetchSons(albumMediaType, [album]);
-    } else {
-      addAlbumToReducer(albumFetchedToAlbum(album), albumMediaType);
-    }
+    yield put(addAlbumToReducer(albumFetchedToAlbum(album, -1), albumMediaType));
     return;
   }
 
-  const response = r as { data: AlbumFetched };
+  const parentAlbum = (r as { data: AlbumFetched }).data;
 
-  if (socketHandling === SocketHandling.FindRootFirst) {
-    yield newAlbumFromSocketLogic(response.data, SocketHandling.FindRootFirst);
-  } else {
-    const albumRecord: any = yield select(state => {
-      return albumMediaType === AlbumMediaType.Image ? state.albums.imageAlbumsRecord : state.albums.videoAlbumsRecord;
-    });
-
-    if (albumRecord[response.data.id]) {
-      addAlbumToReducer(albumFetchedToAlbum(response.data), albumMediaType, album.id);
-    } else {
-      //Parent is again not part of the reducer
-      yield newAlbumFromSocketLogic(response.data, SocketHandling.FindRootFirst);
-    }
-  }
+  yield put(addAlbumToReducer(albumFetchedToAlbum(album, parentAlbum.id), albumMediaType));
 }
 
 function* newAlbumFromSocketSaga(action: NewAlbumFromSocketSagaAction): Generator {
@@ -119,7 +95,7 @@ function* newAlbumFromSocketSaga(action: NewAlbumFromSocketSagaAction): Generato
   const r = yield axios(requestConfig);
   const response = r as { data: AlbumFetched };
 
-  yield newAlbumFromSocketLogic(response.data, SocketHandling.JustFindFirstParent);
+  yield newAlbumFromSocketLogic(response.data);
 }
 
 export function* watchFetchAlbumsFromRoot(): Generator {

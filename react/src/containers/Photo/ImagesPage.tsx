@@ -11,22 +11,31 @@ import ThumnailsGalery from '../ThumnailsGalery';
 import { useQuery } from '../../utils/routesUtils';
 import { selectAlbum } from '../../store/album';
 import { Album } from '../../types/Album';
-import { findAlbumRecurs, generateAlbumListRecurs } from '../../store/album/utils';
-import { newAlbumSelected, selectPhoto } from '../../store/photo/actions';
+import { newImageAlbumSelected, selectPhoto } from '../../store/photo/actions';
 import { Photo } from '../../types/Photo';
 import { AlbumMediaType } from '../../store/album/types';
 
 interface ImagesPageProps {
   changeModule: typeof changeModule;
   selectAlbum: typeof selectAlbum;
-  newAlbumSelected: typeof newAlbumSelected;
+  newImageAlbumSelected: typeof newImageAlbumSelected;
   selectPhoto: typeof selectPhoto;
   size: any;
-  albums: Album[];
+  imageAlbumsRecord: Record<number, Album>;
+  imageParentAlbumsRecord: Record<number, Album[]>;
   photos: Photo[];
 }
 
-const ImagesPage: React.FC<ImagesPageProps> = ({ albums, photos, size, selectAlbum, newAlbumSelected, selectPhoto, changeModule }) => {
+const ImagesPage: React.FC<ImagesPageProps> = ({
+  imageAlbumsRecord,
+  imageParentAlbumsRecord,
+  photos,
+  size,
+  selectAlbum,
+  newImageAlbumSelected,
+  selectPhoto,
+  changeModule,
+}) => {
   const albumId = Number(useQuery().get('albumId'));
   const photoId = Number(useQuery().get('photoId'));
 
@@ -38,20 +47,24 @@ const ImagesPage: React.FC<ImagesPageProps> = ({ albums, photos, size, selectAlb
     if (albumId) {
       selectAlbum(albumId, AlbumMediaType.Image);
       const albumsSons: Album[] = [];
-      const album: Album | undefined = findAlbumRecurs(albums, albumId);
-      if (album) {
-        albumsSons.push(album);
-        generateAlbumListRecurs(album, albumsSons);
-        newAlbumSelected(albumsSons);
-      }
+
+      const addSonsRecurs = (parentId: number) => {
+        albumsSons.push(imageAlbumsRecord[parentId]);
+        if (imageParentAlbumsRecord[parentId]) {
+          imageParentAlbumsRecord[parentId].forEach(a => addSonsRecurs(a.id));
+        }
+      };
+
+      addSonsRecurs(albumId);
+      newImageAlbumSelected(albumsSons);
     } else {
       selectAlbum(-1, AlbumMediaType.Image);
-      newAlbumSelected([]);
+      newImageAlbumSelected([]);
     }
 
     const photoFound: Photo | undefined = photos.find(photo => photo.id === photoId);
     selectPhoto(photoFound);
-  }, [albums, selectAlbum, albumId, newAlbumSelected, photos, photoId, selectPhoto]);
+  }, [imageAlbumsRecord, imageParentAlbumsRecord, selectAlbum, albumId, newImageAlbumSelected, photos, photoId, selectPhoto]);
 
   const mainElem = <MainPhoto screenWidth={size.width} screenHeight={size.height} />;
 
@@ -61,8 +74,9 @@ const ImagesPage: React.FC<ImagesPageProps> = ({ albums, photos, size, selectAlb
 };
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.imageAlbumsTree,
+  imageAlbumsRecord: state.albums.imageAlbumsRecord,
+  imageParentAlbumsRecord: state.albums.imageParentAlbumsRecord,
   photos: state.photos.photos,
 });
 
-export default withSize({ monitorHeight: true })(connect(mapStateToProps, { changeModule, selectAlbum, newAlbumSelected, selectPhoto })(ImagesPage));
+export default withSize({ monitorHeight: true })(connect(mapStateToProps, { changeModule, selectAlbum, newImageAlbumSelected, selectPhoto })(ImagesPage));

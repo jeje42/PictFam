@@ -17,6 +17,7 @@ interface VideoListItemProps {
   videoModule: VideoModule;
   selectModeVideoIndexes: number[];
   videoReading?: Video;
+  displayAddToPlaylist: boolean;
   removeVideoFromPlaylist: (index: number) => void;
   setVideoModalAddToPlaylist: (videoOrUndefined: Video[] | undefined) => void;
   setSelectModeVideoIndexes: (selectedVideoList: number[]) => void;
@@ -42,6 +43,7 @@ const VideoListItemFC: React.FC<VideoListItemProps> = props => {
     albumOrPlaylistId,
     videoModule,
     videoReading,
+    displayAddToPlaylist,
     selectModeVideoIndexes,
     setVideoModalAddToPlaylist,
     setSelectModeVideoIndexes,
@@ -79,6 +81,7 @@ const VideoListItemFC: React.FC<VideoListItemProps> = props => {
       }
 
       // Determine rectangle on screen
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const hoverBoundingRect = ref.current!.getBoundingClientRect();
 
@@ -127,7 +130,7 @@ const VideoListItemFC: React.FC<VideoListItemProps> = props => {
   let addOrDeleteButton;
   let selectionCheckbox;
   if (videoModule === VideoModule.Video) {
-    addOrDeleteButton = (
+    addOrDeleteButton = displayAddToPlaylist ? (
       <ListItemIcon>
         <Tooltip title={`Ajouter à la playlist`}>
           <Add
@@ -138,7 +141,7 @@ const VideoListItemFC: React.FC<VideoListItemProps> = props => {
           />
         </Tooltip>
       </ListItemIcon>
-    );
+    ) : undefined;
 
     const selectedVideoIndex = selectModeVideoIndexes.indexOf(index);
     if (selectMode) {

@@ -12,10 +12,9 @@ export const fetchAlbumsFromRootSagaAction = (albumMediaType: AlbumMediaType): F
   albumMediaType,
 });
 
-export const addAlbumToReducer = (album: Album, albumMediaType: AlbumMediaType, parentId?: number): AddAlbumToReducer => ({
+export const addAlbumToReducer = (album: Album, albumMediaType: AlbumMediaType): AddAlbumToReducer => ({
   type: AlbumAction.ADD_ALBUM_TO_REDUCER,
   album,
-  parentId,
   albumMediaType,
 });
 

@@ -1,7 +1,7 @@
 import {
   AddVideoToReducerAction,
-  NewAlbumSelected,
   NewOrUpdateVideoFromSocketSagaAction,
+  NewVideoAlbumSelected,
   SelectNextVideoAction,
   SelectPreviousVideoAction,
   SelectVideoAction,
@@ -50,9 +50,9 @@ export const selectPreviousVideo = (): SelectPreviousVideoAction => {
   };
 };
 
-export const newAlbumSelected = (albums: Album[]): NewAlbumSelected => {
+export const newVideoAlbumSelected = (albums: Album[]): NewVideoAlbumSelected => {
   return {
-    type: VideoAction.NEW_ALBUM_VIDEO_SELECTED,
+    type: VideoAction.NEW_VIDEO_ALBUM_SELECTED,
     albums: albums,
   };
 };

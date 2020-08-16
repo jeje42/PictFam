@@ -102,7 +102,7 @@ export function videosReducer(state = initialState, action: VideoActionTypes): V
       return selectedNextVideo(state);
     case VideoAction.VIDEOS_SELECTED_PREVIOUS:
       return selectedPreviousVideo(state);
-    case VideoAction.NEW_ALBUM_VIDEO_SELECTED:
+    case VideoAction.NEW_VIDEO_ALBUM_SELECTED:
       return newAlbumSelected(state, action.albums);
     case VideoAction.INIT_VIDEOS_STATE:
       return initialState;

@@ -8,12 +8,15 @@ import Collapse from '@material-ui/core/Collapse';
 import List from '@material-ui/core/List';
 import * as React from 'react';
 import { AlbumsHash } from './DrawerInterface';
+import { AppState } from '../../../store';
+import { connect } from 'react-redux';
 
 interface AlbumLeafProps {
   album: Album;
-  albumsHash: AlbumsHash;
+  expandedAlbumsHash: AlbumsHash;
   nestedIndex: number;
   albumIdSelected: number;
+  imageParentAlbumsRecord: Record<number, Album[]>;
   handleListAlbumClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, album: Album, toggleAlbum: boolean) => void;
 }
 
@@ -22,7 +25,7 @@ interface AlbumLeafProps {
  *  - Generates the item (variable item)
  *  - if the album has sons, generates collapse and the nested by calling generateAlbumLeaf recursively.
  **/
-const AlbumLeaf: React.FC<AlbumLeafProps> = props => {
+const AlbumLeafFC: React.FC<AlbumLeafProps> = props => {
   const localClasses = makeStyles((theme: any) =>
     createStyles({
       nested: {
@@ -31,7 +34,9 @@ const AlbumLeaf: React.FC<AlbumLeafProps> = props => {
     }),
   )();
 
-  const albumHasSons = props.album.sons && props.album.sons.length;
+  const { album, expandedAlbumsHash, imageParentAlbumsRecord } = props;
+
+  const albumHasSons = imageParentAlbumsRecord[album.id] && imageParentAlbumsRecord[album.id].length > 0;
 
   const item = (
     <ListItem
@@ -43,33 +48,32 @@ const AlbumLeaf: React.FC<AlbumLeafProps> = props => {
     >
       <ListItemText primary={props.album.name} />
       {albumHasSons ? (
-        props.albumsHash[props.album.id] ? (
+        expandedAlbumsHash[props.album.id] ? (
           <ExpandLess onClick={(event: any) => props.handleListAlbumClick(event, props.album, true)} />
         ) : (
           <ExpandMore onClick={(event: any) => props.handleListAlbumClick(event, props.album, true)} />
         )
-      ) : (
-        undefined
-      )}
+      ) : undefined}
     </ListItem>
   );
   let collapse;
-  if (albumHasSons > 0) {
-    const sonsElem = props.album.sons.map(albumSon => {
+  if (albumHasSons) {
+    const sonsElem = imageParentAlbumsRecord[album.id].map(sonAlbum => {
       return (
-        <AlbumLeaf
-          key={albumSon.id}
-          album={albumSon}
-          albumsHash={props.albumsHash}
+        <AlbumLeafFC
+          key={sonAlbum.id}
+          album={sonAlbum}
+          expandedAlbumsHash={expandedAlbumsHash}
           nestedIndex={props.nestedIndex + 1}
           albumIdSelected={props.albumIdSelected}
           handleListAlbumClick={props.handleListAlbumClick}
+          imageParentAlbumsRecord={imageParentAlbumsRecord}
         />
       );
     });
 
     collapse = (
-      <Collapse in={props.albumsHash[props.album.id]} timeout='auto' unmountOnExit>
+      <Collapse in={props.expandedAlbumsHash[props.album.id]} timeout='auto' unmountOnExit>
         <List component='div' disablePadding>
           {sonsElem}
         </List>
@@ -85,4 +89,8 @@ const AlbumLeaf: React.FC<AlbumLeafProps> = props => {
   );
 };
 
-export { AlbumLeaf };
+const mapStateToProps = (state: AppState) => ({
+  imageParentAlbumsRecord: state.albums.imageParentAlbumsRecord,
+});
+
+export default connect(mapStateToProps, {})(AlbumLeafFC);

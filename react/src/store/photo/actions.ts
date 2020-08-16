@@ -38,9 +38,9 @@ export function selectPreviousPhoto() {
   };
 }
 
-export function newAlbumSelected(albums: Album[]) {
+export function newImageAlbumSelected(albums: Album[]) {
   return {
-    type: PhotoAction.NEW_ALBUM_SELECTED,
+    type: PhotoAction.NEW_IMAGE_ALBUM_SELECTED,
     albums: albums,
   };
 }

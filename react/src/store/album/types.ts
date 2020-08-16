@@ -16,11 +16,11 @@ export enum AlbumMediaType {
 }
 
 export interface AlbumState {
-  imageAlbumsTree: Album[];
   imageAlbumsRecord: Record<number, Album>;
+  imageParentAlbumsRecord: Record<number, Album[]>;
   albumImageIdSelected: number;
-  videoAlbumsTree: Album[];
   videoAlbumsRecord: Record<number, Album>;
+  videoParentAlbumsRecord: Record<number, Album[]>;
   albumVideoIdSelected: number;
 }
 
@@ -44,7 +44,6 @@ export interface AddAlbumToReducer {
   type: typeof AlbumAction.ADD_ALBUM_TO_REDUCER;
   albumMediaType: AlbumMediaType;
   album: Album;
-  parentId?: number;
 }
 
 export interface UpdateAlbumToReducer {

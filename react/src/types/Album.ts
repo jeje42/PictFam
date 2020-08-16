@@ -17,7 +17,7 @@ export interface Album {
   id: number;
   name: string;
   isRoot: boolean;
-  sons: Album[];
+  parentId: number;
   _links: {
     father: Href;
     sons: Href;

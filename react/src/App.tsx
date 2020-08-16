@@ -8,7 +8,6 @@ import { ROUTE_IMAGES, ROUTE_VIDEOS } from './utils/routesUtils';
 import ImagesPage from './containers/Photo/ImagesPage';
 import VideoPage from './containers/Video/VideoPage';
 import { Module } from './store/app/types';
-import { Album } from './types/Album';
 import { fetchAllAction } from './store/auth-profile/actions';
 import { SocketHoc } from './WebSockets';
 import { MyConnectedSnackbar } from './containers/Feedback';
@@ -16,15 +15,13 @@ import { MyConnectedSnackbar } from './containers/Feedback';
 interface AppProps {
   isAuthenticated: boolean;
   currentModule: Module;
-  albumsImage: Album[];
-  videoAlbums: Album[];
   fetchAllAction: typeof fetchAllAction;
 }
 
-const App: React.FC<AppProps> = ({ currentModule, albumsImage, videoAlbums, fetchAllAction, isAuthenticated }) => {
+const App: React.FC<AppProps> = ({ currentModule, fetchAllAction, isAuthenticated }) => {
   useEffect(() => {
     fetchAllAction();
-  }, [albumsImage.length, videoAlbums.length, currentModule, isAuthenticated, fetchAllAction]);
+  }, [currentModule, isAuthenticated, fetchAllAction]);
 
   function PrivateRoute({ children, path, ...rest }: { children: React.ReactNode; path: string }) {
     return (
@@ -78,8 +75,6 @@ const App: React.FC<AppProps> = ({ currentModule, albumsImage, videoAlbums, fetc
 const mapStateToProps = (state: AppState) => ({
   isAuthenticated: state.auth.isAuthenticated,
   currentModule: state.app.module,
-  albumsImage: state.albums.imageAlbumsTree,
-  videoAlbums: state.albums.videoAlbumsTree,
   token: state.auth.token,
 });
 

@@ -7,73 +7,78 @@ import { useHistory } from 'react-router-dom';
 
 import { AppState } from '../../../store';
 import { Album } from '../../../types/Album';
-import { newAlbumSelected } from '../../../store/photo/actions';
 import { drawerWidthChanged } from '../../../store/drawer/actions';
 import Alert from '@material-ui/lab/Alert';
 import { Grow } from '@material-ui/core';
 import { AlbumsHash } from './DrawerInterface';
-import { AlbumLeaf } from './AlbumLeaf';
+import AlbumLeaf from './AlbumLeaf';
 import { ROUTE_IMAGES } from '../../../utils/routesUtils';
-import { isSonSelectedRecurs } from '../../../store/album/utils';
 
 interface DrawerAlbumsProps {
-  albums: Album[];
-  newAlbumSelected: typeof newAlbumSelected;
+  imageAlbumsRecord: Record<number, Album>;
+  imageParentAlbumsRecord: Record<number, Album[]>;
+  numberOfAlbums: number;
   drawerWidthChanged: typeof drawerWidthChanged;
   albumIdSelected: number;
   size: any;
 }
 
-const recursAlbumOpen = (album: Album, finalObject: AlbumsHash, albumIdSelected: number) => {
-  finalObject[album.id] = isSonSelectedRecurs(album.sons, albumIdSelected);
-  album.sons.forEach(son => {
-    recursAlbumOpen(son, finalObject, albumIdSelected);
-  });
-};
-
 const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
-  const [albumsHash, setAlbumsHash] = React.useState({} as AlbumsHash);
+  const [expandedAlbumsHash, setExpandedAlbumsHash] = React.useState({} as AlbumsHash);
   const history = useHistory();
-  const { albums, albumIdSelected } = props;
+  const { imageAlbumsRecord, imageParentAlbumsRecord, albumIdSelected } = props;
 
   useEffect(() => {
-    const newAlbumHash: AlbumsHash = {};
-    albums.forEach((album: Album) => {
-      recursAlbumOpen(album, newAlbumHash, albumIdSelected);
-    });
+    const defineOpenedAlbumsRecurs = (newAlbumHash: AlbumsHash, albumId: number) => {
+      const album = imageAlbumsRecord[albumId];
+      if (!album) {
+        return;
+      }
 
-    setAlbumsHash(newAlbumHash);
-  }, [albums, albumIdSelected]);
+      newAlbumHash[album.id] = true;
+
+      if (album.parentId !== -1) {
+        defineOpenedAlbumsRecurs(newAlbumHash, album.parentId);
+      }
+    };
+
+    const newExpandedAlbumHash: AlbumsHash = {};
+    defineOpenedAlbumsRecurs(newExpandedAlbumHash, albumIdSelected);
+
+    setExpandedAlbumsHash(newExpandedAlbumHash);
+  }, [imageAlbumsRecord, albumIdSelected]);
 
   useEffect(() => {
     props.drawerWidthChanged(Math.trunc(props.size.width));
   }, [props, props.size.width]);
 
-  const toggleAlbumHash = (idAlbum: number) => {
-    const newAlbumHash = { ...albumsHash };
-    newAlbumHash[idAlbum] = !albumsHash[idAlbum];
-    setAlbumsHash(newAlbumHash);
+  const toggleAlbumHash = (idAlbum: number, expandedAlbumsHash: AlbumsHash) => {
+    const newExpandedAlbumsHash = { ...expandedAlbumsHash };
+    newExpandedAlbumsHash[idAlbum] = !newExpandedAlbumsHash[idAlbum];
+    return newExpandedAlbumsHash;
   };
 
   const handleListAlbumClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, album: Album, toggleAlbum: boolean) => {
     event.stopPropagation();
     if (toggleAlbum) {
-      toggleAlbumHash(album.id);
+      setExpandedAlbumsHash(prevState => toggleAlbumHash(album.id, prevState));
     } else {
       history.push(`${ROUTE_IMAGES}?albumId=${album.id}`);
     }
   };
 
+  const rootAlbums = imageParentAlbumsRecord[-1];
+
   let listRootElem;
-  if (props.albums.length > 0) {
+  if (rootAlbums && rootAlbums.length > 0) {
     listRootElem = (
       <List>
-        {props.albums.map(album => {
+        {rootAlbums.map(album => {
           return (
             <AlbumLeaf
               key={album.id}
               album={album}
-              albumsHash={albumsHash}
+              expandedAlbumsHash={expandedAlbumsHash}
               nestedIndex={1}
               albumIdSelected={props.albumIdSelected}
               handleListAlbumClick={handleListAlbumClick}
@@ -87,7 +92,7 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
   return (
     <div>
       {listRootElem}
-      <Grow in={!props.albums || props.albums.length === 0}>
+      <Grow in={!rootAlbums || rootAlbums.length === 0}>
         <Alert severity='error'>No albums available</Alert>
       </Grow>
     </div>
@@ -95,8 +100,10 @@ const DrawerAlbums: React.FC<DrawerAlbumsProps> = props => {
 };
 
 const mapStateToProps = (state: AppState) => ({
-  albums: state.albums.imageAlbumsTree,
+  imageAlbumsRecord: state.albums.imageAlbumsRecord,
+  imageParentAlbumsRecord: state.albums.imageParentAlbumsRecord,
+  numberOfAlbums: Object.keys(state.albums.imageAlbumsRecord).length,
   albumIdSelected: state.albums.albumImageIdSelected,
 });
 
-export default withSize()(connect(mapStateToProps, { newAlbumSelected, drawerWidthChanged })(DrawerAlbums));
+export default withSize()(connect(mapStateToProps, { drawerWidthChanged })(DrawerAlbums));

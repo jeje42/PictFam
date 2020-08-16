@@ -107,13 +107,13 @@ function* startFetchSaga() {
   if (state.auth.isAuthenticated) {
     switch (state.app.module) {
       case Module.Image:
-        if (state.albums.imageAlbumsTree.length === 0) {
+        if (Object.values(state.albums.imageAlbumsRecord).length === 0) {
           yield put(startPhotosFetched());
           yield put(fetchAlbumsFromRootSagaAction(AlbumMediaType.Image));
         }
         break;
       case Module.Video:
-        if (state.albums.videoAlbumsTree.length === 0) {
+        if (Object.values(state.albums.videoAlbumsRecord).length === 0) {
           yield put(fetchAlbumsFromRootSagaAction(AlbumMediaType.Video));
           yield put(startVideosFetched());
           yield put(startFetchAllPlaylists());

@@ -46,7 +46,7 @@ const selectedPreviousPhoto = (state: PhotosState) => {
 };
 
 const newAlbumSelected = (state: PhotosState, albums: Album[]) => {
-  const newPhotosSelected = state.photos.filter(photo => albums.filter(album => album.id === photo.album.id).length > 0);
+  const newPhotosSelected = state.photos.filter(photo => albums.filter(album => album && album.id === photo.album.id).length > 0);
   return {
     ...state,
     photosSelected: newPhotosSelected,
@@ -89,7 +89,7 @@ export function photosReducer(state = initialState, action: PhotoActionTypes): P
       return selectedNextPhoto(state);
     case PhotoAction.PHOTOS_SELECTED_PREVIOUS:
       return selectedPreviousPhoto(state);
-    case PhotoAction.NEW_ALBUM_SELECTED:
+    case PhotoAction.NEW_IMAGE_ALBUM_SELECTED:
       return newAlbumSelected(state, action.albums);
     case PhotoAction.ADD_PHOTO_TO_REDUCER:
       return addPhotoToReducer(state, action.photo);

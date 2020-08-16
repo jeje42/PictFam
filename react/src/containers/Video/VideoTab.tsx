@@ -25,33 +25,13 @@ interface VideoTabProps {
   playlists: Playlist[];
   height: number;
   token: string;
-  albums: Album[];
+  videoAlbumsRecord: Record<number, Album>;
   videoModule: VideoModule;
   setPlaylist: typeof setPlaylist;
 }
 
-const findAlbumRecurs = (album: Album, albumId: number): Album | undefined => {
-  if (album.id === albumId) {
-    return album;
-  }
-
-  const albumSonFound = album.sons.find(son => son.id === albumId);
-  if (albumSonFound) {
-    return albumSonFound;
-  }
-
-  album.sons.forEach(son => {
-    const albumFoundInSons = findAlbumRecurs(son, albumId);
-    if (albumFoundInSons) {
-      return albumFoundInSons;
-    }
-  });
-
-  return undefined;
-};
-
 const VideoTab: React.FC<VideoTabProps> = props => {
-  const { height } = props;
+  const { height, videoAlbumsRecord, playlists } = props;
   const [videoModuleState, setVideoModuleState] = useState<VideoModule>(props.videoModule);
   const [videoModalAddToPlaylist, setVideoModalAddToPlaylist] = useState<Video[] | undefined>();
   const [selectMode, setSelectMode] = useState<boolean>(false);
@@ -68,7 +48,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
     });
   })();
 
-  const playlistSelected = props.playlists.find(playlist => playlist.selected);
+  const playlistSelected = playlists.find(playlist => playlist.selected);
 
   useEffect(() => {
     setVideoModuleState(props.videoModule);
@@ -209,13 +189,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
   } else if (props.videoModule === VideoModule.Video) {
     albumOrPlaylistId = `albumId=${props.albumId}`;
 
-    let albumSelected: Album | undefined;
-    props.albums.forEach(album => {
-      const albumFound = findAlbumRecurs(album, props.albumId);
-      if (albumFound) {
-        albumSelected = albumFound;
-      }
-    });
+    const albumSelected = videoAlbumsRecord[props.albumId];
 
     const handleCloseModalAddToPlaylist = () => {
       setVideoModalAddToPlaylist(undefined);
@@ -229,24 +203,28 @@ const VideoTab: React.FC<VideoTabProps> = props => {
       <List>
         <ListItem key={`PlaylistAlbum`}>
           <ListItemText primary={`Videos dans ${albumSelected ? albumSelected.name : `l'album`}`} />
-          <Tooltip title={'Activer/désactiver la sélection'}>
-            <Checkbox checked={selectMode} onChange={() => setSelectMode(!selectMode)} inputProps={{ 'aria-label': 'primary checkbox' }} />
-          </Tooltip>
-          <ListItemIcon>
-            <Tooltip title={selectMode ? 'Ajouter la sélection à la playlist' : 'Ajouter tout à la playlist'}>
-              <LibraryAdd
-                onClick={() => {
-                  if (selectMode) {
-                    if (selectModeVideoIndexes.length > 0) {
-                      setVideoModalAddToPlaylist(videosDisplayed.filter((video: Video, index: number) => selectModeVideoIndexes.includes(index)));
-                    }
-                  } else {
-                    setVideoModalAddToPlaylist(videosDisplayed);
-                  }
-                }}
-              />
-            </Tooltip>
-          </ListItemIcon>
+          {playlists.length > 0 ? (
+            <>
+              <Tooltip title={'Activer/désactiver la sélection'}>
+                <Checkbox checked={selectMode} onChange={() => setSelectMode(!selectMode)} inputProps={{ 'aria-label': 'primary checkbox' }} />
+              </Tooltip>
+              <ListItemIcon>
+                <Tooltip title={selectMode ? 'Ajouter la sélection à la playlist' : 'Ajouter tout à la playlist'}>
+                  <LibraryAdd
+                    onClick={() => {
+                      if (selectMode) {
+                        if (selectModeVideoIndexes.length > 0) {
+                          setVideoModalAddToPlaylist(videosDisplayed.filter((video: Video, index: number) => selectModeVideoIndexes.includes(index)));
+                        }
+                      } else {
+                        setVideoModalAddToPlaylist(videosDisplayed);
+                      }
+                    }}
+                  />
+                </Tooltip>
+              </ListItemIcon>
+            </>
+          ) : undefined}
         </ListItem>
       </List>
     );
@@ -272,6 +250,7 @@ const VideoTab: React.FC<VideoTabProps> = props => {
               videoReading={props.videoReading}
               moveVideoHovered={moveVideoHovered}
               saveAfterDrop={saveAfterDrop}
+              displayAddToPlaylist={playlists.length > 0}
             />
           );
         })}
@@ -294,7 +273,7 @@ const mapStateToProps = (state: AppState) => ({
   videos: state.videos.videosSelected,
   videoReading: state.videos.videoReading,
   albumId: state.albums.albumVideoIdSelected,
-  albums: state.albums.videoAlbumsTree,
+  videoAlbumsRecord: state.albums.videoAlbumsRecord,
   playlists: state.playlists.playlists,
   videoModule: state.app.videoModule,
   token: state.auth.token,

@@ -8,7 +8,7 @@ export enum PhotoAction {
   PHOTOS_SELECTED = 'PHOTOS_SELECTED',
   PHOTOS_SELECTED_NEXT = 'PHOTOS_SELECTED_NEXT',
   PHOTOS_SELECTED_PREVIOUS = 'PHOTOS_SELECTED_PREVIOUS',
-  NEW_ALBUM_SELECTED = 'NEW_ALBUM_SELECTED',
+  NEW_IMAGE_ALBUM_SELECTED = 'NEW_IMAGE_ALBUM_SELECTED',
   INIT_PHOTOS_STATE = 'INIT_PHOTOS_STATE',
 
   NEW_OR_UPDATE_PHOTO_FROM_SOCKET_SAGA = 'NEW_OR_UPDATE_PHOTO_FROM_SOCKET_SAGA',
@@ -48,8 +48,8 @@ interface SelectPreviousPhotoAction {
   type: typeof PhotoAction.PHOTOS_SELECTED_PREVIOUS;
 }
 
-interface NewAlbumSelected {
-  type: typeof PhotoAction.NEW_ALBUM_SELECTED;
+interface NewImageAlbumSelected {
+  type: typeof PhotoAction.NEW_IMAGE_ALBUM_SELECTED;
   albums: Album[];
 }
 
@@ -68,6 +68,6 @@ export type PhotoActionTypes =
   | SelectPhotoAction
   | SelectNextPhotoAction
   | SelectPreviousPhotoAction
-  | NewAlbumSelected
+  | NewImageAlbumSelected
   | InitStateAction
   | AddPhotoToReducerAction;

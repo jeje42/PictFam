@@ -85,7 +85,7 @@ const SocketHocFC: React.FC<SocketHocProps> = ({
         token,
       );
     }
-  }, [token, startFetchOnePlaylist, removePlaylist]);
+  }, [token, startFetchOnePlaylist, removePlaylist, newAlbumFromSocketSagaAction, newOrUpdatePhotoFromSocketSagaAction, newOrUpdateVideoFromSocketSagaAction]);
 
   return <></>;
 };
