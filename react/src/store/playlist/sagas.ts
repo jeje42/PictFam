@@ -21,8 +21,7 @@ function* tryToFetchPlaylist(action: PlaylistActionTypes) {
 
   const response: Response = yield call(getRequest, options);
 
-  const playListDataToList: PlaylistFetched[] =
-    action.type === PLAYLIST_ACTION.START_FETCH_ALL_PLAYLIST ? (response.data as PlaylistFetched[]) : [response.data as PlaylistFetched];
+  const playListDataToList = response.data as PlaylistFetched[];
 
   const playlists: Playlist[] = playListDataToList.map((value: PlaylistFetched) => {
     const sortedPlaylistVideos = value.playlistVideos.sort((a: PlaylistVideosFetched, b: PlaylistVideosFetched) => a.position - b.position);

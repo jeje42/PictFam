@@ -13,4 +13,6 @@ public interface PlaylistRepository extends PagingAndSortingRepository<Playlist,
     Optional<Playlist> findByNameAndUser(String name, User user);
 
     List<Playlist> findAllByUser(User user);
+
+    List<Playlist> findAllByUserAndId(User user, Long id);
 }

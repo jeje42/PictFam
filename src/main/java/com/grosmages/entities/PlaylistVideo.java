@@ -1,5 +1,7 @@
 package com.grosmages.entities;
 
+import com.grosmages.event.PlaylistListener;
+import com.grosmages.event.PlaylistVideoListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -18,6 +20,7 @@ import javax.persistence.*;
                 joinColumns = @JoinColumn(name = "PLAYLIST_ID")),
         @AssociationOverride(name = "pk.video",
                 joinColumns = @JoinColumn(name = "VIDEO_ID")) })
+@EntityListeners(PlaylistVideoListener.class)
 public class PlaylistVideo implements java.io.Serializable {
 
     @EmbeddedId

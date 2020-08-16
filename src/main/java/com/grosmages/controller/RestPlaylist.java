@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -110,15 +111,20 @@ public class RestPlaylist {
         return null;
     }
 
-    @GetMapping(value = "/playlist")
-    public List<PlaylistForClient> updatePlaylist(Principal principal) {
+    @GetMapping(path = {"/playlist", "/playlist/{playlistId}"})
+    public List<PlaylistForClient> updatePlaylist(Principal principal, @PathVariable("playlistId") Optional<String> playlistId) {
         String userName = principal.getName();
         User user = userRepository.findByName(userName).orElse(null);
         if (user == null) {
             throw new ForbiddenException();
         }
 
-        List<Playlist> playlists = playlistRepository.findAllByUser(user);
+        List<Playlist> playlists;
+        if (playlistId.isPresent()) {
+            playlists = playlistRepository.findAllByUserAndId(user, Long.parseLong(playlistId.get()));
+        } else {
+            playlists = playlistRepository.findAllByUser(user);
+        }
 
         final ModelMapper modelMapper = new ModelMapper();
         modelMapper.typeMap(PlaylistVideo.class, PlaylistVideoForClient.class).addMappings(mapper -> {

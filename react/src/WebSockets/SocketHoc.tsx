@@ -15,6 +15,12 @@ enum WsPlaylist {
   Remove = 'removePlaylist',
 }
 
+enum WsPlaylistVideo {
+  New = 'newPlaylistVideo',
+  Update = 'updatePlaylistVideo',
+  Remove = 'removePlaylistVideo',
+}
+
 enum WsAlbum {
   New = 'newAlbum',
   Update = 'updateAlbum',
@@ -69,6 +75,10 @@ const SocketHocFC: React.FC<SocketHocProps> = ({
           { route: `${TOPIC}/${WsPlaylist.New}`, callback: (message: { body: string }) => newOrUpdatePlaylistCB(message.body) },
           { route: `${TOPIC}/${WsPlaylist.Update}`, callback: (message: { body: string }) => newOrUpdatePlaylistCB(message.body) },
           { route: `${TOPIC}/${WsPlaylist.Remove}`, callback: (message: { body: string }) => removePlaylistCB(message.body) },
+
+          { route: `${TOPIC}/${WsPlaylistVideo.New}`, callback: (message: { body: string }) => newOrUpdatePlaylistCB(`/playlist/${message.body}`) },
+          { route: `${TOPIC}/${WsPlaylistVideo.Update}`, callback: (message: { body: string }) => newOrUpdatePlaylistCB(`/playlist/${message.body}`) },
+          { route: `${TOPIC}/${WsPlaylistVideo.Remove}`, callback: (message: { body: string }) => newOrUpdatePlaylistCB(`/playlist/${message.body}`) },
 
           { route: `${TOPIC}/${WsAlbum.New}`, callback: (message: { body: string }) => newOrUpdateAlbumCB(message.body) },
           { route: `${TOPIC}/${WsAlbum.Update}`, callback: (message: { body: string }) => newOrUpdateAlbumCB(message.body) },
